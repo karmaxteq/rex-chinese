@@ -10,6 +10,11 @@
 "Developer" = "开发者";
 "Appearance" = "外观";
 "Color scheme" = "配色方案";
+"Interface style" = "界面样式";
+"Tint with the theme" = "使用主题着色";
+"Tab style" = "标签页样式";
+"Use color for tab icons" = "为标签页图标使用颜色";
+"Shell icon theme" = "Shell 图标主题";
 "Light" = "浅色";
 "Dark" = "深色";
 "Auto" = "自动";
@@ -80,3 +85,12 @@
 "Host" = "主机";
 "Policy" = "策略";
 "Theme" = "主题";
+"Default login shell" = "默认登录 Shell";
+"Filter Shortcuts…" = "筛选快捷键…";
+"Filter Shortcuts..." = "筛选快捷键…";
+"Displayed bottom right" = "显示在右下角";
+"Access Rex securely from your other devices." = "从其他设备安全访问 Rex。";
+"Working、标签页、通知、Dock Badge和Sound" = "运行中、标签页、通知、程序坞标记和声音";
+"Blocked、标签页、通知、Dock Badge和Sound" = "已阻塞、标签页、通知、程序坞标记和声音";
+"Error、标签页、通知、Dock Badge和Sound" = "错误、标签页、通知、程序坞标记和声音";
+"Done、标签页、通知、Dock Badge和Sound" = "已完成、标签页、通知、程序坞标记和声音";
