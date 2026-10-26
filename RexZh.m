@@ -33,6 +33,7 @@ static NSString *RXTranslate(NSString *s) {
             @"Notifications": @"通知",
             @"Remote Hosts": @"远程主机",
             @"Developer": @"开发者",
+            @"Expose settings for development and debugging.": @"显示用于开发和调试的设置。",
             @"Appearance": @"外观",
             @"Color scheme": @"配色方案",
             @"Light": @"浅色",
@@ -93,6 +94,7 @@ static NSString *RXTranslate(NSString *s) {
             @"Let Rex and other clients perform actions in this app.": @"允许 Rex 和其他客户端在此应用中执行操作。",
             @"Access Rex securely from your other devices.": @"从其他设备安全访问 Rex。",
             @"Rex Server Running": @"Rex 服务器运行中",
+            @"Rex Server": @"Rex 服务器",
             @"Interface style": @"界面样式",
             @"Glass": @"玻璃",
             @"Classic": @"经典",
@@ -176,6 +178,7 @@ static NSString *RXTranslate(NSString *s) {
             @"Window": @"窗口",
             @"New Window": @"新建窗口",
             @"Close Window": @"关闭窗口",
+            @"Go to Directory…": @"前往目录…",
             @"Toggle Full Screen": @"切换全屏",
             @"Close": @"关闭",
             @"App": @"应用",
@@ -258,6 +261,40 @@ static NSString *RXTranslate(NSString *s) {
             @"Scroll Up": @"向上滚动",
             @"Scroll Down": @"向下滚动",
             @"Command Palette Search": @"命令面板搜索",
+            @"Insert Path…": @"插入路径…",
+            @"Find": @"查找",
+            @"Find…": @"查找…",
+            @"Find Next": @"查找下一个",
+            @"Find Previous": @"查找上一个",
+            @"Filter Page": @"筛选页面",
+            @"AutoFill": @"自动填充",
+            @"Start Dictation…": @"开始听写…",
+            @"Emoji & Symbols": @"表情与符号",
+            @"Refresh Sessions": @"刷新会话",
+            @"Pane": @"窗格",
+            @"Split Left": @"向左分栏",
+            @"Split Up": @"向上分栏",
+            @"Split Best Fit": @"最佳分栏",
+            @"Focus Left": @"聚焦左侧窗格",
+            @"Focus Right": @"聚焦右侧窗格",
+            @"Focus Up": @"聚焦上方窗格",
+            @"Focus Down": @"聚焦下方窗格",
+            @"Focus Previous Pane": @"聚焦上一个窗格",
+            @"Focus Next Pane": @"聚焦下一个窗格",
+            @"Move Pane Left": @"将窗格向左移动",
+            @"Move Pane Right": @"将窗格向右移动",
+            @"Move Pane Up": @"将窗格向上移动",
+            @"Move Pane Down": @"将窗格向下移动",
+            @"Color Scheme": @"配色方案",
+            @"Tab Style": @"标签页样式",
+            @"Pane Style": @"窗格样式",
+            @"Reset Font Size": @"重置字体大小",
+            @"Increase Font Size": @"增大字体",
+            @"Decrease Font Size": @"减小字体",
+            @"Toggle Sidebar": @"切换侧边栏",
+            @"Toggle Activity": @"切换活动",
+            @"Rex Help": @"Rex 帮助",
+            @"Surface & Content": @"表面与内容",
         };
     });
     NSString *exact = map[s];
@@ -271,6 +308,8 @@ static NSString *RXTranslate(NSString *s) {
     if (![s isEqualToString:original]) return s;
     if ([s hasPrefix:@"Check for Updates"]) return @"检查更新…";
     if ([s hasSuffix:@"、Running"]) return [NSString stringWithFormat:@"%@、运行中", [s substringToIndex:s.length - 8]];
+    if ([s hasPrefix:@"Running for "]) return [NSString stringWithFormat:@"已运行%@", [s substringFromIndex:11]];
+    if ([s hasPrefix:@"登录 Tailscale、Access Rex securely from your other devices."]) return @"登录 Tailscale、从其他设备安全访问 Rex。";
     if ([s hasPrefix:@"Settings - "]) {
         return [NSString stringWithFormat:@"设置 - %@", RXTranslate([s substringFromIndex:11])];
     }
@@ -301,7 +340,36 @@ static NSString *RXTranslate(NSString *s) {
     return s;
 }
 
-static IMP origTitle, origButtonTitleGetter, origMenuTitle, origMenuTitleGetter, origMenuAttributedTitle, origMenuAttributedTitleGetter, origMenuAccessibilityValue, origMenuAccessibilityTitle, origMenuAccessibilityDescription, origWindowTitle, origStringValue, origPlaceholder, origPlaceholderGetter, origAccessibilityLabel, origAccessibilityTitle, origAccessibilityHelp, origToolTip, origAccessibilityValue, origSegmentAccessibilityValue, origSegmentAccessibilityDescription, origPopupTitleOfSelectedItem, origPopupCellTitle, origViewAccessibilityLabelGetter, origViewAccessibilityTitleGetter, origViewAccessibilityHelpGetter, origViewAccessibilityValueGetter, origViewAccessibilityValueDescriptionGetter, origViewAccessibilityRoleDescriptionGetter, origButtonAccessibilityLabel, origButtonAccessibilityTitle, origButtonAccessibilityHelp, origBundleLocalized, origSplitChildren, origSplitters, origCellStringValue, origCellSetStringValue, origCellAccessibilityLabel, origCellAccessibilityTitle, origCellAccessibilityHelp, origCellAccessibilityValue, origSwiftLabel, origSwiftHelp, origSwiftAttribute, origSwiftValue, origSwiftValueDescription, origSwiftRoleDescription, origSwiftAttributedLabel;
+static IMP origTitle, origButtonTitleGetter, origMenuTitle, origMenuTitleGetter, origMenuAttributedTitle, origMenuAttributedTitleGetter, origMenuAccessibilityValue, origMenuAccessibilityLabel, origMenuAccessibilityTitle, origMenuAccessibilityDescription, origWindowTitle, origStringValue, origPlaceholder, origPlaceholderGetter, origAccessibilityLabel, origAccessibilityTitle, origAccessibilityHelp, origToolTip, origAccessibilityValue, origSegmentAccessibilityValue, origSegmentAccessibilityDescription, origPopupTitleOfSelectedItem, origPopupCellTitle, origViewAccessibilityLabelGetter, origViewAccessibilityTitleGetter, origViewAccessibilityHelpGetter, origViewAccessibilityValueGetter, origViewAccessibilityValueDescriptionGetter, origViewAccessibilityRoleDescriptionGetter, origButtonAccessibilityLabel, origButtonAccessibilityTitle, origButtonAccessibilityHelp, origBundleLocalized, origSplitChildren, origSplitters, origCellStringValue, origCellSetStringValue, origCellAccessibilityLabel, origCellAccessibilityTitle, origCellAccessibilityHelp, origCellAccessibilityValue, origSwiftLabel, origSwiftHelp, origSwiftAttribute, origSwiftValue, origSwiftValueDescription, origSwiftRoleDescription, origSwiftAttributedLabel;
+static IMP origAXElementAttribute, origAXElementValue, origAXElementPlaceholder, origAXElementLabel, origAXElementTitle, origAXElementHelp, origAXElementRoleDescription;
+static __thread BOOL RXInAXElementHook;
+static NSMutableDictionary *RXPopupOriginals;
+static IMP RXPopupOriginal(id self, SEL sel) {
+    for (Class cls = object_getClass(self); cls; cls = class_getSuperclass(cls)) {
+        NSString *key = [NSString stringWithFormat:@"%p:%s", cls, sel_getName(sel)];
+        NSValue *value = RXPopupOriginals[key];
+        if (value) return value.pointerValue;
+    }
+    return NULL;
+}
+
+static id RXAXElementAttribute(id self, SEL _cmd, NSString *attribute) {
+    id value = origAXElementAttribute ? ((id (*)(id, SEL, NSString *))origAXElementAttribute)(self, _cmd, attribute) : nil;
+    if (RXInAXElementHook) return value;
+    RXInAXElementHook = YES;
+    id translated = [value isKindOfClass:[NSString class]] ? RXTranslate(value) : value;
+    RXInAXElementHook = NO;
+    return translated;
+}
+static id RXAXElementObject(id self, SEL _cmd) {
+    IMP original = (_cmd == @selector(accessibilityValue)) ? origAXElementValue : (_cmd == @selector(accessibilityPlaceholderValue) ? origAXElementPlaceholder : (_cmd == @selector(accessibilityLabel) ? origAXElementLabel : (_cmd == @selector(accessibilityTitle) ? origAXElementTitle : (_cmd == @selector(accessibilityHelp) ? origAXElementHelp : origAXElementRoleDescription))));
+    id value = original ? ((id (*)(id, SEL))original)(self, _cmd) : nil;
+    if (RXInAXElementHook) return value;
+    RXInAXElementHook = YES;
+    id translated = [value isKindOfClass:[NSString class]] ? RXTranslate(value) : value;
+    RXInAXElementHook = NO;
+    return translated;
+}
 static void RXSetTitle(id self, SEL _cmd, NSString *value) {
     ((void (*)(id, SEL, NSString *))origTitle)(self, _cmd, RXTranslate(value));
 }
@@ -339,6 +407,10 @@ static NSString *RXMenuAccessibilityTitle(id self, SEL _cmd) {
     NSString *value = origMenuAccessibilityTitle ? ((NSString *(*)(id, SEL))origMenuAccessibilityTitle)(self, _cmd) : nil;
     return RXTranslate(value);
 }
+static NSString *RXMenuAccessibilityLabel(id self, SEL _cmd) {
+    NSString *value = origMenuAccessibilityLabel ? ((NSString *(*)(id, SEL))origMenuAccessibilityLabel)(self, _cmd) : nil;
+    return RXTranslate(value);
+}
 static NSString *RXMenuAccessibilityDescription(id self, SEL _cmd) {
     NSString *value = origMenuAccessibilityDescription ? ((NSString *(*)(id, SEL))origMenuAccessibilityDescription)(self, _cmd) : nil;
     return RXTranslate(value);
@@ -355,12 +427,21 @@ static void RXCellSetStringValue(id self, SEL _cmd, NSString *value) {
     if (origCellSetStringValue) ((void (*)(id, SEL, NSString *))origCellSetStringValue)(self, _cmd, RXTranslate(value));
 }
 static NSString *RXPopupTitleOfSelectedItem(id self, SEL _cmd) {
-    NSString *value = origPopupTitleOfSelectedItem ? ((NSString *(*)(id, SEL))origPopupTitleOfSelectedItem)(self, _cmd) : nil;
+    IMP original = RXPopupOriginal(self, _cmd);
+    if (!original) original = origPopupTitleOfSelectedItem;
+    NSString *value = original ? ((NSString *(*)(id, SEL))original)(self, _cmd) : nil;
     return RXTranslate(value);
 }
 static NSString *RXPopupCellTitle(id self, SEL _cmd) {
-    NSString *value = origPopupCellTitle ? ((NSString *(*)(id, SEL))origPopupCellTitle)(self, _cmd) : nil;
+    IMP original = RXPopupOriginal(self, _cmd);
+    if (!original) original = origPopupCellTitle;
+    NSString *value = original ? ((NSString *(*)(id, SEL))original)(self, _cmd) : nil;
     return RXTranslate(value);
+}
+static id RXPopupAccessibilityValueAttribute(id self, SEL _cmd) {
+    IMP original = RXPopupOriginal(self, _cmd);
+    id value = original ? ((id (*)(id, SEL))original)(self, _cmd) : nil;
+    return [value isKindOfClass:[NSString class]] ? RXTranslate(value) : value;
 }
 static void RXSetWindowTitle(id self, SEL _cmd, NSString *value) {
     if (origWindowTitle) ((void (*)(id, SEL, NSString *))origWindowTitle)(self, _cmd, RXTranslate(value));
@@ -433,32 +514,100 @@ static id RXCellAttributeValue(id self, SEL _cmd, NSString *attribute) {
     id value = origCellAccessibilityValue ? ((id (*)(id, SEL, NSString *))origCellAccessibilityValue)(self, _cmd, attribute) : nil;
     return [value isKindOfClass:[NSString class]] ? RXTranslate(value) : value;
 }
+static NSMutableDictionary *RXSwiftNodeOriginals;
+static IMP RXSwiftNodeOriginal(id self, SEL sel) {
+    for (Class cls = object_getClass(self); cls; cls = class_getSuperclass(cls)) {
+        NSString *key = [NSString stringWithFormat:@"%p:%s", cls, sel_getName(sel)];
+        NSValue *value = RXSwiftNodeOriginals[key];
+        if (value) return value.pointerValue;
+    }
+    return NULL;
+}
 static NSString *RXSwiftLabel(id self, SEL _cmd) {
-    return RXTranslate(origSwiftLabel ? ((NSString *(*)(id, SEL))origSwiftLabel)(self, _cmd) : nil);
+    IMP original = RXSwiftNodeOriginal(self, _cmd);
+    if (!original) original = origSwiftLabel;
+    return RXTranslate(original ? ((NSString *(*)(id, SEL))original)(self, _cmd) : nil);
 }
 static NSString *RXSwiftHelp(id self, SEL _cmd) {
-    return RXTranslate(origSwiftHelp ? ((NSString *(*)(id, SEL))origSwiftHelp)(self, _cmd) : nil);
+    IMP original = RXSwiftNodeOriginal(self, _cmd);
+    if (!original) original = origSwiftHelp;
+    return RXTranslate(original ? ((NSString *(*)(id, SEL))original)(self, _cmd) : nil);
 }
 static id RXSwiftAttribute(id self, SEL _cmd, NSString *attribute) {
-    id value = origSwiftAttribute ? ((id (*)(id, SEL, NSString *))origSwiftAttribute)(self, _cmd, attribute) : nil;
+    IMP original = RXSwiftNodeOriginal(self, _cmd);
+    if (!original) original = origSwiftAttribute;
+    id value = original ? ((id (*)(id, SEL, NSString *))original)(self, _cmd, attribute) : nil;
     return [value isKindOfClass:[NSString class]] ? RXTranslate(value) : value;
 }
 static id RXSwiftValue(id self, SEL _cmd) {
-    id value = origSwiftValue ? ((id (*)(id, SEL))origSwiftValue)(self, _cmd) : nil;
+    IMP original = RXSwiftNodeOriginal(self, _cmd);
+    if (!original) original = origSwiftValue;
+    id value = original ? ((id (*)(id, SEL))original)(self, _cmd) : nil;
     return [value isKindOfClass:[NSString class]] ? RXTranslate(value) : value;
 }
 static id RXSwiftValueDescription(id self, SEL _cmd) {
-    id value = origSwiftValueDescription ? ((id (*)(id, SEL))origSwiftValueDescription)(self, _cmd) : nil;
+    IMP original = RXSwiftNodeOriginal(self, _cmd);
+    if (!original) original = origSwiftValueDescription;
+    id value = original ? ((id (*)(id, SEL))original)(self, _cmd) : nil;
     return [value isKindOfClass:[NSString class]] ? RXTranslate(value) : value;
 }
 static id RXSwiftRoleDescription(id self, SEL _cmd) {
-    id value = origSwiftRoleDescription ? ((id (*)(id, SEL))origSwiftRoleDescription)(self, _cmd) : nil;
+    IMP original = RXSwiftNodeOriginal(self, _cmd);
+    if (!original) original = origSwiftRoleDescription;
+    id value = original ? ((id (*)(id, SEL))original)(self, _cmd) : nil;
     return [value isKindOfClass:[NSString class]] ? RXTranslate(value) : value;
 }
 static NSAttributedString *RXSwiftAttributedLabel(id self, SEL _cmd) {
-    NSAttributedString *value = origSwiftAttributedLabel ? ((NSAttributedString *(*)(id, SEL))origSwiftAttributedLabel)(self, _cmd) : nil;
+    IMP original = RXSwiftNodeOriginal(self, _cmd);
+    if (!original) original = origSwiftAttributedLabel;
+    NSAttributedString *value = original ? ((NSAttributedString *(*)(id, SEL))original)(self, _cmd) : nil;
     return value ? [[NSAttributedString alloc] initWithString:RXTranslate(value.string)] : nil;
 }
+
+static BOOL RXIsSwiftAccessibilityNode(Class cls, Class nodeClass) {
+    for (Class current = cls; current; current = class_getSuperclass(current)) {
+        if (current == nodeClass) return YES;
+    }
+    return NO;
+}
+
+static void RXInstallSwiftNodeHooks(void) {
+    Class nodeClass = objc_getClass("SwiftUI.AccessibilityNode");
+    if (!nodeClass) return;
+    if (!RXSwiftNodeOriginals) RXSwiftNodeOriginals = [NSMutableDictionary dictionary];
+    SEL selectors[] = {
+        @selector(accessibilityLabel), @selector(accessibilityHelp), @selector(accessibilityAttributeValue:),
+        @selector(accessibilityValue), @selector(accessibilityValueDescription), @selector(accessibilityRoleDescription),
+        @selector(accessibilityAttributedLabel)
+    };
+    IMP replacements[] = {
+        (IMP)RXSwiftLabel, (IMP)RXSwiftHelp, (IMP)RXSwiftAttribute, (IMP)RXSwiftValue,
+        (IMP)RXSwiftValueDescription, (IMP)RXSwiftRoleDescription, (IMP)RXSwiftAttributedLabel
+    };
+    unsigned int count = objc_getClassList(NULL, 0);
+    Class *classes = (Class *)calloc(count, sizeof(Class));
+    objc_getClassList(classes, count);
+    for (unsigned int i = 0; i < count; i++) {
+        Class cls = classes[i];
+        if (!RXIsSwiftAccessibilityNode(cls, nodeClass)) continue;
+        unsigned int methodCount = 0;
+        Method *methods = class_copyMethodList(cls, &methodCount);
+        for (NSUInteger j = 0; j < sizeof(selectors) / sizeof(selectors[0]); j++) {
+            for (unsigned int k = 0; k < methodCount; k++) {
+                if (method_getName(methods[k]) != selectors[j]) continue;
+                NSString *key = [NSString stringWithFormat:@"%p:%s", cls, sel_getName(selectors[j])];
+                if (!RXSwiftNodeOriginals[key]) {
+                    RXSwiftNodeOriginals[key] = [NSValue valueWithPointer:method_getImplementation(methods[k])];
+                    method_setImplementation(methods[k], replacements[j]);
+                }
+                break;
+            }
+        }
+        free(methods);
+    }
+    free(classes);
+}
+
 static NSArray *RXSplitChildren(id self, SEL _cmd) {
     NSArray *children = origSplitChildren ? ((NSArray *(*)(id, SEL))origSplitChildren)(self, _cmd) : @[];
     for (id child in children) {
@@ -501,7 +650,41 @@ static IMP RXHook(Class cls, SEL sel, IMP replacement) {
     method_setImplementation(method, replacement);
     return original;
 }
-
+static NSString *RXPopupTitleOfSelectedItem(id self, SEL _cmd);
+static NSString *RXPopupCellTitle(id self, SEL _cmd);
+static BOOL RXIsSubclassOf(Class cls, Class parent) {
+    for (Class current = cls; current; current = class_getSuperclass(current)) if (current == parent) return YES;
+    return NO;
+}
+static void RXInstallPopupHooks(void) {
+    Class popup = [NSPopUpButton class];
+    Class popupCell = [NSPopUpButtonCell class];
+    if (!RXPopupOriginals) RXPopupOriginals = [NSMutableDictionary dictionary];
+    unsigned int count = objc_getClassList(NULL, 0);
+    Class *classes = (Class *)calloc(count, sizeof(Class));
+    objc_getClassList(classes, count);
+    for (unsigned int i = 0; i < count; i++) {
+        Class cls = classes[i];
+        SEL selectors[] = { @selector(titleOfSelectedItem), @selector(title), @selector(accessibilityValueAttribute) };
+        SEL sel = RXIsSubclassOf(cls, popup) ? selectors[0] : (RXIsSubclassOf(cls, popupCell) ? selectors[1] : NULL);
+        if (RXIsSubclassOf(cls, popupCell)) sel = selectors[2];
+        if (!sel) continue;
+        unsigned int methodCount = 0;
+        Method *methods = class_copyMethodList(cls, &methodCount);
+        for (unsigned int j = 0; j < methodCount; j++) {
+            if (method_getName(methods[j]) != sel) continue;
+            NSString *key = [NSString stringWithFormat:@"%p:%s", cls, sel_getName(sel)];
+            if (!RXPopupOriginals[key]) {
+                RXPopupOriginals[key] = [NSValue valueWithPointer:method_getImplementation(methods[j])];
+                IMP replacement = sel == @selector(titleOfSelectedItem) ? (IMP)RXPopupTitleOfSelectedItem : (sel == @selector(title) ? (IMP)RXPopupCellTitle : (IMP)RXPopupAccessibilityValueAttribute);
+                method_setImplementation(methods[j], replacement);
+            }
+            break;
+        }
+        free(methods);
+    }
+    free(classes);
+}
 static void RXRefreshMenu(NSMenu *menu) {
     if (![menu isKindOfClass:[NSMenu class]]) return;
     for (NSMenuItem *item in menu.itemArray) {
@@ -554,6 +737,8 @@ static void RXWalkAX(id element, NSUInteger depth) {
 }
 
 static void RXRefreshAccessibility(void) {
+    RXInstallSwiftNodeHooks();
+    RXInstallPopupHooks();
     for (NSWindow *window in NSApp.windows) {
         RXWalk(window.contentView);
         RXWalkAX(window, 0);
@@ -563,6 +748,14 @@ static void RXRefreshAccessibility(void) {
 
 __attribute__((constructor)) static void RexChineseInstall(void) {
     @autoreleasepool {
+        Class axElement = objc_getClass("NSAccessibilityElement");
+        origAXElementAttribute = axElement ? RXHook(axElement, @selector(accessibilityAttributeValue:), (IMP)RXAXElementAttribute) : NULL;
+        origAXElementValue = axElement ? RXHook(axElement, @selector(accessibilityValue), (IMP)RXAXElementObject) : NULL;
+        origAXElementPlaceholder = axElement ? RXHook(axElement, @selector(accessibilityPlaceholderValue), (IMP)RXAXElementObject) : NULL;
+        origAXElementLabel = axElement ? RXHook(axElement, @selector(accessibilityLabel), (IMP)RXAXElementObject) : NULL;
+        origAXElementTitle = axElement ? RXHook(axElement, @selector(accessibilityTitle), (IMP)RXAXElementObject) : NULL;
+        origAXElementHelp = axElement ? RXHook(axElement, @selector(accessibilityHelp), (IMP)RXAXElementObject) : NULL;
+        origAXElementRoleDescription = axElement ? RXHook(axElement, @selector(accessibilityRoleDescription), (IMP)RXAXElementObject) : NULL;
         origTitle = RXHook([NSButton class], @selector(setTitle:), (IMP)RXSetTitle);
         origButtonTitleGetter = RXHook([NSButton class], @selector(title), (IMP)RXButtonTitle);
         origMenuTitle = RXHook([NSMenuItem class], @selector(setTitle:), (IMP)RXSetMenuTitle);
@@ -570,6 +763,7 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
         origMenuAttributedTitle = RXHook([NSMenuItem class], @selector(setAttributedTitle:), (IMP)RXSetMenuAttributedTitle);
         origMenuAttributedTitleGetter = RXHook([NSMenuItem class], @selector(attributedTitle), (IMP)RXMenuAttributedTitle);
         origMenuAccessibilityValue = RXHook([NSMenuItem class], @selector(accessibilityAttributeValue:), (IMP)RXMenuAccessibilityAttributeValue);
+        origMenuAccessibilityLabel = RXHook([NSMenuItem class], @selector(accessibilityLabel), (IMP)RXMenuAccessibilityLabel);
         origMenuAccessibilityTitle = RXHook([NSMenuItem class], @selector(accessibilityTitle), (IMP)RXMenuAccessibilityTitle);
         origMenuAccessibilityDescription = RXHook([NSMenuItem class], @selector(accessibilityDescription), (IMP)RXMenuAccessibilityDescription);
         origWindowTitle = RXHook([NSWindow class], @selector(setTitle:), (IMP)RXSetWindowTitle);
@@ -592,8 +786,7 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
         origSegmentAccessibilityDescription = segmentClass ? RXHook(segmentClass, @selector(accessibilityDescription), (IMP)RXSegmentAccessibilityDescription) : NULL;
         origCellStringValue = RXHook([NSCell class], @selector(stringValue), (IMP)RXCellStringValue);
         origCellSetStringValue = RXHook([NSCell class], @selector(setStringValue:), (IMP)RXCellSetStringValue);
-        origPopupTitleOfSelectedItem = RXHook([NSPopUpButton class], @selector(titleOfSelectedItem), (IMP)RXPopupTitleOfSelectedItem);
-        origPopupCellTitle = RXHook([NSPopUpButtonCell class], @selector(title), (IMP)RXPopupCellTitle);
+        RXInstallPopupHooks();
         origBundleLocalized = RXHook([NSBundle class], @selector(localizedStringForKey:value:table:), (IMP)RXBundleLocalized);
         Class splitClass = objc_getClass("SuperSplit.SuperSplitLayoutAccessibilityNSView");
         origSplitChildren = splitClass ? RXHook(splitClass, @selector(accessibilityChildren), (IMP)RXSplitChildren) : NULL;
@@ -605,14 +798,7 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
         origCellAccessibilityTitle = RXHook([NSCell class], @selector(accessibilityTitle), (IMP)RXCellTitle);
         origCellAccessibilityHelp = RXHook([NSCell class], @selector(accessibilityHelp), (IMP)RXCellHelp);
         origCellAccessibilityValue = RXHook([NSCell class], @selector(accessibilityAttributeValue:), (IMP)RXCellAttributeValue);
-        Class swiftNode = objc_getClass("SwiftUI.AccessibilityNode");
-        origSwiftLabel = swiftNode ? RXHook(swiftNode, @selector(accessibilityLabel), (IMP)RXSwiftLabel) : NULL;
-        origSwiftHelp = swiftNode ? RXHook(swiftNode, @selector(accessibilityHelp), (IMP)RXSwiftHelp) : NULL;
-        origSwiftAttribute = swiftNode ? RXHook(swiftNode, @selector(accessibilityAttributeValue:), (IMP)RXSwiftAttribute) : NULL;
-        origSwiftValue = swiftNode ? RXHook(swiftNode, @selector(accessibilityValue), (IMP)RXSwiftValue) : NULL;
-        origSwiftValueDescription = swiftNode ? RXHook(swiftNode, @selector(accessibilityValueDescription), (IMP)RXSwiftValueDescription) : NULL;
-        origSwiftRoleDescription = swiftNode ? RXHook(swiftNode, @selector(accessibilityRoleDescription), (IMP)RXSwiftRoleDescription) : NULL;
-        origSwiftAttributedLabel = swiftNode ? RXHook(swiftNode, @selector(accessibilityAttributedLabel), (IMP)RXSwiftAttributedLabel) : NULL;
+        RXInstallSwiftNodeHooks();
         dispatch_async(dispatch_get_main_queue(), ^{
             [[NSNotificationCenter defaultCenter] addObserverForName:NSMenuDidBeginTrackingNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
                 RXRefreshMenu(note.object);

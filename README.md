@@ -15,12 +15,18 @@ open "$HOME/Applications/Rex Beta 中文版.app"
 
 ## 实测覆盖（Rex Beta 0.1.0）
 
-2026-10-26 在 macOS 上启动补丁副本，并通过 Accessibility 树逐页检查：
+2026-10-26 在 macOS 上启动补丁副本，并通过 Accessibility 树逐页检查。测试入口是
+`~/Applications/Rex Beta 中文版.app`；`/Applications/Rex Beta.app` 保持未修改。
 
 - 主工作区：切换会话、命令面板、活动、新建标签页、分栏布局、移动窗格、向右/向下分栏、缩放窗格、关闭窗格、终端、隐藏侧边栏等已显示为简体中文。
 - 设置侧栏：服务器、界面、主题、终端、快捷键、集成、通知、远程主机、开发者已覆盖。
 - 设置内容：服务器页、界面页、主题页、终端页、快捷键页、集成页、通知页的标题、说明、按钮、帮助文本已覆盖；快捷键页的动态描述也会翻译。
 - 更新提示：`Rex Beta is up to date` 已覆盖。
-- 系统菜单：文件、编辑、显示、窗口、帮助、服务设置、隐藏/退出等已覆盖。
+- 系统菜单的顶层名称已覆盖；菜单项仍有未覆盖项，见下方清单。
 
-仍可见的英文是系统或第三方运行时生成的少数文本：主菜单中的 `Check for Updates...`、服务器页的动态运行时长前缀 `Rex Server Running for`、部分 SwiftUI 选择器的当前值（例如 `Always`、`Default`、`Dock and menu bar`）以及主题名称。这些不是资源键，当前补丁没有修改终端输出、主题品牌名或用户自己的会话/主机名称。
+仍可见的英文来自系统菜单或 SwiftUI 生成的动态值：
+
+- 应用菜单中的 `Check for Updates...`；文件、编辑、显示、窗口、帮助菜单中的部分命令项（例如 `New Window`、`Find`、`Split Left`、`Rex Help`）。
+- 界面页的动态值 `Always`、`Default`、`Surface & Content`、`Dock and menu bar`，以及选项描述 `Above`、`Left Side`、`Right Side`、`Comfortable`、`Compact`。
+- 终端页的动态值 `Regular`、`Block`、`Normal`、`Automatic (by keyboard layout)`、`Extend`、`Theme`、`Ask First`，以及启动命令占位符 `Default login shell`。
+- 主题页内置主题名称（如 `Merino Light`、`Alpine Milk`）和终端输出、用户会话名、主机名。这些属于品牌或用户内容，当前补丁保留原文。
