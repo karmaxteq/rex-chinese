@@ -417,6 +417,14 @@ static NSString *RXTranslate(NSString *s) {
     if ([s containsString:@"— Active"]) s = [s stringByReplacingOccurrencesOfString:@"— Active" withString:@"— 当前"];
     if ([s containsString:@"Import a Ghostty or iTerm theme file"]) s = [s stringByReplacingOccurrencesOfString:@"Import a Ghostty or iTerm theme file" withString:@"导入 Ghostty 或 iTerm 主题文件"];
     if ([s containsString:@"Themes are matched to an appearance based on their background color."]) s = [s stringByReplacingOccurrencesOfString:@"Themes are matched to an appearance based on their background color." withString:@"主题会根据背景颜色匹配到相应外观。"];
+    if ([s containsString:@"Access Rex securely from your other devices."]) s = [s stringByReplacingOccurrencesOfString:@"Access Rex securely from your other devices." withString:@"从其他设备安全访问 Rex。"];
+    if ([s containsString:@"Displayed bottom right"]) s = [s stringByReplacingOccurrencesOfString:@"Displayed bottom right" withString:@"显示在右下角"];
+    if ([s containsString:@"Default login shell"]) s = [s stringByReplacingOccurrencesOfString:@"Default login shell" withString:@"默认登录 Shell"];
+    if ([s containsString:@"Filter Shortcuts…"]) s = [s stringByReplacingOccurrencesOfString:@"Filter Shortcuts…" withString:@"筛选快捷键…"];
+    if ([s containsString:@"Filter Shortcuts..."]) s = [s stringByReplacingOccurrencesOfString:@"Filter Shortcuts..." withString:@"筛选快捷键…"];
+    if ([s containsString:@"swift build && swift test"]) s = [s stringByReplacingOccurrencesOfString:@"swift build && swift test" withString:@"Swift 构建 && Swift 测试"];
+    if ([s containsString:@"warning:"]) s = [s stringByReplacingOccurrencesOfString:@"warning:" withString:@"警告："];
+    if ([s containsString:@"Build complete!"]) s = [s stringByReplacingOccurrencesOfString:@"Build complete!" withString:@"构建完成！"];
     if (![s isEqualToString:original]) return s;
     if ([s hasPrefix:@"Check for Updates"]) return @"检查更新…";
     if ([s hasSuffix:@"、Running"]) return [NSString stringWithFormat:@"%@、运行中", [s substringToIndex:s.length - 8]];
@@ -930,6 +938,88 @@ static IMP RXHook(Class cls, SEL sel, IMP replacement) {
     IMP original = method_getImplementation(method);
     method_setImplementation(method, replacement);
     return original;
+}
+
+static id RXRawAXValue(id element, NSString *attribute);
+static IMP origTextFieldTextViewDraw;
+static IMP origSelectionCellDraw;
+
+static void RXTextFieldTextViewDraw(id self, SEL _cmd, NSRect rect) {
+    if (origTextFieldTextViewDraw) ((void (*)(id, SEL, NSRect))origTextFieldTextViewDraw)(self, _cmd, rect);
+    NSString *raw = nil;
+    if ([self isKindOfClass:[NSTextView class]]) raw = [(NSTextView *)self string];
+    if (!raw.length) {
+        id value = RXRawAXValue(self, NSAccessibilityValueAttribute);
+        if ([value isKindOfClass:[NSString class]]) raw = value;
+    }
+    NSString *translated = RXTranslate(raw);
+    if (!translated.length || [translated isEqualToString:raw]) return;
+    NSView *view = (NSView *)self;
+    [NSColor.controlBackgroundColor setFill];
+    NSRectFill(view.bounds);
+    NSDictionary *attributes = @{
+        NSFontAttributeName: [NSFont systemFontOfSize:16.0],
+        NSForegroundColorAttributeName: NSColor.labelColor
+    };
+    [translated drawAtPoint:NSMakePoint(NSMinX(view.bounds), NSMinY(view.bounds) - 1.0) withAttributes:attributes];
+}
+
+static void RXInstallTextFieldTextViewHook(void) {
+    Class cls = objc_getClass("RexMacOS.RexTextFieldTextView");
+    if (!cls || origTextFieldTextViewDraw) return;
+    SEL selector = @selector(drawRect:);
+    unsigned int methodCount = 0;
+    Method *methods = class_copyMethodList(cls, &methodCount);
+    Method ownMethod = NULL;
+    for (unsigned int i = 0; i < methodCount; i++) {
+        if (method_getName(methods[i]) == selector) {
+            ownMethod = methods[i];
+            break;
+        }
+    }
+    free(methods);
+    if (!ownMethod) return;
+    origTextFieldTextViewDraw = method_getImplementation(ownMethod);
+    method_setImplementation(ownMethod, (IMP)RXTextFieldTextViewDraw);
+}
+
+static void RXSelectionCellDraw(id self, SEL _cmd, NSRect cellFrame, NSView *controlView) {
+    if (origSelectionCellDraw) ((void (*)(id, SEL, NSRect, NSView *))origSelectionCellDraw)(self, _cmd, cellFrame, controlView);
+    NSString *raw = origCellStringValue ? ((NSString *(*)(id, SEL))origCellStringValue)(self, @selector(stringValue)) : [(NSCell *)self stringValue];
+    NSString *translated = RXTranslate(raw);
+    if (!translated.length || [translated isEqualToString:raw]) return;
+    [NSColor.controlBackgroundColor setFill];
+    NSRectFill(cellFrame);
+    NSDictionary *attributes = @{
+        NSFontAttributeName: [NSFont systemFontOfSize:16.0],
+        NSForegroundColorAttributeName: NSColor.labelColor
+    };
+    [translated drawInRect:NSInsetRect(cellFrame, 4.0, 0.0) withAttributes:attributes];
+}
+
+static void RXInstallSelectionCellHook(void) {
+    Class cls = objc_getClass("_TtCC7SwiftUI18SelectionTextField4Cell");
+    if (!cls || origSelectionCellDraw) return;
+    SEL selector = @selector(drawInteriorWithFrame:inView:);
+    Method inherited = class_getInstanceMethod(cls, selector);
+    if (!inherited) return;
+    unsigned int methodCount = 0;
+    Method *methods = class_copyMethodList(cls, &methodCount);
+    Method ownMethod = NULL;
+    for (unsigned int i = 0; i < methodCount; i++) {
+        if (method_getName(methods[i]) == selector) {
+            ownMethod = methods[i];
+            break;
+        }
+    }
+    free(methods);
+    if (!ownMethod) {
+        class_addMethod(cls, selector, method_getImplementation(inherited), method_getTypeEncoding(inherited));
+        ownMethod = class_getInstanceMethod(cls, selector);
+    }
+    if (!ownMethod) return;
+    origSelectionCellDraw = method_getImplementation(ownMethod);
+    method_setImplementation(ownMethod, (IMP)RXSelectionCellDraw);
 }
 
 static void RXAttributedDrawWithRect(id self, SEL _cmd, NSRect rect, NSStringDrawingOptions options, NSStringDrawingContext *context) {
@@ -1457,6 +1547,16 @@ static void RXDumpLayers(void) {
 
 static void RXWalkAX(id element, NSUInteger depth);
 
+static id RXRawAXValue(id element, NSString *attribute) {
+    if ([element isKindOfClass:[NSView class]] && origAccessibilityValue) {
+        return ((id (*)(id, SEL, NSString *))origAccessibilityValue)(element, @selector(accessibilityAttributeValue:), attribute);
+    }
+    if (origAXElementAttribute && [element respondsToSelector:@selector(accessibilityAttributeValue:)]) {
+        return ((id (*)(id, SEL, NSString *))origAXElementAttribute)(element, @selector(accessibilityAttributeValue:), attribute);
+    }
+    return nil;
+}
+
 static void RXWalk(NSView *view) {
     if (![view isKindOfClass:[NSView class]]) return;
     if ([view isKindOfClass:[NSTextField class]]) {
@@ -1581,6 +1681,7 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
         origSegmentAccessibilityDescription = segmentClass ? RXHook(segmentClass, @selector(accessibilityDescription), (IMP)RXSegmentAccessibilityDescription) : NULL;
         origCellStringValue = RXHook([NSCell class], @selector(stringValue), (IMP)RXCellStringValue);
         origCellSetStringValue = RXHook([NSCell class], @selector(setStringValue:), (IMP)RXCellSetStringValue);
+        RXInstallDrawingHooks();
         RXInstallPopupHooks();
         origBundleLocalized = RXHook([NSBundle class], @selector(localizedStringForKey:value:table:), (IMP)RXBundleLocalized);
         Class splitClass = objc_getClass("SuperSplit.SuperSplitLayoutAccessibilityNSView");
@@ -1599,7 +1700,11 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
                 RXRefreshMenu(note.object);
                 RXRefreshMenu(NSApp.mainMenu);
             }];
-            [NSTimer scheduledTimerWithTimeInterval:0.2 repeats:YES block:^(NSTimer *timer) { RXInstallCommandPaletteHooks(); }];
+            [NSTimer scheduledTimerWithTimeInterval:0.2 repeats:YES block:^(NSTimer *timer) {
+                RXInstallCommandPaletteHooks();
+                RXInstallTextFieldTextViewHook();
+                RXInstallSelectionCellHook();
+            }];
             NSTimer *timer = [NSTimer timerWithTimeInterval:2.0 repeats:YES block:^(NSTimer *timer) { RXRefreshAccessibility(); }];
             [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
         });

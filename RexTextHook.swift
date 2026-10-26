@@ -453,6 +453,30 @@ private func translate(_ value: String) -> String {
   }
   if value.hasPrefix("Click to record a different shortcut.") { return "点击以录制其他快捷键。" }
   if value.hasPrefix("Click to record a shortcut.") { return "点击以录制快捷键。" }
+  if value.contains("Access Rex securely from your other devices.") {
+    return value.replacingOccurrences(of: "Access Rex securely from your other devices.", with: "从其他设备安全访问 Rex。")
+  }
+  if value.contains("Displayed bottom right") {
+    return value.replacingOccurrences(of: "Displayed bottom right", with: "显示在右下角")
+  }
+  if value.contains("Default login shell") {
+    return value.replacingOccurrences(of: "Default login shell", with: "默认登录 Shell")
+  }
+  if value.contains("Filter Shortcuts…") {
+    return value.replacingOccurrences(of: "Filter Shortcuts…", with: "筛选快捷键…")
+  }
+  if value.contains("Filter Shortcuts...") {
+    return value.replacingOccurrences(of: "Filter Shortcuts...", with: "筛选快捷键…")
+  }
+  if value.contains("swift build && swift test") {
+    return value.replacingOccurrences(of: "swift build && swift test", with: "Swift 构建 && Swift 测试")
+  }
+  if value.contains("warning:") {
+    return value.replacingOccurrences(of: "warning:", with: "警告：")
+  }
+  if value.contains("Build complete!") {
+    return value.replacingOccurrences(of: "Build complete!", with: "构建完成！")
+  }
   if value.contains("Dock Badge") || value.contains("Sound") {
     return value.replacingOccurrences(of: "Dock Badge", with: "程序坞标记")
       .replacingOccurrences(of: "Sound", with: "声音")
