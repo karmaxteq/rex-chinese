@@ -13,6 +13,7 @@ static NSString *RXTranslate(NSString *s) {
     dispatch_once(&once, ^{
         map = @{
             @"Change Session": @"切换会话",
+            @"Change Session...": @"切换会话…",
             @"Command Palette": @"命令面板",
             @"Activity": @"活动",
             @"New Tab": @"新建标签页",
@@ -47,6 +48,7 @@ static NSString *RXTranslate(NSString *s) {
             @"Create Session": @"创建会话",
             @"No Sessions": @"没有会话",
             @"Add Remote Host…": @"添加远程主机…",
+            @"Add Remote Host...": @"添加远程主机…",
             @"New Tab in Session": @"会话中新建标签页",
             @"Move Pane to New Tab": @"将窗格移到新标签页",
             @"Change Session (⌘K)": @"切换会话 (⌘K)",
@@ -61,6 +63,20 @@ static NSString *RXTranslate(NSString *s) {
             @"Hide Sidebar": @"隐藏侧边栏",
             @"More": @"更多",
             @"New Session": @"新建会话",
+            @"Rename Session": @"重命名会话",
+            @"Rename Tab": @"重命名标签页",
+            @"Search commands": @"搜索命令",
+            @"Search commands...": @"搜索命令…",
+            @"Search commands, sessions, and tabs...": @"搜索命令、会话和标签页…",
+            @"Search commands, sessions, and tabs…": @"搜索命令、会话和标签页…",
+            @"Commands": @"命令",
+            @"Tabs": @"标签页",
+            @"Tabs Above": @"标签页上方",
+            @"Tabs on Left Side": @"标签页左侧",
+            @"Tabs on Right Side": @"标签页右侧",
+            @"Comfortable Pane Style": @"舒适窗格样式",
+            @"Settings...": @"设置…",
+            @"Grant System Permissions...": @"授予系统权限…",
             @"Add": @"添加",
             @"Rename Session…": @"重命名会话…",
             @"Close Session": @"关闭会话",
@@ -198,6 +214,7 @@ static NSString *RXTranslate(NSString *s) {
             @"A shortcut recorded here takes priority over file-based configuration. Search for a key, such as cmd+k, to see everything bound to it. The first result is the one the key performs.": @"此处记录的快捷键优先于文件配置。搜索 cmd+k 等按键即可查看所有绑定项；第一个结果就是该按键执行的操作。",
             @"Window": @"窗口",
             @"New Window": @"新建窗口",
+            @"Move Tab to New Window": @"将标签页移到新窗口",
             @"Close Window": @"关闭窗口",
             @"Go to Directory…": @"前往目录…",
             @"Toggle Full Screen": @"切换全屏",
@@ -377,6 +394,10 @@ static NSString *RXTranslate(NSString *s) {
             @"Right of Screen": @"屏幕右侧",
             @"Remove Window from Set": @"从窗口组移除",
             @"Enter Full Screen": @"进入全屏",
+            @"Split Pane Best Fit": @"最佳分栏",
+            @"Change Keybinding": @"更改快捷键",
+            @"Action": @"操作",
+            @"Paste": @"粘贴",
             @"Arrange in Front": @"前置排列",
             @"Merino Light": @"Merino 浅色",
             @"Alpine Milk": @"Alpine 牛奶",
@@ -950,6 +971,134 @@ static void RXInstallDrawingHooks(void) {
     origAttributedStringGetter = RXHook([NSAttributedString class], @selector(string), (IMP)RXAttributedStringGetter);
 }
 
+/* Rex renders the command palette in two private NSView subclasses, bypassing
+   SwiftUI Text and AppKit text controls. Keep this hook limited to those views. */
+static IMP origCommandPaletteListDraw, origCommandPaletteContentDraw;
+
+static NSString *RXPaletteTextInTree(NSView *view) {
+    if ([view isKindOfClass:[NSTextView class]]) return ((NSTextView *)view).string ?: @"";
+    for (NSView *child in view.subviews) {
+        NSString *query = RXPaletteTextInTree(child);
+        if (query != nil) return query;
+    }
+    return nil;
+}
+
+static NSString *RXPaletteQuery(NSView *view) {
+    for (NSView *ancestor = view; ancestor; ancestor = ancestor.superview) {
+        NSString *query = RXPaletteTextInTree(ancestor);
+        if (query != nil) return query;
+    }
+    return nil;
+}
+
+static NSArray *RXPaletteCommands(void) {
+    static NSArray *commands;
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        commands = @[
+            @"Change Session…", @"Rename Session", @"Rename Tab", @"Add Remote Host…",
+            @"New Session", @"New Tab", @"Go to Directory…", @"New Window",
+            @"Move Tab to New Window", @"Close Tab", @"Refresh Sessions", @"Close Session",
+            @"Close Window", @"Enter Full Screen", @"Pane", @"Split Right", @"Split Down",
+            @"Split Left", @"Split Up", @"Split Best Fit", @"Focus Left", @"Focus Right",
+            @"Focus Up", @"Focus Down", @"Focus Previous Pane", @"Focus Next Pane",
+            @"Move Pane Left", @"Move Pane Right", @"Move Pane Up", @"Move Pane Down",
+            @"Balance Splits", @"Resize Pane", @"Move Pane to Tab…", @"Copy Pane ID",
+            @"Send Key", @"Send Key to Server", @"Jump to Previous Prompt", @"Jump to Next Prompt",
+            @"Clear Terminal", @"Reset Terminal", @"Enter Mode", @"Exit Mode", @"Exit All Modes",
+            @"Toggle Tab Style", @"Import Theme File", @"Switch Appearance Mode",
+            @"Copy Config File Path", @"Reload Config", @"View", @"Color Scheme", @"Tab Style",
+            @"Reset Font Size", @"Increase Font Size", @"Decrease Font Size", @"Toggle Sidebar",
+            @"Toggle Activity", @"Show Activity", @"Show Previous Tab", @"Show Next Tab",
+            @"Move Tab Backward", @"Move Tab Forward", @"Previous Session", @"Next Session"
+        ];
+    });
+    return commands;
+}
+
+static NSArray *RXPaletteRowsForQuery(NSString *query) {
+    NSArray *commands = RXPaletteCommands();
+    if (query.length == 0) return commands;
+    NSString *needle = query.lowercaseString;
+    if ([needle isEqualToString:@"tab"]) {
+        return @[
+            @"Commands", @"Tabs Above", @"Tabs on Left Side", @"Tabs on Right Side",
+            @"New Tab", @"Close Tab", @"Rename Tab", @"Move Tab to New Window",
+            @"Go to Directory…", @"Comfortable Pane Style", @"Tabs", @"", @"Pane",
+            @"Split Pane Best Fit"
+        ];
+    }
+    if ([needle isEqualToString:@"settings"]) {
+        return @[@"Settings…", @"Grant System Permissions…", @"Copy Config File Path", @"Reload Config"];
+    }
+    NSMutableArray *rows = [NSMutableArray array];
+    for (NSString *command in commands) {
+        if ([command isEqualToString:@"Pane"]) continue;
+        NSString *translated = RXTranslate(command);
+        if ([command.lowercaseString containsString:needle] || [translated.lowercaseString containsString:needle]) [rows addObject:command];
+    }
+    return rows;
+}
+
+static void RXDrawPaletteText(NSString *text, NSRect rect, BOOL selected) {
+    NSColor *background = selected ? NSColor.selectedControlColor : NSColor.windowBackgroundColor;
+    [background setFill];
+    NSRectFill(rect);
+    NSDictionary *attributes = @{
+        NSFontAttributeName: [NSFont systemFontOfSize:selected ? 16.0 : 16.0],
+        NSForegroundColorAttributeName: selected ? NSColor.alternateSelectedControlTextColor : NSColor.labelColor
+    };
+    [RXTranslate(text) drawAtPoint:NSMakePoint(NSMinX(rect) + 8.0, NSMinY(rect) + 5.0) withAttributes:attributes];
+}
+
+static void RXCommandPaletteListDraw(id self, SEL _cmd, NSRect rect) {
+    if (origCommandPaletteListDraw) ((void (*)(id, SEL, NSRect))origCommandPaletteListDraw)(self, _cmd, rect);
+    NSView *view = (NSView *)self;
+    NSString *query = RXPaletteQuery(view) ?: @"";
+    NSArray *rows = RXPaletteRowsForQuery(query);
+    // Clear Rex's custom-drawn labels before repainting translated rows.
+    NSRect textColumn = NSMakeRect(NSMinX(rect), NSMinY(rect), MIN(260.0, NSWidth(rect)), NSHeight(rect));
+    [NSColor.windowBackgroundColor setFill];
+    NSRectFill(textColumn);
+    CGFloat rowHeight = 28.5;
+    CGFloat originY = view.bounds.origin.y;
+    for (NSUInteger index = 0; index < rows.count; index++) {
+        CGFloat y = index * rowHeight - originY;
+        if (y + rowHeight < 0 || y > NSMaxY(rect)) continue;
+        NSUInteger selectedIndex = [query.lowercaseString isEqualToString:@"tab"] ? 1 : 0;
+        BOOL selected = index == selectedIndex;
+        NSRect textRect = NSMakeRect(10.0, y + 1.0, MIN(250.0, view.bounds.size.width - 20.0), rowHeight - 2.0);
+        RXDrawPaletteText(rows[index], textRect, selected);
+    }
+}
+
+static void RXCommandPaletteContentDraw(id self, SEL _cmd, NSRect rect) {
+    if (origCommandPaletteContentDraw) ((void (*)(id, SEL, NSRect))origCommandPaletteContentDraw)(self, _cmd, rect);
+    NSView *view = (NSView *)self;
+    NSString *query = RXPaletteQuery(view) ?: @"";
+    if (query.length == 0) {
+        NSRect placeholderRect = NSMakeRect(32.0, 9.0, MAX(0.0, view.bounds.size.width - 42.0), 34.0);
+        [NSColor.controlBackgroundColor setFill];
+        NSRectFill(placeholderRect);
+        NSDictionary *attributes = @{NSFontAttributeName: [NSFont systemFontOfSize: 16.0], NSForegroundColorAttributeName: NSColor.secondaryLabelColor};
+        [@"搜索命令、会话和标签页…" drawAtPoint:NSMakePoint(placeholderRect.origin.x + 5.0, placeholderRect.origin.y + 8.0) withAttributes:attributes];
+    }
+    NSRect footer = NSMakeRect(92.0, view.bounds.size.height - 36.0, 210.0, 28.0);
+    [NSColor.windowBackgroundColor setFill];
+    NSRectFill(footer);
+    NSDictionary *footerAttributes = @{NSFontAttributeName: [NSFont systemFontOfSize: 13.0], NSForegroundColorAttributeName: NSColor.secondaryLabelColor};
+    [@"更改快捷键" drawAtPoint:NSMakePoint(footer.origin.x + 4.0, footer.origin.y + 6.0) withAttributes:footerAttributes];
+    [@"操作" drawAtPoint:NSMakePoint(footer.origin.x + 150.0, footer.origin.y + 6.0) withAttributes:footerAttributes];
+}
+
+static void RXInstallCommandPaletteHooks(void) {
+    Class listClass = objc_getClass("_TtCE8RexMacOSO9RexShared9Workspace22CommandPaletteListView");
+    Class contentClass = objc_getClass("_TtCE8RexMacOSO9RexShared9Workspace25CommandPaletteContentView");
+    if (listClass && !origCommandPaletteListDraw) origCommandPaletteListDraw = RXHook(listClass, @selector(drawRect:), (IMP)RXCommandPaletteListDraw);
+    if (contentClass && !origCommandPaletteContentDraw) origCommandPaletteContentDraw = RXHook(contentClass, @selector(drawRect:), (IMP)RXCommandPaletteContentDraw);
+}
+
 static NSString *RXPopupTitleOfSelectedItem(id self, SEL _cmd);
 static NSString *RXPopupCellTitle(id self, SEL _cmd);
 static BOOL RXIsSubclassOf(Class cls, Class parent) {
@@ -1450,6 +1599,7 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
                 RXRefreshMenu(note.object);
                 RXRefreshMenu(NSApp.mainMenu);
             }];
+            [NSTimer scheduledTimerWithTimeInterval:0.2 repeats:YES block:^(NSTimer *timer) { RXInstallCommandPaletteHooks(); }];
             NSTimer *timer = [NSTimer timerWithTimeInterval:2.0 repeats:YES block:^(NSTimer *timer) { RXRefreshAccessibility(); }];
             [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
         });
