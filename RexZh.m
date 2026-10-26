@@ -181,10 +181,20 @@ static NSString *RXTranslate(NSString *s) {
             @"Prefer generated titles": @"优先使用生成的标题",
             @"Show the running program and its directory instead of titles that shells set. Titles that programs set for themselves, and names you give tabs, still appear.": @"显示正在运行的程序及其目录，而不是 Shell 设置的标题。程序自行设置的标题以及你为标签页指定的名称仍会显示。",
             @"Shell": @"Shell",
+            @"Dynamic": @"动态",
+            @"Choose…": @"选择…",
+            @"Choose...": @"选择…",
             @"Startup command": @"启动命令",
             @"Executable and arguments. Use quotes to group arguments. Applies to new terminals on this Mac. Remote hosts use their own default shell. New tabs and splits use the source terminal’s working directory when available. Otherwise, they use the server’s default directory.": @"可执行文件和参数。使用引号将参数分组。适用于此 Mac 上的新终端。远程主机使用自己的默认 Shell。新标签页和分栏可用时使用源终端的工作目录，否则使用服务器的默认目录。",
             @"Filter Shortcuts": @"筛选快捷键",
             @"Filter Shortcuts…": @"筛选快捷键…",
+            @"Displayed bottom right": @"显示在右下角",
+            @"Opens Running settings": @"打开“运行中”设置",
+            @"Opens Blocked settings": @"打开“已阻塞”设置",
+            @"Opens Error settings": @"打开“错误”设置",
+            @"Opens Done settings": @"打开“已完成”设置",
+            @"Dock Badge and Sound": @"程序坞标记和声音",
+            @"Dock Badge和Sound": @"程序坞标记和声音",
             @"A shortcut recorded here takes priority over file-based configuration. Search for a key, such as cmd+k, to see everything bound to it. The first result is the one the key performs.": @"此处记录的快捷键优先于文件配置。搜索 cmd+k 等按键即可查看所有绑定项；第一个结果就是该按键执行的操作。",
             @"Window": @"窗口",
             @"New Window": @"新建窗口",
@@ -218,7 +228,6 @@ static NSString *RXTranslate(NSString *s) {
             @"Teach Claude Code, Codex, OpenCode and Pi how to use Rex.": @"教会 Claude Code、Codex、OpenCode 和 Pi 使用 Rex。",
             @"In-App Notifications": @"应用内通知",
             @"Notification position": @"通知位置",
-            @"Displayed bottom right": @"显示在右下角",
             @"Top left": @"左上",
             @"Top center": @"顶部居中",
             @"Top right": @"右上",
@@ -245,9 +254,6 @@ static NSString *RXTranslate(NSString *s) {
             @"Error、标签页、通知、Dock Badge和Sound": @"错误、标签页、通知、程序坞标记和声音",
             @"Done、标签页、通知、Dock Badge和Sound": @"已完成、标签页、通知、程序坞标记和声音",
             @"Opens Working settings": @"打开“运行中”设置",
-            @"Opens Blocked settings": @"打开“已阻塞”设置",
-            @"Opens Error settings": @"打开“错误”设置",
-            @"Opens Done settings": @"打开“已完成”设置",
             @"on": @"开",
             @"off": @"关",
             @"Light Mode": @"浅色模式",
@@ -296,6 +302,29 @@ static NSString *RXTranslate(NSString *s) {
             @"Move Pane Right": @"将窗格向右移动",
             @"Move Pane Up": @"将窗格向上移动",
             @"Move Pane Down": @"将窗格向下移动",
+            @"Focus Pane Left": @"聚焦左侧窗格",
+            @"Focus Pane Right": @"聚焦右侧窗格",
+            @"Focus Pane Up": @"聚焦上方窗格",
+            @"Focus Pane Down": @"聚焦下方窗格",
+            @"Balance Splits": @"平衡分栏",
+            @"Resize Pane": @"调整窗格大小",
+            @"Move Pane to Tab…": @"将窗格移到标签页…",
+            @"Copy Pane ID": @"复制窗格 ID",
+            @"Send Key": @"发送按键",
+            @"Send Key to Server": @"向服务器发送按键",
+            @"Jump to Previous Prompt": @"跳到上一个提示符",
+            @"Jump to Next Prompt": @"跳到下一个提示符",
+            @"Clear Terminal": @"清空终端",
+            @"Reset Terminal": @"重置终端",
+            @"Enter Mode": @"进入模式",
+            @"Exit Mode": @"退出模式",
+            @"Exit All Modes": @"退出所有模式",
+            @"Toggle Tab Style": @"切换标签页样式",
+            @"Import Theme File": @"导入主题文件",
+            @"Switch Appearance Mode": @"切换外观模式",
+            @"Copy Config File Path": @"复制配置文件路径",
+            @"Reload Config": @"重新加载配置",
+            @"View": @"显示",
             @"Color Scheme": @"配色方案",
             @"Tab Style": @"标签页样式",
             @"Pane Style": @"窗格样式",
@@ -394,6 +423,34 @@ static NSString *RXTranslate(NSString *s) {
     }
     if ([s hasPrefix:@"Click to record a shortcut."]) {
         return @"点击以录制快捷键。";
+    }
+    if ([s containsString:@"Dock Badge"] || [s containsString:@"Sound"]) {
+        s = [s stringByReplacingOccurrencesOfString:@"Dock Badge" withString:@"程序坞标记"];
+        s = [s stringByReplacingOccurrencesOfString:@"Sound" withString:@"声音"];
+        return s;
+    }
+    if ([s isEqualToString:@"Command Delete"]) return @"⌘ Delete";
+    if ([s isEqualToString:@"Command Left Arrow"]) return @"⌘ ←";
+    if ([s isEqualToString:@"Command Right Arrow"]) return @"⌘ →";
+    if ([s isEqualToString:@"Option Left Arrow"]) return @"⌥ ←";
+    if ([s isEqualToString:@"Option Right Arrow"]) return @"⌥ →";
+    if ([s containsString:@"Option Command "]) {
+        s = [s stringByReplacingOccurrencesOfString:@"Option" withString:@"⌥"];
+        s = [s stringByReplacingOccurrencesOfString:@"Command" withString:@"⌘"];
+        s = [s stringByReplacingOccurrencesOfString:@"Left Arrow" withString:@"←"];
+        s = [s stringByReplacingOccurrencesOfString:@"Right Arrow" withString:@"→"];
+        s = [s stringByReplacingOccurrencesOfString:@"Up Arrow" withString:@"↑"];
+        s = [s stringByReplacingOccurrencesOfString:@"Down Arrow" withString:@"↓"];
+        return s;
+    }
+    if ([s containsString:@"Command "] && ([s containsString:@"Arrow"] || [s containsString:@"Return"])) {
+        s = [s stringByReplacingOccurrencesOfString:@"Command" withString:@"⌘"];
+        s = [s stringByReplacingOccurrencesOfString:@"Left Arrow" withString:@"←"];
+        s = [s stringByReplacingOccurrencesOfString:@"Right Arrow" withString:@"→"];
+        s = [s stringByReplacingOccurrencesOfString:@"Up Arrow" withString:@"↑"];
+        s = [s stringByReplacingOccurrencesOfString:@"Down Arrow" withString:@"↓"];
+        s = [s stringByReplacingOccurrencesOfString:@"Return" withString:@"↩"];
+        return s;
     }
     if ([s hasPrefix:@"Move "] && [s hasSuffix:@" pane"]) {
         NSString *middle = [s substringWithRange:NSMakeRange(5, s.length - 10)];

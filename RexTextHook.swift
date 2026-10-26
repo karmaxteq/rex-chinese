@@ -60,6 +60,9 @@ private let translations: [String: String] = [
   "Links": "链接",
   "Titles": "标题",
   "Shell": "Shell",
+  "Dynamic": "动态",
+  "Choose…": "选择…",
+  "Choose...": "选择…",
   "Coding Agents": "编码智能体",
   "Integrate with available agents": "与可用智能体集成",
   "Installs a Rex skill and session hooks for supported agents": "为受支持的智能体安装 Rex 技能和会话钩子",
@@ -133,6 +136,9 @@ private let translations: [String: String] = [
   "Option key": "Option 键",
   "Automatic sends Alt on U.S. layouts and types special keys elsewhere. Applies to all terminals on this Mac, including remote hosts.": "在美国键盘布局上自动发送 Alt，在其他布局上输入特殊按键。适用于此 Mac 上的所有终端，包括远程主机。",
   "Filter Shortcuts": "筛选快捷键",
+  "Opens Running settings": "打开“运行中”设置",
+  "Dock Badge and Sound": "程序坞标记和声音",
+  "Dock Badge和Sound": "程序坞标记和声音",
   "Open Onboarding Session…": "打开入门会话…",
   "Open Onboarding Session...": "打开入门会话…",
   "Working": "运行中",
@@ -362,6 +368,29 @@ private let translations: [String: String] = [
   "Move Pane Right": "将窗格向右移动",
   "Move Pane Up": "将窗格向上移动",
   "Move Pane Down": "将窗格向下移动",
+  "Focus Pane Left": "聚焦左侧窗格",
+  "Focus Pane Right": "聚焦右侧窗格",
+  "Focus Pane Up": "聚焦上方窗格",
+  "Focus Pane Down": "聚焦下方窗格",
+  "Balance Splits": "平衡分栏",
+  "Resize Pane": "调整窗格大小",
+  "Move Pane to Tab…": "将窗格移到标签页…",
+  "Copy Pane ID": "复制窗格 ID",
+  "Send Key": "发送按键",
+  "Send Key to Server": "向服务器发送按键",
+  "Jump to Previous Prompt": "跳到上一个提示符",
+  "Jump to Next Prompt": "跳到下一个提示符",
+  "Clear Terminal": "清空终端",
+  "Reset Terminal": "重置终端",
+  "Enter Mode": "进入模式",
+  "Exit Mode": "退出模式",
+  "Exit All Modes": "退出所有模式",
+  "Toggle Tab Style": "切换标签页样式",
+  "Import Theme File": "导入主题文件",
+  "Switch Appearance Mode": "切换外观模式",
+  "Copy Config File Path": "复制配置文件路径",
+  "Reload Config": "重新加载配置",
+  "View": "显示",
   "Color Scheme": "配色方案",
   "Tab Style": "标签页样式",
   "Reset Font Size": "重置字体大小",
@@ -424,6 +453,34 @@ private func translate(_ value: String) -> String {
   }
   if value.hasPrefix("Click to record a different shortcut.") { return "点击以录制其他快捷键。" }
   if value.hasPrefix("Click to record a shortcut.") { return "点击以录制快捷键。" }
+  if value.contains("Dock Badge") || value.contains("Sound") {
+    return value.replacingOccurrences(of: "Dock Badge", with: "程序坞标记")
+      .replacingOccurrences(of: "Sound", with: "声音")
+  }
+  if value == "Default login shell" { return "默认登录 Shell" }
+  if value == "Filter Shortcuts…" || value == "Filter Shortcuts..." { return "筛选快捷键…" }
+  if value == "Displayed bottom right" { return "显示在右下角" }
+  if value == "Command Delete" { return "⌘ Delete" }
+  if value == "Command Left Arrow" { return "⌘ ←" }
+  if value == "Command Right Arrow" { return "⌘ →" }
+  if value == "Option Left Arrow" { return "⌥ ←" }
+  if value == "Option Right Arrow" { return "⌥ →" }
+  if value.contains(" Option Command ") || value.hasPrefix("Option Command ") {
+    return value.replacingOccurrences(of: "Option", with: "⌥")
+      .replacingOccurrences(of: "Command", with: "⌘")
+      .replacingOccurrences(of: "Left Arrow", with: "←")
+      .replacingOccurrences(of: "Right Arrow", with: "→")
+      .replacingOccurrences(of: "Up Arrow", with: "↑")
+      .replacingOccurrences(of: "Down Arrow", with: "↓")
+  }
+  if value.contains("Command ") && (value.contains("Arrow") || value.contains("Return")) {
+    return value.replacingOccurrences(of: "Command", with: "⌘")
+      .replacingOccurrences(of: "Left Arrow", with: "←")
+      .replacingOccurrences(of: "Right Arrow", with: "→")
+      .replacingOccurrences(of: "Up Arrow", with: "↑")
+      .replacingOccurrences(of: "Down Arrow", with: "↓")
+      .replacingOccurrences(of: "Return", with: "↩")
+  }
   if value.hasPrefix("Running for ") { return "已运行" + value.dropFirst("Running for ".count) }
   return value
 }
