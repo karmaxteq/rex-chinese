@@ -408,15 +408,84 @@ static NSString *RXTranslate(NSString *s) {
             @"Merino Light": @"Merino 浅色",
             @"Alpine Milk": @"Alpine 牛奶",
             @"Buttercream Diner": @"奶油餐厅",
+            @"Coastal Linen": @"海岸亚麻",
+            @"Glacier Mint": @"冰川薄荷",
+            @"Ivory Gallery": @"象牙画廊",
+            @"Lavender Postcard": @"薰衣草明信片",
+            @"Newsprint Fog": @"报纸薄雾",
+            @"Orchard Breeze": @"果园微风",
+            @"Peach Veranda": @"桃色阳台",
+            @"Porcelain Morning": @"瓷器晨曦",
+            @"Silver Point Light": @"银点浅色",
+            @"Sunlit Parchment": @"阳光羊皮纸",
+            @"Terracotta Noon": @"陶土正午",
             @"Merino Dark": @"Merino 深色",
             @"Abyssal Trench": @"深渊海沟",
             @"Basalt Shore": @"玄武岩海岸",
+            @"Cathode Amber": @"阴极琥珀",
+            @"Charcoal Atelier": @"炭黑工坊",
+            @"Cinder Peak": @"煤渣峰",
+            @"Cobalt Foundry": @"钴蓝铸造厂",
+            @"Ember Hollow": @"余烬谷",
+            @"Heliotrope Haze": @"天芥菜薄雾",
+            @"Ink Meridian": @"墨色子午线",
+            @"Juniper Smoke": @"杜松烟",
+            @"Midnight Tundra": @"午夜苔原",
+            @"Misty Forest": @"迷雾森林",
+            @"Moss Cathedral": @"苔藓大教堂",
             @"Neon Arcade": @"霓虹街机",
+            @"Nocturne Rose": @"夜曲玫瑰",
+            @"Oxblood Library": @"牛血红图书馆",
+            @"Petrol Lagoon": @"石油蓝泻湖",
+            @"Phosphor Archive": @"磷光档案",
+            @"Polar Aurora": @"极地极光",
+            @"Roasted Umber": @"烘烤赭石",
+            @"Saffron Nightfall": @"藏红花夜幕",
+            @"Silver Point Dark": @"银点深色",
+            @"Sonoran Dusk": @"索诺兰暮色",
             @"Static Noir": @"静态黑色",
+            @"Velvet Dusk": @"天鹅绒暮色",
+            @"Whitby Bay": @"惠特比湾",
+            // Recent settings and remote-host labels are kept in the runtime map
+            // as well as Localizable.strings so accessibility descriptions and
+            // composite SwiftUI labels use the same Simplified Chinese text.
+            @"Panes": @"窗格",
+            @"App Icon": @"应用图标",
+            @"Default — Dynamic": @"默认 — 动态",
+            @"Bright": @"明亮",
+            @"Twilight": @"暮色",
+            @"Fill available space": @"填充可用空间",
+            @"Show tab icons": @"显示标签页图标",
+            @"Show pane headers": @"显示窗格标题",
+            @"Match program backgrounds": @"匹配程序背景",
+            @"Fade panes for inactive windows": @"淡化非活动窗口的窗格",
+            @"Highlight active pane": @"突出显示活动窗格",
+            @"Autobalance splits": @"自动平衡分栏",
+            @"Focus follows mouse": @"焦点跟随鼠标",
+            @"Show window on launch": @"启动时显示窗口",
+            @"Host URL": @"主机 URL",
+            @"Host name": @"主机名称",
+            @"Host Name": @"主机名称",
+            @"Host icon": @"主机图标",
+            @"Globe": @"地球",
+            @"Tagged builds for testers.": @"供测试人员使用的标记版本。",
+            @"Preview": @"预览版",
+            @"Local API": @"本地 API",
+            @"Local API URL": @"本地 API URL",
+            @"Allowed origin": @"允许的来源",
+            @"Add Origin": @"添加来源",
+            @"Update Channel Tagged builds for testers.": @"更新频道 供测试人员使用的标记版本。",
+            @"Local API URL unix:///Users/a1/Library/Application Support/rex/server.sock": @"本地 API URL unix:///Users/a1/Library/Application Support/rex/server.sock",
         };
     });
     NSString *exact = map[s];
     if (exact) return exact;
+    if ([s isEqualToString:@"theme"]) return @"主题";
+    if ([s hasSuffix:@" theme"]) {
+        NSString *base = [s substringToIndex:s.length - 6];
+        NSString *translatedBase = RXTranslate(base);
+        if (translatedBase.length && ![translatedBase isEqualToString:base]) return [translatedBase stringByAppendingString:@"主题"];
+    }
     NSString *original = s;
     if ([s containsString:@"Light Mode"]) s = [s stringByReplacingOccurrencesOfString:@"Light Mode" withString:@"浅色模式"];
     if ([s containsString:@"Dark Mode"]) s = [s stringByReplacingOccurrencesOfString:@"Dark Mode" withString:@"深色模式"];
@@ -612,15 +681,24 @@ static void RXDebugTranslation(id self, SEL selector, NSString *value, NSString 
     (void)source;
 }
 
-static IMP origTitle, origButtonTitleGetter, origMenuTitle, origMenuTitleGetter, origMenuAttributedTitle, origMenuAttributedTitleGetter, origMenuAccessibilityValue, origMenuAccessibilityLabel, origMenuAccessibilityTitle, origMenuAccessibilityDescription, origWindowTitle, origStringValue, origPlaceholder, origPlaceholderGetter, origAccessibilityLabel, origAccessibilityTitle, origAccessibilityHelp, origToolTip, origAccessibilityValue, origSegmentAccessibilityValue, origSegmentAccessibilityDescription, origPopupTitleOfSelectedItem, origPopupCellTitle, origViewAccessibilityLabelGetter, origViewAccessibilityTitleGetter, origViewAccessibilityHelpGetter, origViewAccessibilityValueGetter, origViewAccessibilityValueDescriptionGetter, origViewAccessibilityRoleDescriptionGetter, origButtonAccessibilityLabel, origButtonAccessibilityTitle, origButtonAccessibilityHelp, origBundleLocalized, origSplitChildren, origSplitters, origCellStringValue, origCellSetStringValue, origCellAccessibilityLabel, origCellAccessibilityTitle, origCellAccessibilityHelp, origCellAccessibilityValue, origSwiftLabel, origSwiftHelp, origSwiftAttribute, origSwiftValue, origSwiftValueDescription, origSwiftRoleDescription, origSwiftAttributedLabel;
-static IMP origAXElementAttribute, origAXElementValue, origAXElementPlaceholder, origAXElementLabel, origAXElementTitle, origAXElementHelp, origAXElementRoleDescription;
+static IMP origTitle, origButtonTitleGetter, origMenuTitle, origMenuTitleGetter, origMenuAttributedTitle, origMenuAttributedTitleGetter, origMenuAccessibilityValue, origMenuAccessibilityLabel, origMenuAccessibilityTitle, origMenuAccessibilityDescription, origWindowTitle, origStringValue, origPlaceholder, origPlaceholderGetter, origAccessibilityLabel, origAccessibilityTitle, origAccessibilityHelp, origToolTip, origAccessibilityValue, origSegmentAccessibilityValue, origSegmentAccessibilityDescription, origPopupTitleOfSelectedItem, origPopupCellTitle, origViewAccessibilityLabelGetter, origViewAccessibilityTitleGetter, origViewAccessibilityHelpGetter, origViewAccessibilityDescriptionGetter, origViewAccessibilityPlaceholderGetter, origViewAccessibilityValueGetter, origViewAccessibilityValueDescriptionGetter, origViewAccessibilityRoleDescriptionGetter, origButtonAccessibilityLabel, origButtonAccessibilityTitle, origButtonAccessibilityHelp, origButtonAccessibilityDescription, origBundleLocalized, origSplitChildren, origSplitters, origCellStringValue, origCellSetStringValue, origCellAccessibilityLabel, origCellAccessibilityTitle, origCellAccessibilityHelp, origCellAccessibilityValue, origSwiftLabel, origSwiftHelp, origSwiftDescription, origSwiftAttribute, origSwiftValue, origSwiftValueDescription, origSwiftRoleDescription, origSwiftPlaceholder, origSwiftAttributedLabel;
+static IMP origAXElementAttribute, origAXElementValue, origAXElementPlaceholder, origAXElementLabel, origAXElementTitle, origAXElementHelp, origAXElementDescription, origAXElementRoleDescription;
 static __thread BOOL RXInAXElementHook;
 static NSMutableDictionary *RXPopupOriginals;
 static NSMutableDictionary *RXMenuItemOriginals;
 static NSWindow *RXAXWalkWindow;
 static NSRect RXDefaultShellFrame;
 static BOOL RXHasDefaultShellFrame;
+static NSRect RXNotificationFrame;
+static BOOL RXHasNotificationFrame;
+// Residual overlays are attached to SwiftUI's private detail subtree. That
+// subtree can be replaced while navigating settings, so keeping only a
+// reference to the current detail view is not enough to remove an overlay
+// created for the previous page. Track the views we create and remove those
+// exact instances on the next refresh; native SwiftUI views are never touched.
+static NSHashTable *RXOwnedResidualOverlays;
 static void RXRefreshMenu(NSMenu *menu);
+static void RXUpdateSettingsResidualOverlays(NSWindow *window);
 static void RXTranslatePopupMenu(NSMenu *menu);
 static IMP RXPopupOriginal(id self, SEL sel) {
     for (Class cls = object_getClass(self); cls; cls = class_getSuperclass(cls)) {
@@ -641,7 +719,7 @@ static id RXAXElementAttribute(id self, SEL _cmd, NSString *attribute) {
     return translated;
 }
 static id RXAXElementObject(id self, SEL _cmd) {
-    IMP original = (_cmd == @selector(accessibilityValue)) ? origAXElementValue : (_cmd == @selector(accessibilityPlaceholderValue) ? origAXElementPlaceholder : (_cmd == @selector(accessibilityLabel) ? origAXElementLabel : (_cmd == @selector(accessibilityTitle) ? origAXElementTitle : (_cmd == @selector(accessibilityHelp) ? origAXElementHelp : origAXElementRoleDescription))));
+    IMP original = (_cmd == @selector(accessibilityValue)) ? origAXElementValue : (_cmd == @selector(accessibilityPlaceholderValue) ? origAXElementPlaceholder : (_cmd == @selector(accessibilityLabel) ? origAXElementLabel : (_cmd == @selector(accessibilityTitle) ? origAXElementTitle : (_cmd == @selector(accessibilityHelp) ? origAXElementHelp : (_cmd == @selector(accessibilityDescription) ? origAXElementDescription : origAXElementRoleDescription)))));
     id value = original ? ((id (*)(id, SEL))original)(self, _cmd) : nil;
     if (RXInAXElementHook) return value;
     RXInAXElementHook = YES;
@@ -733,6 +811,14 @@ static id RXPopupAccessibilityValueAttribute(id self, SEL _cmd) {
 }
 static void RXSetWindowTitle(id self, SEL _cmd, NSString *value) {
     if (origWindowTitle) ((void (*)(id, SEL, NSString *))origWindowTitle)(self, _cmd, RXTranslate(value));
+    // Settings navigation changes the window title before SwiftUI finishes
+    // replacing its detail subtree. Refresh immediately so an overlay from
+    // the previous page cannot remain visible during that transition.
+    if ([self isKindOfClass:[NSWindow class]]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            RXUpdateSettingsResidualOverlays((NSWindow *)self);
+        });
+    }
 }
 static void RXSetStringValue(id self, SEL _cmd, NSString *value) {
     ((void (*)(id, SEL, NSString *))origStringValue)(self, _cmd, RXTranslate(value));
@@ -768,6 +854,14 @@ static NSString *RXViewAccessibilityHelp(id self, SEL _cmd) {
     NSString *value = origViewAccessibilityHelpGetter ? ((NSString *(*)(id, SEL))origViewAccessibilityHelpGetter)(self, _cmd) : nil;
     return RXTranslate(value);
 }
+static NSString *RXViewAccessibilityDescription(id self, SEL _cmd) {
+    NSString *value = origViewAccessibilityDescriptionGetter ? ((NSString *(*)(id, SEL))origViewAccessibilityDescriptionGetter)(self, _cmd) : nil;
+    return RXTranslate(value);
+}
+static NSString *RXViewAccessibilityPlaceholder(id self, SEL _cmd) {
+    NSString *value = origViewAccessibilityPlaceholderGetter ? ((NSString *(*)(id, SEL))origViewAccessibilityPlaceholderGetter)(self, _cmd) : nil;
+    return RXTranslate(value);
+}
 static id RXViewAccessibilityValue(id self, SEL _cmd) {
     id value = origViewAccessibilityValueGetter ? ((id (*)(id, SEL))origViewAccessibilityValueGetter)(self, _cmd) : nil;
     return [value isKindOfClass:[NSString class]] ? RXTranslate(value) : value;
@@ -788,6 +882,10 @@ static void RXSetButtonAccessibilityTitle(id self, SEL _cmd, NSString *value) {
 }
 static void RXSetButtonAccessibilityHelp(id self, SEL _cmd, NSString *value) {
     if (origButtonAccessibilityHelp) ((void (*)(id, SEL, NSString *))origButtonAccessibilityHelp)(self, _cmd, RXTranslate(value));
+}
+static NSString *RXButtonAccessibilityDescription(id self, SEL _cmd) {
+    NSString *value = origButtonAccessibilityDescription ? ((NSString *(*)(id, SEL))origButtonAccessibilityDescription)(self, _cmd) : nil;
+    return RXTranslate(value);
 }
 static NSString *RXCellLabel(id self, SEL _cmd) {
     return RXTranslate(origCellAccessibilityLabel ? ((NSString *(*)(id, SEL))origCellAccessibilityLabel)(self, _cmd) : nil);
@@ -819,6 +917,16 @@ static NSString *RXSwiftLabel(id self, SEL _cmd) {
 static NSString *RXSwiftHelp(id self, SEL _cmd) {
     IMP original = RXSwiftNodeOriginal(self, _cmd);
     if (!original) original = origSwiftHelp;
+    return RXTranslate(original ? ((NSString *(*)(id, SEL))original)(self, _cmd) : nil);
+}
+static NSString *RXSwiftDescription(id self, SEL _cmd) {
+    IMP original = RXSwiftNodeOriginal(self, _cmd);
+    if (!original) original = origSwiftDescription;
+    return RXTranslate(original ? ((NSString *(*)(id, SEL))original)(self, _cmd) : nil);
+}
+static NSString *RXSwiftPlaceholder(id self, SEL _cmd) {
+    IMP original = RXSwiftNodeOriginal(self, _cmd);
+    if (!original) original = origSwiftPlaceholder;
     return RXTranslate(original ? ((NSString *(*)(id, SEL))original)(self, _cmd) : nil);
 }
 static id RXSwiftAttribute(id self, SEL _cmd, NSString *attribute) {
@@ -866,12 +974,14 @@ static void RXInstallSwiftNodeHooks(void) {
     if (!nodeClass) return;
     if (!RXSwiftNodeOriginals) RXSwiftNodeOriginals = [NSMutableDictionary dictionary];
     SEL selectors[] = {
-        @selector(accessibilityLabel), @selector(accessibilityHelp), @selector(accessibilityAttributeValue:),
+        @selector(accessibilityLabel), @selector(accessibilityHelp), @selector(accessibilityDescription),
+        @selector(accessibilityPlaceholderValue), @selector(accessibilityAttributeValue:),
         @selector(accessibilityValue), @selector(accessibilityValueDescription), @selector(accessibilityRoleDescription),
         @selector(accessibilityAttributedLabel)
     };
     IMP replacements[] = {
-        (IMP)RXSwiftLabel, (IMP)RXSwiftHelp, (IMP)RXSwiftAttribute, (IMP)RXSwiftValue,
+        (IMP)RXSwiftLabel, (IMP)RXSwiftHelp, (IMP)RXSwiftDescription, (IMP)RXSwiftPlaceholder,
+        (IMP)RXSwiftAttribute, (IMP)RXSwiftValue,
         (IMP)RXSwiftValueDescription, (IMP)RXSwiftRoleDescription, (IMP)RXSwiftAttributedLabel
     };
     unsigned int count = objc_getClassList(NULL, 0);
@@ -1493,6 +1603,26 @@ static void RXWalk(NSView *view) {
 }
 @end
 
+@interface RXRemoteHostPlaceholderOverlayView : NSView
+@property(nonatomic, copy) NSString *text;
+@end
+
+@implementation RXRemoteHostPlaceholderOverlayView
+- (BOOL)isFlipped { return YES; }
+- (BOOL)isOpaque { return YES; }
+- (NSView *)hitTest:(NSPoint)point { (void)point; return nil; }
+- (void)drawRect:(NSRect)dirtyRect {
+    (void)dirtyRect;
+    [NSColor.textBackgroundColor setFill];
+    NSRectFill(self.bounds);
+    NSDictionary *attributes = @{
+        NSFontAttributeName: [NSFont systemFontOfSize:14.0],
+        NSForegroundColorAttributeName: NSColor.placeholderTextColor
+    };
+    [self.text drawAtPoint:NSMakePoint(2.0, 4.0) withAttributes:attributes];
+}
+@end
+
 @interface RXTerminalPreviewOverlayView : NSView
 @end
 
@@ -1534,6 +1664,8 @@ static void RXSetResidualOverlay(NSView *detail, NSString *key, NSString *text, 
         overlay = [[RXResidualOverlayView alloc] initWithFrame:frame];
         overlay.identifier = key;
     }
+    if (!RXOwnedResidualOverlays) RXOwnedResidualOverlays = [NSHashTable weakObjectsHashTable];
+    [RXOwnedResidualOverlays addObject:overlay];
     overlay.wantsLayer = YES;
     overlay.layer.zPosition = 1000.0;
     [detail addSubview:overlay positioned:NSWindowAbove relativeTo:nil];
@@ -1543,15 +1675,46 @@ static void RXSetResidualOverlay(NSView *detail, NSString *key, NSString *text, 
     [overlay setNeedsDisplay:YES];
 }
 
+static void RXRemoveOwnedResidualOverlays(void) {
+    if (!RXOwnedResidualOverlays) return;
+    for (NSView *overlay in [RXOwnedResidualOverlays allObjects]) {
+        [overlay removeFromSuperview];
+    }
+    [RXOwnedResidualOverlays removeAllObjects];
+}
+
 static void RXRemoveResidualOverlays(NSView *view) {
     if (![view isKindOfClass:[NSView class]]) return;
     for (NSView *subview in [view.subviews copy]) {
-        if ([subview isKindOfClass:[RXResidualOverlayView class]] || [subview isKindOfClass:[RXTerminalPreviewOverlayView class]]) {
+        if ([subview isKindOfClass:[RXResidualOverlayView class]] || [subview isKindOfClass:[RXRemoteHostPlaceholderOverlayView class]] || [subview isKindOfClass:[RXTerminalPreviewOverlayView class]]) {
             [subview removeFromSuperview];
             continue;
         }
         RXRemoveResidualOverlays(subview);
     }
+}
+
+static void RXUpdateRemoteHostSheetOverlay(NSWindow *window) {
+    if (!window || window.title.length || !window.contentView) return;
+    NSSize size = window.frame.size;
+    if (size.width < 450.0 || size.width > 520.0 || size.height < 300.0 || size.height > 390.0) return;
+    NSView *content = window.contentView;
+    RXRemoteHostPlaceholderOverlayView *overlay = nil;
+    for (NSView *subview in content.subviews) {
+        if ([subview isKindOfClass:[RXRemoteHostPlaceholderOverlayView class]] && [subview.identifier isEqualToString:@"rex-remote-host-placeholder"]) {
+            overlay = (RXRemoteHostPlaceholderOverlayView *)subview;
+            break;
+        }
+    }
+    if (!overlay) {
+        overlay = [[RXRemoteHostPlaceholderOverlayView alloc] initWithFrame:NSZeroRect];
+        overlay.identifier = @"rex-remote-host-placeholder";
+        [content addSubview:overlay positioned:NSWindowAbove relativeTo:nil];
+    }
+    overlay.text = @"主机名称";
+    overlay.frame = NSMakeRect(101.0, 164.0, size.width - 131.0, 28.0);
+    overlay.hidden = NO;
+    [overlay setNeedsDisplay:YES];
 }
 
 static NSView *RXFindSettingsDetail(NSView *view);
@@ -1565,6 +1728,8 @@ static void RXSetWindowResidualOverlay(NSWindow *window, NSString *key, NSString
     NSRect frame = [host convertRect:windowFrame fromView:nil];
     RXResidualOverlayView *overlay = [[RXResidualOverlayView alloc] initWithFrame:frame];
     overlay.identifier = key;
+    if (!RXOwnedResidualOverlays) RXOwnedResidualOverlays = [NSHashTable weakObjectsHashTable];
+    [RXOwnedResidualOverlays addObject:overlay];
     overlay.wantsLayer = YES;
     overlay.layer.zPosition = 1000.0;
     overlay.text = text;
@@ -1594,17 +1759,32 @@ static NSView *RXFindSettingsDetail(NSView *view) {
 static void RXUpdateSettingsResidualOverlays(NSWindow *window) {
     NSString *title = window.title ?: @"";
     if (![title hasPrefix:@"设置"] && ![title hasPrefix:@"Settings"]) return;
+    RXRemoveOwnedResidualOverlays();
     NSView *detail = RXFindSettingsDetail(window.contentView);
     if (!detail) return;
+    // Remove every overlay instance owned by this patch before rebuilding the
+    // visible page. SwiftUI may have moved the old detail subtree elsewhere in
+    // the window, so cleaning only the currently discovered detail leaves
+    // stale text behind after navigation. The registry contains only views we
+    // created, so native SwiftUI content is unaffected.
+    RXRemoveResidualOverlays(detail);
     BOOL server = [title containsString:@"服务器"] || [title containsString:@"Server"];
     BOOL notifications = [title containsString:@"通知"] || [title containsString:@"Notifications"];
     BOOL terminal = [title containsString:@"终端"] || [title containsString:@"Terminal"];
     // SwiftUI replaces the detail subtree while navigating. Remove stale overlays
     // before adding only the overlay that belongs to the visible page.
     if (server) RXSetResidualOverlay(detail, @"rex-server-access", @"从其他设备安全访问 Rex。", NSMakeRect(74.0, 604.0, 430.0, 25.0), NO);
-    if (notifications) RXSetResidualOverlay(detail, @"rex-notification-position", @"显示在右下角", NSMakeRect(30.0, 679.0, 430.0, 25.0), NO);
+    if (notifications) {
+        if (RXHasNotificationFrame) {
+            RXSetWindowResidualOverlay(window, @"rex-notification-position", @"显示在右下角", RXNotificationFrame);
+        } else {
+            RXSetResidualOverlay(detail, @"rex-notification-position", @"显示在右下角", NSMakeRect(30.0, 679.0, 430.0, 25.0), NO);
+        }
+    }
     if (terminal) {
         RXTerminalPreviewOverlayView *preview = [[RXTerminalPreviewOverlayView alloc] initWithFrame:NSMakeRect(30.0, 676.0, 625.0, 57.0)];
+        if (!RXOwnedResidualOverlays) RXOwnedResidualOverlays = [NSHashTable weakObjectsHashTable];
+        [RXOwnedResidualOverlays addObject:preview];
         preview.wantsLayer = YES;
         preview.layer.zPosition = 1000.0;
         [detail addSubview:preview positioned:NSWindowAbove relativeTo:nil];
@@ -1627,12 +1807,20 @@ static void RXWalkAX(id element, NSUInteger depth) {
                 RXDefaultShellFrame = frame;
                 RXHasDefaultShellFrame = !NSIsEmptyRect(frame);
             }
+            if ([rawValue containsString:@"Displayed bottom right"] || [value containsString:@"Displayed bottom right"]) {
+                NSRect frame = RXAccessibilityFrame(element);
+                RXNotificationFrame = frame;
+                RXHasNotificationFrame = !NSIsEmptyRect(frame);
+            }
             if (![translated isEqualToString:value]) {
                 id frame = [element accessibilityAttributeValue:@"AXFrame"];
                 NSRect rect = [frame isKindOfClass:[NSValue class]] ? [frame rectValue] : NSZeroRect;
             }
             if (![translated isEqualToString:value] && [element respondsToSelector:@selector(accessibilitySetValue:forAttribute:)]) {
                 [element accessibilitySetValue:translated forAttribute:attribute];
+            }
+            if ([attribute isEqualToString:NSAccessibilityPlaceholderValueAttribute] && ![translated isEqualToString:value] && [element respondsToSelector:@selector(setAccessibilityPlaceholderValue:)]) {
+                [element setAccessibilityPlaceholderValue:translated];
             }
         }
     }
@@ -1647,12 +1835,13 @@ static void RXRefreshAccessibility(void) {
     RXInstallSwiftNodeHooks();
     RXInstallPopupHooks();
     for (NSWindow *window in NSApp.windows) {
-        RXRemoveResidualOverlays(window.contentView);
         RXHasDefaultShellFrame = NO;
+        RXHasNotificationFrame = NO;
         RXAXWalkWindow = window;
         RXWalk(window.contentView);
         RXWalkAX(window, 0);
         RXUpdateSettingsResidualOverlays(window);
+        RXUpdateRemoteHostSheetOverlay(window);
     }
     RXAXWalkWindow = nil;
     RXRefreshMenu(NSApp.mainMenu);
@@ -1667,6 +1856,7 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
         origAXElementLabel = axElement ? RXHook(axElement, @selector(accessibilityLabel), (IMP)RXAXElementObject) : NULL;
         origAXElementTitle = axElement ? RXHook(axElement, @selector(accessibilityTitle), (IMP)RXAXElementObject) : NULL;
         origAXElementHelp = axElement ? RXHook(axElement, @selector(accessibilityHelp), (IMP)RXAXElementObject) : NULL;
+        origAXElementDescription = axElement ? RXHook(axElement, @selector(accessibilityDescription), (IMP)RXAXElementObject) : NULL;
         origAXElementRoleDescription = axElement ? RXHook(axElement, @selector(accessibilityRoleDescription), (IMP)RXAXElementObject) : NULL;
         origTitle = RXHook([NSButton class], @selector(setTitle:), (IMP)RXSetTitle);
         origButtonTitleGetter = RXHook([NSButton class], @selector(title), (IMP)RXButtonTitle);
@@ -1689,6 +1879,8 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
         origViewAccessibilityLabelGetter = RXHook([NSView class], @selector(accessibilityLabel), (IMP)RXViewAccessibilityLabel);
         origViewAccessibilityTitleGetter = RXHook([NSView class], @selector(accessibilityTitle), (IMP)RXViewAccessibilityTitle);
         origViewAccessibilityHelpGetter = RXHook([NSView class], @selector(accessibilityHelp), (IMP)RXViewAccessibilityHelp);
+        origViewAccessibilityDescriptionGetter = RXHook([NSView class], @selector(accessibilityDescription), (IMP)RXViewAccessibilityDescription);
+        origViewAccessibilityPlaceholderGetter = RXHook([NSView class], @selector(accessibilityPlaceholderValue), (IMP)RXViewAccessibilityPlaceholder);
         origViewAccessibilityValueGetter = RXHook([NSView class], @selector(accessibilityValue), (IMP)RXViewAccessibilityValue);
         origViewAccessibilityValueDescriptionGetter = RXHook([NSView class], @selector(accessibilityValueDescription), (IMP)RXViewAccessibilityValueDescription);
         origViewAccessibilityRoleDescriptionGetter = RXHook([NSView class], @selector(accessibilityRoleDescription), (IMP)RXViewAccessibilityRoleDescription);
@@ -1707,6 +1899,7 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
         origButtonAccessibilityLabel = RXHook([NSButton class], @selector(setAccessibilityLabel:), (IMP)RXSetButtonAccessibilityLabel);
         origButtonAccessibilityTitle = RXHook([NSButton class], @selector(setAccessibilityTitle:), (IMP)RXSetButtonAccessibilityTitle);
         origButtonAccessibilityHelp = RXHook([NSButton class], @selector(setAccessibilityHelp:), (IMP)RXSetButtonAccessibilityHelp);
+        origButtonAccessibilityDescription = RXHook([NSButton class], @selector(accessibilityDescription), (IMP)RXButtonAccessibilityDescription);
         origCellAccessibilityLabel = RXHook([NSCell class], @selector(accessibilityLabel), (IMP)RXCellLabel);
         origCellAccessibilityTitle = RXHook([NSCell class], @selector(accessibilityTitle), (IMP)RXCellTitle);
         origCellAccessibilityHelp = RXHook([NSCell class], @selector(accessibilityHelp), (IMP)RXCellHelp);
@@ -1721,7 +1914,7 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
                 RXInstallCommandPaletteHooks();
                 RXInstallTextFieldTextViewHook();
             }];
-            NSTimer *timer = [NSTimer timerWithTimeInterval:0.5 repeats:YES block:^(NSTimer *timer) { RXRefreshAccessibility(); }];
+            NSTimer *timer = [NSTimer timerWithTimeInterval:2.0 repeats:YES block:^(NSTimer *timer) { RXRefreshAccessibility(); }];
             [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
         });
     }

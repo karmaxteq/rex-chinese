@@ -441,10 +441,47 @@ private let translations: [String: String] = [
   "Remove Window from Set": "从窗口组移除",
   "Arrange in Front": "前置排列",
   "Static Noir": "静态黑色",
+  "Host URL": "主机 URL",
+  "Host name": "主机名称",
+  "Host Name": "主机名称",
+  "Host icon": "主机图标",
+  "Globe": "地球",
+  "Tagged builds for testers.": "供测试人员使用的标记版本。",
+  "Preview": "预览版",
+  "Local API": "本地 API",
+  "Local API URL": "本地 API URL",
+  "Allowed origin": "允许的来源",
+  "Add Origin": "添加来源",
 ]
 
 private func translate(_ value: String) -> String {
   if let translated = translations[value] { return translated }
+  if value == "theme" { return "主题" }
+  if value.hasSuffix(" theme") {
+    let base = String(value.dropLast(6))
+    let translatedBase = translate(base)
+    if translatedBase != base { return translatedBase + "主题" }
+  }
+  if value == "Session Filter" { return "会话筛选" }
+  if value == "Filter or create" || value == "Filter or create..." || value == "Filter or create…" { return "筛选或创建…" }
+  if value.hasPrefix("Reconnecting to ") { return "正在重新连接 " + value.dropFirst("Reconnecting to ".count) }
+  if value.hasPrefix("Connecting to ") { return "正在连接 " + value.dropFirst("Connecting to ".count) }
+  if value.hasPrefix("Connected to ") { return "已连接到 " + value.dropFirst("Connected to ".count) }
+  if value.hasPrefix("Create a session on ") { return "在 " + value.dropFirst("Create a session on ".count) + " 上创建会话" }
+  if value.hasPrefix("Loading Sessions on ") { return "正在加载 " + value.dropFirst("Loading Sessions on ".count) + " 上的会话" }
+  if value.hasPrefix("Running for ") { return "已运行" + value.dropFirst("Running for ".count) }
+  if value.hasPrefix("Exited with status ") { return "已退出，状态码 " + value.dropFirst("Exited with status ".count) }
+  if value.hasPrefix("Connection warning for ") { return "连接警告：" + value.dropFirst("Connection warning for ".count) }
+  if value.hasPrefix("Connection errors: ") { return "连接错误：" + value.dropFirst("Connection errors: ".count) }
+  if value.hasPrefix("Tailscale failed: ") { return "Tailscale 失败：" + value.dropFirst("Tailscale failed: ".count) }
+  if value.hasPrefix("Tailscale assigned ") { return "Tailscale 已分配 " + value.dropFirst("Tailscale assigned ".count) }
+  if value.hasPrefix("Restart required: ") { return "需要重新启动：" + value.dropFirst("Restart required: ".count) }
+  if value.hasPrefix("Rex Server is running as part of ") { return "Rex 服务器属于 " + value.dropFirst("Rex Server is running as part of ".count) }
+  if value.hasPrefix("Restarted the Rex server for Rex ") { return "已为 Rex " + value.dropFirst("Restarted the Rex server for Rex ".count) + " 重新启动服务器" }
+  if value.hasPrefix("Update Rex on the server to use ") { return "更新服务器上的 Rex 以使用 " + value.dropFirst("Update Rex on the server to use ".count) }
+  if value.hasPrefix("Set Cursor Blink Interval to ") { return "将光标闪烁间隔设为 " + value.dropFirst("Set Cursor Blink Interval to ".count) }
+  if value.hasPrefix("Set Terminal Font Size to ") { return "将终端字体大小设为 " + value.dropFirst("Set Terminal Font Size to ".count) }
+  if value.hasPrefix("Server Version ") { return value.replacingOccurrences(of: "Server Version", with: "服务器版本").replacingOccurrences(of: "API Version", with: "API 版本").replacingOccurrences(of: "Revision", with: "修订版") }
   if value.hasPrefix("Change the shortcut for ") {
     return "修改 " + translate(String(value.dropFirst("Change the shortcut for ".count))) + " 的快捷键"
   }
