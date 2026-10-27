@@ -5,6 +5,7 @@
 #import <objc/runtime.h>
 #include <dlfcn.h>
 #include <string.h>
+#include <objc/message.h>
 
 static NSString *RXTranslate(NSString *s) {
     if (![s isKindOfClass:[NSString class]] || s.length == 0) return s;
@@ -205,6 +206,11 @@ static NSString *RXTranslate(NSString *s) {
             @"Filter Shortcuts": @"筛选快捷键",
             @"Filter Shortcuts…": @"筛选快捷键…",
             @"Displayed bottom right": @"显示在右下角",
+            @"Open Session on Web…": @"在网页上打开会话…",
+            @"Open Session on Web...": @"在网页上打开会话…",
+            @"Switch Host": @"切换主机",
+            @"Remove Host…": @"移除主机…",
+            @"Remove Host...": @"移除主机…",
             @"Opens Running settings": @"打开“运行中”设置",
             @"Opens Blocked settings": @"打开“已阻塞”设置",
             @"Opens Error settings": @"打开“错误”设置",
@@ -447,6 +453,23 @@ static NSString *RXTranslate(NSString *s) {
     if ([s hasPrefix:@"Record a shortcut for "]) {
         return [NSString stringWithFormat:@"录制 %@ 的快捷键", RXTranslate([s substringFromIndex:22])];
     }
+    if ([s hasPrefix:@"录制 "] && [s hasSuffix:@" 的快捷键"]) {
+        NSString *suffix = @" 的快捷键";
+        NSString *action = [s substringWithRange:NSMakeRange(3, s.length - 3 - suffix.length)];
+        return [NSString stringWithFormat:@"录制 %@ 的快捷键", RXTranslate(action)];
+    }
+    if ([s hasPrefix:@"Opens "] && [s hasSuffix:@" settings"]) {
+        NSString *prefix = @"Opens ";
+        NSString *suffix = @" settings";
+        NSString *page = [s substringWithRange:NSMakeRange(prefix.length, s.length - prefix.length - suffix.length)];
+        return [NSString stringWithFormat:@"打开“%@”设置", RXTranslate(page)];
+    }
+    if ([s hasPrefix:@"打开 "] && [s hasSuffix:@" settings"]) {
+        NSString *prefix = @"打开 ";
+        NSString *suffix = @" settings";
+        NSString *page = [s substringWithRange:NSMakeRange(prefix.length, s.length - prefix.length - suffix.length)];
+        return [NSString stringWithFormat:@"打开“%@”设置", RXTranslate(page)];
+    }
     if ([s hasPrefix:@"Click to record a different shortcut."]) {
         return @"点击以录制其他快捷键。";
     }
@@ -594,6 +617,9 @@ static IMP origAXElementAttribute, origAXElementValue, origAXElementPlaceholder,
 static __thread BOOL RXInAXElementHook;
 static NSMutableDictionary *RXPopupOriginals;
 static NSMutableDictionary *RXMenuItemOriginals;
+static NSWindow *RXAXWalkWindow;
+static NSRect RXDefaultShellFrame;
+static BOOL RXHasDefaultShellFrame;
 static void RXRefreshMenu(NSMenu *menu);
 static void RXTranslatePopupMenu(NSMenu *menu);
 static IMP RXPopupOriginal(id self, SEL sel) {
@@ -927,7 +953,7 @@ static NSString *RXBundleLocalized(id self, SEL _cmd, NSString *key, NSString *v
 static id RXAccessibilityAttributeValue(id self, SEL _cmd, NSString *attribute) {
     id value = ((id (*)(id, SEL, NSString *))origAccessibilityValue)(self, _cmd, attribute);
     RXDebugTranslation(self, _cmd, value, [NSString stringWithFormat:@"View %@", attribute]);
-    if ([value isKindOfClass:[NSString class]] && ([attribute isEqualToString:NSAccessibilityTitleAttribute] || [attribute isEqualToString:NSAccessibilityDescriptionAttribute] || [attribute isEqualToString:NSAccessibilityHelpAttribute] || [attribute isEqualToString:NSAccessibilityValueAttribute])) {
+    if ([value isKindOfClass:[NSString class]] && ([attribute isEqualToString:NSAccessibilityTitleAttribute] || [attribute isEqualToString:NSAccessibilityDescriptionAttribute] || [attribute isEqualToString:NSAccessibilityHelpAttribute] || [attribute isEqualToString:NSAccessibilityValueAttribute] || [attribute isEqualToString:NSAccessibilityPlaceholderValueAttribute] || [attribute isEqualToString:NSAccessibilityValueDescriptionAttribute] || [attribute isEqualToString:NSAccessibilityRoleDescriptionAttribute])) {
         return RXTranslate(value);
     }
     return value;
@@ -942,7 +968,6 @@ static IMP RXHook(Class cls, SEL sel, IMP replacement) {
 
 static id RXRawAXValue(id element, NSString *attribute);
 static IMP origTextFieldTextViewDraw;
-static IMP origSelectionCellDraw;
 
 static void RXTextFieldTextViewDraw(id self, SEL _cmd, NSRect rect) {
     if (origTextFieldTextViewDraw) ((void (*)(id, SEL, NSRect))origTextFieldTextViewDraw)(self, _cmd, rect);
@@ -981,45 +1006,6 @@ static void RXInstallTextFieldTextViewHook(void) {
     if (!ownMethod) return;
     origTextFieldTextViewDraw = method_getImplementation(ownMethod);
     method_setImplementation(ownMethod, (IMP)RXTextFieldTextViewDraw);
-}
-
-static void RXSelectionCellDraw(id self, SEL _cmd, NSRect cellFrame, NSView *controlView) {
-    if (origSelectionCellDraw) ((void (*)(id, SEL, NSRect, NSView *))origSelectionCellDraw)(self, _cmd, cellFrame, controlView);
-    NSString *raw = origCellStringValue ? ((NSString *(*)(id, SEL))origCellStringValue)(self, @selector(stringValue)) : [(NSCell *)self stringValue];
-    NSString *translated = RXTranslate(raw);
-    if (!translated.length || [translated isEqualToString:raw]) return;
-    [NSColor.controlBackgroundColor setFill];
-    NSRectFill(cellFrame);
-    NSDictionary *attributes = @{
-        NSFontAttributeName: [NSFont systemFontOfSize:16.0],
-        NSForegroundColorAttributeName: NSColor.labelColor
-    };
-    [translated drawInRect:NSInsetRect(cellFrame, 4.0, 0.0) withAttributes:attributes];
-}
-
-static void RXInstallSelectionCellHook(void) {
-    Class cls = objc_getClass("_TtCC7SwiftUI18SelectionTextField4Cell");
-    if (!cls || origSelectionCellDraw) return;
-    SEL selector = @selector(drawInteriorWithFrame:inView:);
-    Method inherited = class_getInstanceMethod(cls, selector);
-    if (!inherited) return;
-    unsigned int methodCount = 0;
-    Method *methods = class_copyMethodList(cls, &methodCount);
-    Method ownMethod = NULL;
-    for (unsigned int i = 0; i < methodCount; i++) {
-        if (method_getName(methods[i]) == selector) {
-            ownMethod = methods[i];
-            break;
-        }
-    }
-    free(methods);
-    if (!ownMethod) {
-        class_addMethod(cls, selector, method_getImplementation(inherited), method_getTypeEncoding(inherited));
-        ownMethod = class_getInstanceMethod(cls, selector);
-    }
-    if (!ownMethod) return;
-    origSelectionCellDraw = method_getImplementation(ownMethod);
-    method_setImplementation(ownMethod, (IMP)RXSelectionCellDraw);
 }
 
 static void RXAttributedDrawWithRect(id self, SEL _cmd, NSRect rect, NSStringDrawingOptions options, NSStringDrawingContext *context) {
@@ -1424,127 +1410,6 @@ static void RXTranslatePopupMenu(NSMenu *menu) {
     }
 }
 
-static void RXDumpMenuDiagnostics(void) {
-    FILE *file = fopen("/tmp/rex-menu-diag.log", "w");
-    if (!file) return;
-    for (NSMenuItem *item in NSApp.mainMenu.itemArray) {
-        NSString *topDescription = [item accessibilityAttributeValue:NSAccessibilityDescriptionAttribute];
-        fprintf(file, "TOP class=%s title=%s label=%s axTitle=%s desc=%s\n", class_getName(object_getClass(item)), item.title.UTF8String ?: "", item.accessibilityLabel.UTF8String ?: "", item.accessibilityTitle.UTF8String ?: "", topDescription.UTF8String ?: "");
-        for (Class cls = object_getClass(item); cls && cls != [NSObject class]; cls = class_getSuperclass(cls)) {
-            unsigned int methodCount = 0;
-            Method *methods = class_copyMethodList(cls, &methodCount);
-            for (unsigned int i = 0; i < methodCount; i++) fprintf(file, "  TOPMETHOD class=%s sel=%s imp=%p\n", class_getName(cls), sel_getName(method_getName(methods[i])), method_getImplementation(methods[i]));
-            free(methods);
-        }
-        for (NSMenuItem *child in item.submenu.itemArray) {
-            NSString *childDescription = [child accessibilityAttributeValue:NSAccessibilityDescriptionAttribute];
-            fprintf(file, "CHILD class=%s title=%s label=%s axTitle=%s desc=%s\n", class_getName(object_getClass(child)), child.title.UTF8String ?: "", child.accessibilityLabel.UTF8String ?: "", child.accessibilityTitle.UTF8String ?: "", childDescription.UTF8String ?: "");
-            for (Class cls = object_getClass(child); cls && cls != [NSObject class]; cls = class_getSuperclass(cls)) {
-                unsigned int methodCount = 0;
-                Method *methods = class_copyMethodList(cls, &methodCount);
-                for (unsigned int i = 0; i < methodCount; i++) {
-                    SEL sel = method_getName(methods[i]);
-                    if (strstr(class_getName(cls), "SwiftUI.SwiftUIMenuItem") != NULL) fprintf(file, "  METHOD class=%s sel=%s imp=%p\n", class_getName(cls), sel_getName(sel), method_getImplementation(methods[i]));
-                }
-                free(methods);
-            }
-        }
-    }
-    fclose(file);
-}
-
-static void RXDumpPopupDiagnostics(void) {
-    FILE *file = fopen("/tmp/rex-popup-diag.log", "w");
-    if (!file) return;
-    unsigned int count = objc_getClassList(NULL, 0);
-    Class *classes = (Class *)calloc(count, sizeof(Class));
-    objc_getClassList(classes, count);
-    for (unsigned int i = 0; i < count; i++) {
-        const char *name = class_getName(classes[i]);
-        if (!strstr(name, "PopUp") && !strstr(name, "Popup") && !strstr(name, "Picker") && !strstr(name, "Accessibility")) continue;
-        fprintf(file, "CLASS %s\n", name);
-        unsigned int methodCount = 0;
-        Method *methods = class_copyMethodList(classes[i], &methodCount);
-        for (unsigned int j = 0; j < methodCount; j++) fprintf(file, "  %s\n", sel_getName(method_getName(methods[j])));
-        free(methods);
-    }
-    free(classes);
-    fclose(file);
-}
-
-static void RXDumpPopupControls(void) {
-    FILE *file = fopen("/tmp/rex-popup-controls.log", "w");
-    if (!file) return;
-    for (NSWindow *window in NSApp.windows) {
-        NSMutableArray *stack = [NSMutableArray arrayWithObject:window.contentView ?: [NSNull null]];
-        while (stack.count) {
-            id value = stack.lastObject;
-            [stack removeLastObject];
-            if (![value isKindOfClass:[NSView class]]) continue;
-            NSView *view = value;
-            if ([view isKindOfClass:[NSPopUpButton class]]) {
-                NSPopUpButton *popup = (NSPopUpButton *)view;
-                id axValue = [popup accessibilityAttributeValue:NSAccessibilityValueAttribute];
-                id propertyValue = popup.accessibilityValue;
-                id cellValue = [popup.cell respondsToSelector:@selector(accessibilityValue)] ? [popup.cell accessibilityValue] : nil;
-                id cellAX = [popup.cell respondsToSelector:@selector(accessibilityAttributeValue:)] ? [popup.cell accessibilityAttributeValue:NSAccessibilityValueAttribute] : nil;
-                fprintf(file, "POP class=%s cell=%s selected=%s title=%s ax=%s prop=%s cellProp=%s cellAX=%s set=%d\n", class_getName(object_getClass(popup)), class_getName(object_getClass(popup.cell)), popup.titleOfSelectedItem.UTF8String ?: "", popup.title.UTF8String ?: "", [axValue isKindOfClass:[NSString class]] ? [axValue UTF8String] : "", [propertyValue isKindOfClass:[NSString class]] ? [propertyValue UTF8String] : "", [cellValue isKindOfClass:[NSString class]] ? [cellValue UTF8String] : "", [cellAX isKindOfClass:[NSString class]] ? [cellAX UTF8String] : "", [popup respondsToSelector:@selector(setAccessibilityValue:)]);
-            }
-            [stack addObjectsFromArray:view.subviews];
-        }
-    }
-    fclose(file);
-}
-
-static void RXDumpViewTree(NSView *view, NSUInteger depth, FILE *file) {
-    if (![view isKindOfClass:[NSView class]] || depth > 40) return;
-    NSString *title = nil;
-    NSString *stringValue = nil;
-    if ([view isKindOfClass:[NSButton class]]) {
-        title = origButtonTitleGetter ? ((NSString *(*)(id, SEL))origButtonTitleGetter)(view, @selector(title)) : ((NSButton *)view).title;
-    }
-    if ([view isKindOfClass:[NSControl class]]) {
-        NSCell *cell = [(NSControl *)view cell];
-        if (cell && origCellStringValue) stringValue = ((NSString *(*)(id, SEL))origCellStringValue)(cell, @selector(stringValue));
-    }
-    if ([view isKindOfClass:[NSSegmentedControl class]]) {
-        NSSegmentedControl *segments = (NSSegmentedControl *)view;
-        NSMutableArray *labels = [NSMutableArray array];
-        for (NSInteger i = 0; i < segments.segmentCount; i++) [labels addObject:[segments labelForSegment:i] ?: @""];
-        stringValue = [labels componentsJoinedByString:@" | "];
-    }
-    NSString *label = origViewAccessibilityLabelGetter ? ((NSString *(*)(id, SEL))origViewAccessibilityLabelGetter)(view, @selector(accessibilityLabel)) : nil;
-    NSString *accessibilityTitle = origViewAccessibilityTitleGetter ? ((NSString *(*)(id, SEL))origViewAccessibilityTitleGetter)(view, @selector(accessibilityTitle)) : nil;
-    if (title.length || stringValue.length || label.length || accessibilityTitle.length) {
-        fprintf(file, "%*sVIEW class=%s title=%s string=%s label=%s axTitle=%s\\n", (int)(depth * 2), "", class_getName(object_getClass(view)), title.UTF8String ?: "", stringValue.UTF8String ?: "", label.UTF8String ?: "", accessibilityTitle.UTF8String ?: "");
-    }
-    for (NSView *child in view.subviews) RXDumpViewTree(child, depth + 1, file);
-}
-
-static void RXDumpViews(void) {
-    FILE *file = fopen("/tmp/rex-view-diag.log", "w");
-    if (!file) return;
-    for (NSWindow *window in NSApp.windows) RXDumpViewTree(window.contentView, 0, file);
-    fclose(file);
-}
-
-static void RXDumpLayerTree(CALayer *layer, NSUInteger depth, FILE *file) {
-    if (![layer isKindOfClass:[CALayer class]] || depth > 40) return;
-    NSString *string = [layer isKindOfClass:[CATextLayer class]] ? [(CATextLayer *)layer string] : nil;
-    fprintf(file, "%*sLAYER class=%s string=%s delegate=%s\n", (int)(depth * 2), "", class_getName(object_getClass(layer)), string.UTF8String ?: "", class_getName(object_getClass(layer.delegate)));
-    for (CALayer *child in layer.sublayers) RXDumpLayerTree(child, depth + 1, file);
-}
-
-static void RXDumpLayers(void) {
-    static BOOL dumped;
-    if (dumped) return;
-    dumped = YES;
-    FILE *file = fopen("/tmp/rex-layer-diag.log", "w");
-    if (!file) return;
-    for (NSWindow *window in NSApp.windows) RXDumpLayerTree(window.contentView.layer, 0, file);
-    fclose(file);
-}
-
 static void RXWalkAX(id element, NSUInteger depth);
 
 static id RXRawAXValue(id element, NSString *attribute) {
@@ -1608,13 +1473,160 @@ static void RXWalk(NSView *view) {
     for (NSView *child in view.subviews) RXWalk(child);
 }
 
+@interface RXResidualOverlayView : NSView
+@property(nonatomic, copy) NSString *text;
+@end
+
+@implementation RXResidualOverlayView
+- (BOOL)isFlipped { return YES; }
+- (BOOL)isOpaque { return YES; }
+- (NSView *)hitTest:(NSPoint)point { (void)point; return nil; }
+- (void)drawRect:(NSRect)dirtyRect {
+    (void)dirtyRect;
+    [[NSColor.controlBackgroundColor colorWithAlphaComponent:1.0] setFill];
+    NSRectFill(self.bounds);
+    NSDictionary *attributes = @{
+        NSFontAttributeName: [NSFont systemFontOfSize:16.0],
+        NSForegroundColorAttributeName: NSColor.secondaryLabelColor
+    };
+    [self.text drawAtPoint:NSMakePoint(0.0, 1.0) withAttributes:attributes];
+}
+@end
+
+@interface RXTerminalPreviewOverlayView : NSView
+@end
+
+@implementation RXTerminalPreviewOverlayView
+- (BOOL)isFlipped { return YES; }
+- (BOOL)isOpaque { return YES; }
+- (NSView *)hitTest:(NSPoint)point { (void)point; return nil; }
+- (void)drawRect:(NSRect)dirtyRect {
+    (void)dirtyRect;
+    NSBezierPath *box = [NSBezierPath bezierPathWithRoundedRect:NSInsetRect(self.bounds, 0.5, 0.5) xRadius:11.0 yRadius:11.0];
+    [NSColor.textBackgroundColor setFill];
+    [box fill];
+    [NSColor.separatorColor setStroke];
+    [box stroke];
+    NSDictionary *attributes = @{
+        NSFontAttributeName: [NSFont fontWithName:@"Menlo" size:15.0] ?: [NSFont monospacedSystemFontOfSize:15.0 weight:NSFontWeightRegular],
+        NSForegroundColorAttributeName: NSColor.labelColor
+    };
+    NSArray *lines = @[
+        @"~/rex | main $ Swift 构建 && Swift 测试",
+        @"main.swift:4: 警告：'run() -> Bool' 已弃用",
+        @"构建完成！ (1.24 秒)"
+    ];
+    for (NSUInteger index = 0; index < lines.count; index++) {
+        [lines[index] drawAtPoint:NSMakePoint(12.0, 5.0 + index * 17.0) withAttributes:attributes];
+    }
+}
+@end
+
+static void RXSetResidualOverlay(NSView *detail, NSString *key, NSString *text, NSRect frame, BOOL hidden) {
+    RXResidualOverlayView *overlay = nil;
+    for (NSView *subview in detail.subviews) {
+        if ([subview isKindOfClass:[RXResidualOverlayView class]] && [subview.identifier isEqualToString:key]) {
+            overlay = (RXResidualOverlayView *)subview;
+            break;
+        }
+    }
+    if (!overlay) {
+        overlay = [[RXResidualOverlayView alloc] initWithFrame:frame];
+        overlay.identifier = key;
+    }
+    overlay.wantsLayer = YES;
+    overlay.layer.zPosition = 1000.0;
+    [detail addSubview:overlay positioned:NSWindowAbove relativeTo:nil];
+    overlay.text = text;
+    overlay.frame = frame;
+    overlay.hidden = hidden;
+    [overlay setNeedsDisplay:YES];
+}
+
+static void RXRemoveResidualOverlays(NSView *view) {
+    if (![view isKindOfClass:[NSView class]]) return;
+    for (NSView *subview in [view.subviews copy]) {
+        if ([subview isKindOfClass:[RXResidualOverlayView class]] || [subview isKindOfClass:[RXTerminalPreviewOverlayView class]]) {
+            [subview removeFromSuperview];
+            continue;
+        }
+        RXRemoveResidualOverlays(subview);
+    }
+}
+
+static NSView *RXFindSettingsDetail(NSView *view);
+
+static void RXSetWindowResidualOverlay(NSWindow *window, NSString *key, NSString *text, NSRect screenFrame) {
+    if (!window || NSIsEmptyRect(screenFrame)) return;
+    NSView *content = window.contentView;
+    if (!content) return;
+    NSView *host = RXFindSettingsDetail(content) ?: content;
+    NSRect windowFrame = [window convertRectFromScreen:screenFrame];
+    NSRect frame = [host convertRect:windowFrame fromView:nil];
+    RXResidualOverlayView *overlay = [[RXResidualOverlayView alloc] initWithFrame:frame];
+    overlay.identifier = key;
+    overlay.wantsLayer = YES;
+    overlay.layer.zPosition = 1000.0;
+    overlay.text = text;
+    [host addSubview:overlay positioned:NSWindowAbove relativeTo:nil];
+    [overlay setNeedsDisplay:YES];
+}
+
+static NSRect RXAccessibilityFrame(id element) {
+    SEL selector = @selector(accessibilityFrame);
+    if ([element respondsToSelector:selector]) {
+        return ((NSRect (*)(id, SEL))objc_msgSend)(element, selector);
+    }
+    id frameObject = RXRawAXValue(element, @"AXFrame");
+    return [frameObject isKindOfClass:[NSValue class]] ? [frameObject rectValue] : NSZeroRect;
+}
+
+static NSView *RXFindSettingsDetail(NSView *view) {
+    if (![view isKindOfClass:[NSView class]]) return nil;
+    if (strcmp(class_getName(object_getClass(view)), "RexMacOS.SettingsShellDetailView") == 0) return view;
+    for (NSView *child in view.subviews) {
+        NSView *result = RXFindSettingsDetail(child);
+        if (result) return result;
+    }
+    return nil;
+}
+
+static void RXUpdateSettingsResidualOverlays(NSWindow *window) {
+    NSString *title = window.title ?: @"";
+    if (![title hasPrefix:@"设置"] && ![title hasPrefix:@"Settings"]) return;
+    NSView *detail = RXFindSettingsDetail(window.contentView);
+    if (!detail) return;
+    BOOL server = [title containsString:@"服务器"] || [title containsString:@"Server"];
+    BOOL notifications = [title containsString:@"通知"] || [title containsString:@"Notifications"];
+    BOOL terminal = [title containsString:@"终端"] || [title containsString:@"Terminal"];
+    // SwiftUI replaces the detail subtree while navigating. Remove stale overlays
+    // before adding only the overlay that belongs to the visible page.
+    if (server) RXSetResidualOverlay(detail, @"rex-server-access", @"从其他设备安全访问 Rex。", NSMakeRect(74.0, 604.0, 430.0, 25.0), NO);
+    if (notifications) RXSetResidualOverlay(detail, @"rex-notification-position", @"显示在右下角", NSMakeRect(30.0, 679.0, 430.0, 25.0), NO);
+    if (terminal) {
+        RXTerminalPreviewOverlayView *preview = [[RXTerminalPreviewOverlayView alloc] initWithFrame:NSMakeRect(30.0, 676.0, 625.0, 57.0)];
+        preview.wantsLayer = YES;
+        preview.layer.zPosition = 1000.0;
+        [detail addSubview:preview positioned:NSWindowAbove relativeTo:nil];
+        [preview setNeedsDisplay:YES];
+        if (RXHasDefaultShellFrame) RXSetWindowResidualOverlay(window, @"rex-default-login-shell", @"默认登录 Shell", RXDefaultShellFrame);
+    }
+}
+
 static void RXWalkAX(id element, NSUInteger depth) {
     if (!element || depth > 20 || ![element respondsToSelector:@selector(accessibilityAttributeValue:)]) return;
     NSArray *attrs = @[NSAccessibilityDescriptionAttribute, NSAccessibilityTitleAttribute, NSAccessibilityHelpAttribute, NSAccessibilityPlaceholderValueAttribute, NSAccessibilityValueAttribute, NSAccessibilityValueDescriptionAttribute, NSAccessibilityRoleDescriptionAttribute];
     for (NSString *attribute in attrs) {
         id value = [element accessibilityAttributeValue:attribute];
         if ([value isKindOfClass:[NSString class]]) {
+            id rawObject = RXRawAXValue(element, attribute);
+            NSString *rawValue = [rawObject isKindOfClass:[NSString class]] ? rawObject : value;
             NSString *translated = RXTranslate(value);
+            if ([rawValue containsString:@"Default login shell"]) {
+                NSRect frame = RXAccessibilityFrame(element);
+                RXDefaultShellFrame = frame;
+                RXHasDefaultShellFrame = !NSIsEmptyRect(frame);
+            }
             if (![translated isEqualToString:value]) {
                 id frame = [element accessibilityAttributeValue:@"AXFrame"];
                 NSRect rect = [frame isKindOfClass:[NSValue class]] ? [frame rectValue] : NSZeroRect;
@@ -1635,9 +1647,14 @@ static void RXRefreshAccessibility(void) {
     RXInstallSwiftNodeHooks();
     RXInstallPopupHooks();
     for (NSWindow *window in NSApp.windows) {
+        RXRemoveResidualOverlays(window.contentView);
+        RXHasDefaultShellFrame = NO;
+        RXAXWalkWindow = window;
         RXWalk(window.contentView);
         RXWalkAX(window, 0);
+        RXUpdateSettingsResidualOverlays(window);
     }
+    RXAXWalkWindow = nil;
     RXRefreshMenu(NSApp.mainMenu);
 }
 
@@ -1703,9 +1720,8 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
             [NSTimer scheduledTimerWithTimeInterval:0.2 repeats:YES block:^(NSTimer *timer) {
                 RXInstallCommandPaletteHooks();
                 RXInstallTextFieldTextViewHook();
-                RXInstallSelectionCellHook();
             }];
-            NSTimer *timer = [NSTimer timerWithTimeInterval:2.0 repeats:YES block:^(NSTimer *timer) { RXRefreshAccessibility(); }];
+            NSTimer *timer = [NSTimer timerWithTimeInterval:0.5 repeats:YES block:^(NSTimer *timer) { RXRefreshAccessibility(); }];
             [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
         });
     }
