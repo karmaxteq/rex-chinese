@@ -132,6 +132,7 @@ static NSString *RXTranslate(NSString *s) {
             @"Quit and Keep Windows": @"退出并保留窗口",
             @"Back": @"返回",
             @"Forward": @"前进",
+            @"Settings navigation": @"设置导航",
             @"Go to the previous Settings page": @"转到上一个设置页面",
             @"Go to the next Settings page": @"转到下一个设置页面",
             @"Settings page": @"设置页面",
@@ -725,7 +726,7 @@ static void RXDebugTranslation(id self, SEL selector, NSString *value, NSString 
     (void)source;
 }
 
-static IMP origTitle, origButtonTitleGetter, origMenuTitle, origMenuTitleGetter, origMenuAttributedTitle, origMenuAttributedTitleGetter, origMenuAccessibilityValue, origMenuAccessibilityLabel, origMenuAccessibilityTitle, origMenuAccessibilityDescription, origWindowTitle, origStringValue, origPlaceholder, origPlaceholderGetter, origAccessibilityLabel, origAccessibilityTitle, origAccessibilityHelp, origAccessibilityDescription, origToolTip, origAccessibilityValue, origSegmentAccessibilityValue, origSegmentAccessibilityDescription, origPopupTitleOfSelectedItem, origPopupCellTitle, origViewAccessibilityLabelGetter, origViewAccessibilityTitleGetter, origViewAccessibilityHelpGetter, origViewAccessibilityDescriptionGetter, origViewAccessibilityPlaceholderGetter, origViewAccessibilityValueGetter, origViewAccessibilityValueDescriptionGetter, origViewAccessibilityRoleDescriptionGetter, origButtonAccessibilityLabel, origButtonAccessibilityTitle, origButtonAccessibilityHelp, origButtonAccessibilityDescription, origBundleLocalized, origSplitChildren, origSplitters, origCellStringValue, origCellSetStringValue, origCellAccessibilityLabel, origCellAccessibilityTitle, origCellAccessibilityHelp, origCellAccessibilityValue, origSwiftLabel, origSwiftHelp, origSwiftDescription, origSwiftAttribute, origSwiftValue, origSwiftValueDescription, origSwiftRoleDescription, origSwiftPlaceholder, origSwiftAttributedLabel;
+static IMP origTitle, origButtonTitleGetter, origMenuTitle, origMenuTitleGetter, origMenuAttributedTitle, origMenuAttributedTitleGetter, origMenuAccessibilityValue, origMenuAccessibilityLabel, origMenuAccessibilityTitle, origMenuAccessibilityDescription, origWindowTitle, origStringValue, origPlaceholder, origPlaceholderGetter, origAccessibilityLabel, origAccessibilityTitle, origAccessibilityHelp, origAccessibilityDescription, origToolTip, origAccessibilityValue, origSegmentAccessibilityValue, origSegmentAccessibilityDescription, origSegmentAccessibilityDescriptionAttribute, origToolbarViewerDescriptionAttribute, origToolbarViewerTitleAttribute, origPopupTitleOfSelectedItem, origPopupCellTitle, origViewAccessibilityLabelGetter, origViewAccessibilityTitleGetter, origViewAccessibilityHelpGetter, origViewAccessibilityDescriptionGetter, origViewAccessibilityPlaceholderGetter, origViewAccessibilityValueGetter, origViewAccessibilityValueDescriptionGetter, origViewAccessibilityRoleDescriptionGetter, origButtonAccessibilityLabel, origButtonAccessibilityTitle, origButtonAccessibilityHelp, origButtonAccessibilityDescription, origToolbarItemLabel, origToolbarItemLabelGetter, origToolbarItemPaletteLabel, origToolbarItemPaletteLabelGetter, origToolbarItemToolTip, origToolbarItemToolTipGetter, origBundleLocalized, origSplitChildren, origSplitters, origCellStringValue, origCellSetStringValue, origCellAccessibilityLabel, origCellAccessibilityTitle, origCellAccessibilityHelp, origCellAccessibilityValue, origSwiftLabel, origSwiftHelp, origSwiftDescription, origSwiftAttribute, origSwiftValue, origSwiftValueDescription, origSwiftRoleDescription, origSwiftPlaceholder, origSwiftAttributedLabel;
 static IMP origAXElementAttribute, origAXElementValue, origAXElementPlaceholder, origAXElementLabel, origAXElementTitle, origAXElementHelp, origAXElementDescription, origAXElementRoleDescription;
 static __thread BOOL RXInAXElementHook;
 static NSMutableDictionary *RXPopupOriginals;
@@ -751,6 +752,7 @@ static NSHashTable *RXOwnedResidualOverlays;
 static void RXRefreshMenu(NSMenu *menu);
 static void RXUpdateSettingsResidualOverlays(NSWindow *window);
 static void RXTranslatePopupMenu(NSMenu *menu);
+static void RXRefreshToolbarItem(NSToolbarItem *item);
 static IMP RXPopupOriginal(id self, SEL sel) {
     for (Class cls = object_getClass(self); cls; cls = class_getSuperclass(cls)) {
         NSString *key = [NSString stringWithFormat:@"%p:%s", cls, sel_getName(sel)];
@@ -780,6 +782,27 @@ static id RXAXElementObject(id self, SEL _cmd) {
 }
 static void RXSetTitle(id self, SEL _cmd, NSString *value) {
     ((void (*)(id, SEL, NSString *))origTitle)(self, _cmd, RXTranslate(value));
+}
+static void RXSetToolbarItemLabel(id self, SEL _cmd, NSString *value) {
+    if (origToolbarItemLabel) ((void (*)(id, SEL, NSString *))origToolbarItemLabel)(self, _cmd, RXTranslate(value));
+}
+static NSString *RXToolbarItemLabel(id self, SEL _cmd) {
+    NSString *value = origToolbarItemLabelGetter ? ((NSString *(*)(id, SEL))origToolbarItemLabelGetter)(self, _cmd) : nil;
+    return RXTranslate(value);
+}
+static void RXSetToolbarItemPaletteLabel(id self, SEL _cmd, NSString *value) {
+    if (origToolbarItemPaletteLabel) ((void (*)(id, SEL, NSString *))origToolbarItemPaletteLabel)(self, _cmd, RXTranslate(value));
+}
+static NSString *RXToolbarItemPaletteLabel(id self, SEL _cmd) {
+    NSString *value = origToolbarItemPaletteLabelGetter ? ((NSString *(*)(id, SEL))origToolbarItemPaletteLabelGetter)(self, _cmd) : nil;
+    return RXTranslate(value);
+}
+static void RXSetToolbarItemToolTip(id self, SEL _cmd, NSString *value) {
+    if (origToolbarItemToolTip) ((void (*)(id, SEL, NSString *))origToolbarItemToolTip)(self, _cmd, RXTranslate(value));
+}
+static NSString *RXToolbarItemToolTip(id self, SEL _cmd) {
+    NSString *value = origToolbarItemToolTipGetter ? ((NSString *(*)(id, SEL))origToolbarItemToolTipGetter)(self, _cmd) : nil;
+    return RXTranslate(value);
 }
 static NSString *RXButtonTitle(id self, SEL _cmd) {
     NSString *value = origButtonTitleGetter ? ((NSString *(*)(id, SEL))origButtonTitleGetter)(self, _cmd) : nil;
@@ -826,6 +849,34 @@ static NSString *RXMenuAccessibilityDescription(id self, SEL _cmd) {
 static NSString *RXSegmentAccessibilityDescription(id self, SEL _cmd) {
     NSString *value = origSegmentAccessibilityDescription ? ((NSString *(*)(id, SEL))origSegmentAccessibilityDescription)(self, _cmd) : nil;
     return RXTranslate(value);
+}
+static NSString *RXSegmentAccessibilityDescriptionAttribute(id self, SEL _cmd) {
+    NSString *value = origSegmentAccessibilityDescriptionAttribute ? ((NSString *(*)(id, SEL))origSegmentAccessibilityDescriptionAttribute)(self, _cmd) : nil;
+    return RXTranslate(value);
+}
+static NSString *RXToolbarViewerDescriptionAttribute(id self, SEL _cmd) {
+    NSString *value = origToolbarViewerDescriptionAttribute ? ((NSString *(*)(id, SEL))origToolbarViewerDescriptionAttribute)(self, _cmd) : nil;
+    return RXTranslate(value);
+}
+static NSString *RXToolbarViewerTitleAttribute(id self, SEL _cmd) {
+    NSString *value = origToolbarViewerTitleAttribute ? ((NSString *(*)(id, SEL))origToolbarViewerTitleAttribute)(self, _cmd) : nil;
+    return RXTranslate(value);
+}
+static id RXSegmentAccessibilityAttributeValue(id self, SEL _cmd, NSString *attribute) {
+    IMP original = origSegmentAccessibilityValue ? origSegmentAccessibilityValue : (origAXElementAttribute ? origAXElementAttribute : origAccessibilityValue);
+    id value = original ? ((id (*)(id, SEL, NSString *))original)(self, _cmd, attribute) : nil;
+    NSString *translatedValue = [value isKindOfClass:[NSString class]] ? RXTranslate(value) : nil;
+    RXDebugTranslation(self, _cmd, value, [NSString stringWithFormat:@"Segment %@", attribute]);
+    if ([value isKindOfClass:[NSString class]] &&
+        ([attribute isEqualToString:NSAccessibilityTitleAttribute] ||
+         [attribute isEqualToString:NSAccessibilityDescriptionAttribute] ||
+         [attribute isEqualToString:NSAccessibilityHelpAttribute] ||
+         [attribute isEqualToString:NSAccessibilityValueAttribute] ||
+         [attribute isEqualToString:NSAccessibilityValueDescriptionAttribute] ||
+         [attribute isEqualToString:NSAccessibilityRoleDescriptionAttribute])) {
+        return translatedValue;
+    }
+    return value;
 }
 static NSString *RXCellStringValue(id self, SEL _cmd) {
     NSString *value = origCellStringValue ? ((NSString *(*)(id, SEL))origCellStringValue)(self, _cmd) : nil;
@@ -2107,6 +2158,10 @@ static void RXWalkAX(id element, NSUInteger depth) {
             }
             if (![translated isEqualToString:value] && [element respondsToSelector:@selector(accessibilitySetValue:forAttribute:)]) {
                 [element accessibilitySetValue:translated forAttribute:attribute];
+                if ([attribute isEqualToString:NSAccessibilityDescriptionAttribute] ||
+                    [attribute isEqualToString:NSAccessibilityTitleAttribute]) {
+                    NSAccessibilityPostNotification(element, NSAccessibilityValueChangedNotification);
+                }
             }
             if ([attribute isEqualToString:NSAccessibilityDescriptionAttribute] && ![translated isEqualToString:value] && [element respondsToSelector:@selector(setAccessibilityDescription:)]) {
                 [element setAccessibilityDescription:translated];
@@ -2122,10 +2177,52 @@ static void RXWalkAX(id element, NSUInteger depth) {
     }
 }
 
+static void RXRefreshToolbarItem(NSToolbarItem *item) {
+    if (![item isKindOfClass:[NSToolbarItem class]]) return;
+    NSString *label = item.label;
+    NSString *translatedLabel = RXTranslate(label);
+    if (translatedLabel.length && ![translatedLabel isEqualToString:label]) item.label = translatedLabel;
+    NSString *paletteLabel = item.paletteLabel;
+    NSString *translatedPaletteLabel = RXTranslate(paletteLabel);
+    if (translatedPaletteLabel.length && ![translatedPaletteLabel isEqualToString:paletteLabel]) item.paletteLabel = translatedPaletteLabel;
+    NSString *toolTip = item.toolTip;
+    NSString *translatedToolTip = RXTranslate(toolTip);
+    if (translatedToolTip.length && ![translatedToolTip isEqualToString:toolTip]) item.toolTip = translatedToolTip;
+    if ([item isKindOfClass:[NSToolbarItemGroup class]]) {
+        for (NSToolbarItem *child in [(NSToolbarItemGroup *)item subitems]) RXRefreshToolbarItem(child);
+    }
+}
+
+static void RXRefreshToolbar(NSToolbar *toolbar) {
+    if (![toolbar isKindOfClass:[NSToolbar class]]) return;
+    for (NSToolbarItem *item in toolbar.items) RXRefreshToolbarItem(item);
+}
+
+static void RXInstallSegmentHooks(void) {
+    if (origSegmentAccessibilityValue) return;
+    // These private AX provider classes are loaded lazily with the first
+    // toolbar that exposes indexed segments, so retry after windows exist.
+    Class segmentClass = objc_getClass("NSAccessibilityIndexedMockUIElement");
+    if (!segmentClass) segmentClass = objc_getClass("NSAccessibilitySegment");
+    if (!segmentClass) return;
+    origSegmentAccessibilityValue = RXHook(segmentClass, @selector(accessibilityAttributeValue:), (IMP)RXSegmentAccessibilityAttributeValue);
+    origSegmentAccessibilityDescription = RXHook(segmentClass, @selector(accessibilityDescription), (IMP)RXSegmentAccessibilityDescription);
+    Class concreteSegmentClass = objc_getClass("NSAccessibilitySegment");
+    if (concreteSegmentClass) {
+        origSegmentAccessibilityDescriptionAttribute = RXHook(concreteSegmentClass, @selector(accessibilityDescriptionAttribute), (IMP)RXSegmentAccessibilityDescriptionAttribute);
+    }
+    Class toolbarViewerClass = objc_getClass("NSToolbarItemViewer");
+    if (toolbarViewerClass) {
+        origToolbarViewerDescriptionAttribute = RXHook(toolbarViewerClass, @selector(accessibilityDescriptionAttribute), (IMP)RXToolbarViewerDescriptionAttribute);
+        origToolbarViewerTitleAttribute = RXHook(toolbarViewerClass, @selector(accessibilityTitleAttribute), (IMP)RXToolbarViewerTitleAttribute);
+    }
+}
+
 static void RXRefreshAccessibility(void) {
     RXInstallMenuItemHooks();
     RXInstallSwiftNodeHooks();
     RXInstallPopupHooks();
+    RXInstallSegmentHooks();
     for (NSWindow *window in NSApp.windows) {
         RXHasDefaultShellFrame = NO;
         RXHasNotificationFrame = NO;
@@ -2134,6 +2231,7 @@ static void RXRefreshAccessibility(void) {
         RXHasRemoteErrorNode = NO;
         RXHasRemoteSaveFrame = NO;
         RXAXWalkWindow = window;
+        RXRefreshToolbar(window.toolbar);
         RXWalk(window.contentView);
         RXWalkAX(window, 0);
         RXUpdateSettingsResidualOverlays(window);
@@ -2157,6 +2255,12 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
         origAXElementRoleDescription = axElement ? RXHook(axElement, @selector(accessibilityRoleDescription), (IMP)RXAXElementObject) : NULL;
         origTitle = RXHook([NSButton class], @selector(setTitle:), (IMP)RXSetTitle);
         origButtonTitleGetter = RXHook([NSButton class], @selector(title), (IMP)RXButtonTitle);
+        origToolbarItemLabel = RXHook([NSToolbarItem class], @selector(setLabel:), (IMP)RXSetToolbarItemLabel);
+        origToolbarItemLabelGetter = RXHook([NSToolbarItem class], @selector(label), (IMP)RXToolbarItemLabel);
+        origToolbarItemPaletteLabel = RXHook([NSToolbarItem class], @selector(setPaletteLabel:), (IMP)RXSetToolbarItemPaletteLabel);
+        origToolbarItemPaletteLabelGetter = RXHook([NSToolbarItem class], @selector(paletteLabel), (IMP)RXToolbarItemPaletteLabel);
+        origToolbarItemToolTip = RXHook([NSToolbarItem class], @selector(setToolTip:), (IMP)RXSetToolbarItemToolTip);
+        origToolbarItemToolTipGetter = RXHook([NSToolbarItem class], @selector(toolTip), (IMP)RXToolbarItemToolTip);
         origMenuTitle = RXHook([NSMenuItem class], @selector(setTitle:), (IMP)RXSetMenuTitle);
         origMenuTitleGetter = RXHook([NSMenuItem class], @selector(title), (IMP)RXMenuTitle);
         origMenuAttributedTitle = RXHook([NSMenuItem class], @selector(setAttributedTitle:), (IMP)RXSetMenuAttributedTitle);
@@ -2183,9 +2287,6 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
         origViewAccessibilityValueDescriptionGetter = RXHook([NSView class], @selector(accessibilityValueDescription), (IMP)RXViewAccessibilityValueDescription);
         origViewAccessibilityRoleDescriptionGetter = RXHook([NSView class], @selector(accessibilityRoleDescription), (IMP)RXViewAccessibilityRoleDescription);
         origAccessibilityValue = RXHook([NSView class], @selector(accessibilityAttributeValue:), (IMP)RXAccessibilityAttributeValue);
-        Class segmentClass = objc_getClass("NSAccessibilitySegment");
-        origSegmentAccessibilityValue = segmentClass ? RXHook(segmentClass, @selector(accessibilityAttributeValue:), (IMP)RXAccessibilityAttributeValue) : NULL;
-        origSegmentAccessibilityDescription = segmentClass ? RXHook(segmentClass, @selector(accessibilityDescription), (IMP)RXSegmentAccessibilityDescription) : NULL;
         origCellStringValue = RXHook([NSCell class], @selector(stringValue), (IMP)RXCellStringValue);
         origCellSetStringValue = RXHook([NSCell class], @selector(setStringValue:), (IMP)RXCellSetStringValue);
         RXInstallDrawingHooks();
