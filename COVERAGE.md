@@ -2,6 +2,8 @@
 
 最后回归：2026-10-28（macOS，`Rex Beta 中文版.app`）。验证对象是补丁副本，不是原版 `/Applications/Rex Beta.app`。
 
+本轮复测先用 `patch.sh` 从原版重新生成补丁副本，退出并重新启动中文版客户端后再执行 UI 回归；因此下面的结果来自稳定提交 `0fdbadc` 的新进程，而不是旧的内存映像。对照打开 `/Applications/Rex Beta.app` 时，同一主工作区仍显示英文。
+
 ## 已实测覆盖
 
 | 区域 | 结果 | 实测内容 |
@@ -35,6 +37,8 @@
 - `RexZh.m` 通过 `clang -fsyntax-only -fobjc-arc -fblocks`（仅有 macOS Accessibility API 弃用警告）。
 - 两个动态库均包含 `arm64` 和 `x86_64`，应用通过 `codesign --verify --deep --strict`。
 - `git diff --check` 通过。
+- 复测了主题编辑器、字体选择器、快捷键“配置”菜单、开发者“更新频道”菜单和 Rex 安装位置菜单；这些弹层的可见标签与帮助文本均为中文，颜色名和字体名等用户数据保留原文。
+- 运行时对照确认：中文版进程加载两个补丁动态库；原版 `/Applications/Rex Beta.app` 的同一主工作区仍返回 `Tabs`、`Change Session`、`Command Palette` 等英文。
 
 ## 有意保留原文或未执行的路径
 
