@@ -7,6 +7,9 @@
 "Integrations" = "集成";
 "Notifications" = "通知";
 "Remote Hosts" = "远程主机";
+"Edit Host" = "编辑主机";
+"Changes are saved locally on this Mac." = "更改将保存在此 Mac 本地。";
+"Save" = "保存";
 "Developer" = "开发者";
 "Appearance" = "外观";
 "Color scheme" = "配色方案";
@@ -230,6 +233,10 @@
 "Disconnected" = "已断开连接";
 "Couldn’t connect" = "无法连接";
 "Couldn't connect" = "无法连接";
+"Couldn’t find" = "找不到";
+"Couldn't find" = "找不到";
+"Couldn’t connect to" = "无法连接到";
+"Couldn't connect to" = "无法连接到";
 "Retry" = "重试";
 "Copy" = "复制";
 "Shows connection details and Retry" = "显示连接详情并重试";

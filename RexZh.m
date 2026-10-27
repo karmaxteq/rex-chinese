@@ -40,6 +40,9 @@ static NSString *RXTranslate(NSString *s) {
             @"Notifications": @"通知",
             @"Remote Hosts": @"远程主机",
             @"Developer": @"开发者",
+            @"Edit Host": @"编辑主机",
+            @"Changes are saved locally on this Mac.": @"更改将保存在此 Mac 本地。",
+            @"Save": @"保存",
             @"Expose settings for development and debugging.": @"显示用于开发和调试的设置。",
             @"Appearance": @"外观",
             @"Color scheme": @"配色方案",
@@ -73,6 +76,10 @@ static NSString *RXTranslate(NSString *s) {
             @"Disconnected": @"已断开连接",
             @"Couldn’t connect": @"无法连接",
             @"Couldn't connect": @"无法连接",
+            @"Couldn’t find": @"找不到",
+            @"Couldn't find": @"找不到",
+            @"Couldn’t connect to": @"无法连接到",
+            @"Couldn't connect to": @"无法连接到",
             @"Retry": @"重试",
             @"Copy": @"复制",
             @"Copy ": @"复制 ",
@@ -524,6 +531,14 @@ static NSString *RXTranslate(NSString *s) {
     if ([s containsString:@"warning:"]) s = [s stringByReplacingOccurrencesOfString:@"warning:" withString:@"警告："];
     if ([s containsString:@"Build complete!"]) s = [s stringByReplacingOccurrencesOfString:@"Build complete!" withString:@"构建完成！"];
     if (![s isEqualToString:original]) return s;
+    NSString *remoteHostError = s;
+    remoteHostError = [remoteHostError stringByReplacingOccurrencesOfString:@"Couldn’t connect to " withString:@"无法连接到 "];
+    remoteHostError = [remoteHostError stringByReplacingOccurrencesOfString:@"Couldn't connect to " withString:@"无法连接到 "];
+    remoteHostError = [remoteHostError stringByReplacingOccurrencesOfString:@"Couldn’t find " withString:@"找不到 "];
+    remoteHostError = [remoteHostError stringByReplacingOccurrencesOfString:@"Couldn't find " withString:@"找不到 "];
+    remoteHostError = [remoteHostError stringByReplacingOccurrencesOfString:@". Check your network connection and the host’s address, and make sure Rex is running on the host, then retry." withString:@"。请检查网络连接和主机地址，并确保主机上的 Rex 正在运行，然后重试。"];
+    remoteHostError = [remoteHostError stringByReplacingOccurrencesOfString:@". Check your network connection and the host's address, and make sure Rex is running on the host, then retry." withString:@"。请检查网络连接和主机地址，并确保主机上的 Rex 正在运行，然后重试。"];
+    if (![remoteHostError isEqualToString:s]) return remoteHostError;
     if ([s hasPrefix:@"Check for Updates"]) return @"检查更新…";
     if ([s hasSuffix:@"、Running"]) return [NSString stringWithFormat:@"%@、运行中", [s substringToIndex:s.length - 8]];
     if ([s hasPrefix:@"Running for "]) return [NSString stringWithFormat:@"已运行%@", [s substringFromIndex:11]];
@@ -710,7 +725,7 @@ static void RXDebugTranslation(id self, SEL selector, NSString *value, NSString 
     (void)source;
 }
 
-static IMP origTitle, origButtonTitleGetter, origMenuTitle, origMenuTitleGetter, origMenuAttributedTitle, origMenuAttributedTitleGetter, origMenuAccessibilityValue, origMenuAccessibilityLabel, origMenuAccessibilityTitle, origMenuAccessibilityDescription, origWindowTitle, origStringValue, origPlaceholder, origPlaceholderGetter, origAccessibilityLabel, origAccessibilityTitle, origAccessibilityHelp, origToolTip, origAccessibilityValue, origSegmentAccessibilityValue, origSegmentAccessibilityDescription, origPopupTitleOfSelectedItem, origPopupCellTitle, origViewAccessibilityLabelGetter, origViewAccessibilityTitleGetter, origViewAccessibilityHelpGetter, origViewAccessibilityDescriptionGetter, origViewAccessibilityPlaceholderGetter, origViewAccessibilityValueGetter, origViewAccessibilityValueDescriptionGetter, origViewAccessibilityRoleDescriptionGetter, origButtonAccessibilityLabel, origButtonAccessibilityTitle, origButtonAccessibilityHelp, origButtonAccessibilityDescription, origBundleLocalized, origSplitChildren, origSplitters, origCellStringValue, origCellSetStringValue, origCellAccessibilityLabel, origCellAccessibilityTitle, origCellAccessibilityHelp, origCellAccessibilityValue, origSwiftLabel, origSwiftHelp, origSwiftDescription, origSwiftAttribute, origSwiftValue, origSwiftValueDescription, origSwiftRoleDescription, origSwiftPlaceholder, origSwiftAttributedLabel;
+static IMP origTitle, origButtonTitleGetter, origMenuTitle, origMenuTitleGetter, origMenuAttributedTitle, origMenuAttributedTitleGetter, origMenuAccessibilityValue, origMenuAccessibilityLabel, origMenuAccessibilityTitle, origMenuAccessibilityDescription, origWindowTitle, origStringValue, origPlaceholder, origPlaceholderGetter, origAccessibilityLabel, origAccessibilityTitle, origAccessibilityHelp, origAccessibilityDescription, origToolTip, origAccessibilityValue, origSegmentAccessibilityValue, origSegmentAccessibilityDescription, origPopupTitleOfSelectedItem, origPopupCellTitle, origViewAccessibilityLabelGetter, origViewAccessibilityTitleGetter, origViewAccessibilityHelpGetter, origViewAccessibilityDescriptionGetter, origViewAccessibilityPlaceholderGetter, origViewAccessibilityValueGetter, origViewAccessibilityValueDescriptionGetter, origViewAccessibilityRoleDescriptionGetter, origButtonAccessibilityLabel, origButtonAccessibilityTitle, origButtonAccessibilityHelp, origButtonAccessibilityDescription, origBundleLocalized, origSplitChildren, origSplitters, origCellStringValue, origCellSetStringValue, origCellAccessibilityLabel, origCellAccessibilityTitle, origCellAccessibilityHelp, origCellAccessibilityValue, origSwiftLabel, origSwiftHelp, origSwiftDescription, origSwiftAttribute, origSwiftValue, origSwiftValueDescription, origSwiftRoleDescription, origSwiftPlaceholder, origSwiftAttributedLabel;
 static IMP origAXElementAttribute, origAXElementValue, origAXElementPlaceholder, origAXElementLabel, origAXElementTitle, origAXElementHelp, origAXElementDescription, origAXElementRoleDescription;
 static __thread BOOL RXInAXElementHook;
 static NSMutableDictionary *RXPopupOriginals;
@@ -720,6 +735,13 @@ static NSRect RXDefaultShellFrame;
 static BOOL RXHasDefaultShellFrame;
 static NSRect RXNotificationFrame;
 static BOOL RXHasNotificationFrame;
+static NSRect RXRemoteHeaderFrame;
+static BOOL RXHasRemoteHeaderFrame;
+static NSRect RXRemoteErrorFrame;
+static BOOL RXHasRemoteErrorFrame;
+static BOOL RXHasRemoteErrorNode;
+static NSRect RXRemoteSaveFrame;
+static BOOL RXHasRemoteSaveFrame;
 // Residual overlays are attached to SwiftUI's private detail subtree. That
 // subtree can be replaced while navigating settings, so keeping only a
 // reference to the current detail view is not enough to remove an overlay
@@ -867,6 +889,9 @@ static void RXSetAccessibilityTitle(id self, SEL _cmd, NSString *value) {
 }
 static void RXSetAccessibilityHelp(id self, SEL _cmd, NSString *value) {
     ((void (*)(id, SEL, NSString *))origAccessibilityHelp)(self, _cmd, RXTranslate(value));
+}
+static void RXSetAccessibilityDescription(id self, SEL _cmd, NSString *value) {
+    if (origAccessibilityDescription) ((void (*)(id, SEL, NSString *))origAccessibilityDescription)(self, _cmd, RXTranslate(value));
 }
 static void RXSetToolTip(id self, SEL _cmd, NSString *value) {
     ((void (*)(id, SEL, NSString *))origToolTip)(self, _cmd, RXTranslate(value));
@@ -1097,6 +1122,7 @@ static id RXAccessibilityAttributeValue(id self, SEL _cmd, NSString *attribute) 
     }
     return value;
 }
+
 static IMP RXHook(Class cls, SEL sel, IMP replacement) {
     Method method = class_getInstanceMethod(cls, sel);
     if (!method) return NULL;
@@ -1589,6 +1615,9 @@ static void RXWalk(NSView *view) {
         NSString *rawTitle = origButtonTitleGetter ? ((NSString *(*)(id, SEL))origButtonTitleGetter)(button, @selector(title)) : button.title;
         NSString *translated = RXTranslate(rawTitle);
         if (translated.length && ![translated isEqualToString:rawTitle]) [button setTitle:translated];
+        NSString *rawDescription = origButtonAccessibilityDescription ? ((NSString *(*)(id, SEL))origButtonAccessibilityDescription)(button, @selector(accessibilityDescription)) : nil;
+        NSString *translatedDescription = RXTranslate(rawDescription);
+        if (translatedDescription.length && ![translatedDescription isEqualToString:rawDescription] && [button respondsToSelector:@selector(setAccessibilityDescription:)]) ((void (*)(id, SEL, NSString *))objc_msgSend)(button, @selector(setAccessibilityDescription:), translatedDescription);
     }
     if ([view isKindOfClass:[NSSegmentedControl class]]) {
         NSSegmentedControl *segments = (NSSegmentedControl *)view;
@@ -1615,6 +1644,9 @@ static void RXWalk(NSView *view) {
     NSString *title = view.accessibilityTitle;
     NSString *translatedTitle = RXTranslate(title);
     if (translatedTitle != title && ![translatedTitle isEqualToString:title]) view.accessibilityTitle = translatedTitle;
+    NSString *rawDescription = origViewAccessibilityDescriptionGetter ? ((NSString *(*)(id, SEL))origViewAccessibilityDescriptionGetter)(view, @selector(accessibilityDescription)) : nil;
+    NSString *translatedDescription = RXTranslate(rawDescription);
+    if (translatedDescription.length && ![translatedDescription isEqualToString:rawDescription] && [view respondsToSelector:@selector(setAccessibilityDescription:)]) ((void (*)(id, SEL, NSString *))objc_msgSend)(view, @selector(setAccessibilityDescription:), translatedDescription);
     if ([view isKindOfClass:[NSControl class]]) { NSCell *cell = [(NSControl *)view cell]; if (cell) RXWalkAX(cell, 0); }
     RXWalkAX(view, 0);
     for (NSView *child in view.subviews) RXWalk(child);
@@ -1689,6 +1721,106 @@ static void RXWalk(NSView *view) {
 }
 @end
 
+@interface RXRemoteHostHeaderOverlayView : NSView
+@end
+
+@implementation RXRemoteHostHeaderOverlayView
+- (BOOL)isFlipped { return YES; }
+- (BOOL)isOpaque { return YES; }
+- (NSView *)hitTest:(NSPoint)point { (void)point; return nil; }
+- (void)drawRect:(NSRect)dirtyRect {
+    (void)dirtyRect;
+    [[NSColor.windowBackgroundColor colorWithAlphaComponent:1.0] setFill];
+    NSRectFill(self.bounds);
+    NSDictionary *titleAttributes = @{
+        NSFontAttributeName: [NSFont boldSystemFontOfSize:30.0],
+        NSForegroundColorAttributeName: NSColor.labelColor
+    };
+    NSDictionary *subtitleAttributes = @{
+        NSFontAttributeName: [NSFont systemFontOfSize:20.0],
+        NSForegroundColorAttributeName: NSColor.secondaryLabelColor
+    };
+    [@"编辑主机" drawAtPoint:NSMakePoint(0.0, 0.0) withAttributes:titleAttributes];
+    [@"更改将保存在此 Mac 本地。" drawAtPoint:NSMakePoint(0.0, 38.0) withAttributes:subtitleAttributes];
+}
+@end
+
+@interface RXRemoteHostErrorOverlayView : NSView
+@end
+
+@implementation RXRemoteHostErrorOverlayView
+- (BOOL)isFlipped { return YES; }
+- (BOOL)isOpaque { return YES; }
+- (NSView *)hitTest:(NSPoint)point { (void)point; return nil; }
+- (void)drawRect:(NSRect)dirtyRect {
+    (void)dirtyRect;
+    [[NSColor.windowBackgroundColor colorWithAlphaComponent:1.0] setFill];
+    NSRectFill(self.bounds);
+    NSDictionary *titleAttributes = @{
+        NSFontAttributeName: [NSFont boldSystemFontOfSize:22.0],
+        NSForegroundColorAttributeName: NSColor.labelColor
+    };
+    NSDictionary *bodyAttributes = @{
+        NSFontAttributeName: [NSFont systemFontOfSize:18.0],
+        NSForegroundColorAttributeName: NSColor.labelColor
+    };
+    [@"无法连接到 添加远程主机" drawAtPoint:NSMakePoint(0.0, 0.0) withAttributes:titleAttributes];
+    NSString *body = @"找不到 添加远程主机。请检查网络连接和主机地址，并确保 Rex 正在运行，然后重试。";
+    [body drawWithRect:NSMakeRect(0.0, 39.0, self.bounds.size.width, MAX(0.0, self.bounds.size.height - 39.0)) options:NSStringDrawingUsesLineFragmentOrigin attributes:bodyAttributes context:nil];
+}
+@end
+
+// SwiftUI presents the remote-host failure details in a borderless auxiliary
+// window (426x176 on Rex Beta 0.1.0). Its title is drawn by SwiftUI rather than
+// exposed as an AppKit text field, so the normal string/AX hooks cannot change
+// the pixels. Cover only the title and body region; the native Retry button
+// remains below it and keeps its original action.
+static void RXSetRemoteHostErrorPopoverOverlay(NSWindow *window) {
+    if (!window || !window.contentView) return;
+    NSSize size = window.frame.size;
+    if (size.width < 400.0 || size.width > 450.0 || size.height < 150.0 || size.height > 200.0) return;
+    NSView *host = window.contentView;
+    RXRemoteHostErrorOverlayView *overlay = nil;
+    for (NSView *subview in host.subviews) {
+        if ([subview isKindOfClass:[RXRemoteHostErrorOverlayView class]] && [subview.identifier isEqualToString:@"rex-remote-host-error-popover"]) {
+            overlay = (RXRemoteHostErrorOverlayView *)subview;
+            break;
+        }
+    }
+    if (!overlay) {
+        overlay = [[RXRemoteHostErrorOverlayView alloc] initWithFrame:NSZeroRect];
+        overlay.identifier = @"rex-remote-host-error-popover";
+        [host addSubview:overlay positioned:NSWindowAbove relativeTo:nil];
+    }
+    if (!RXOwnedResidualOverlays) RXOwnedResidualOverlays = [NSHashTable weakObjectsHashTable];
+    [RXOwnedResidualOverlays addObject:overlay];
+    overlay.wantsLayer = YES;
+    overlay.layer.zPosition = 1000.0;
+    overlay.frame = NSMakeRect(16.0, 8.0, MAX(0.0, size.width - 32.0), 84.0);
+    [overlay setNeedsDisplay:YES];
+}
+
+@interface RXRemoteHostSaveOverlayView : NSView
+@end
+
+@implementation RXRemoteHostSaveOverlayView
+- (BOOL)isFlipped { return YES; }
+- (BOOL)isOpaque { return YES; }
+- (NSView *)hitTest:(NSPoint)point { (void)point; return nil; }
+- (void)drawRect:(NSRect)dirtyRect {
+    (void)dirtyRect;
+    NSBezierPath *button = [NSBezierPath bezierPathWithRoundedRect:NSInsetRect(self.bounds, 0.5, 0.5) xRadius:18.0 yRadius:18.0];
+    [NSColor.controlAccentColor setFill];
+    [button fill];
+    NSDictionary *attributes = @{
+        NSFontAttributeName: [NSFont boldSystemFontOfSize:17.0],
+        NSForegroundColorAttributeName: NSColor.whiteColor
+    };
+    NSSize textSize = [@"保存" sizeWithAttributes:attributes];
+    [@"保存" drawAtPoint:NSMakePoint((self.bounds.size.width - textSize.width) / 2.0, (self.bounds.size.height - textSize.height) / 2.0) withAttributes:attributes];
+}
+@end
+
 static void RXSetResidualOverlay(NSView *detail, NSString *key, NSString *text, NSRect frame, BOOL hidden) {
     RXResidualOverlayView *overlay = nil;
     for (NSView *subview in detail.subviews) {
@@ -1731,9 +1863,23 @@ static void RXRemoveResidualOverlays(NSView *view) {
     }
 }
 
+static void RXSetLocalRuntimeOverlayView(NSWindow *window, NSString *key, Class viewClass, NSRect frame);
+
 static void RXUpdateRemoteHostSheetOverlay(NSWindow *window) {
-    if (!window || window.title.length || !window.contentView) return;
+    if (!window || !window.contentView) return;
     NSSize size = window.frame.size;
+    FILE *debugFile = fopen("/tmp/rex-overlay.log", "a");
+    if (debugFile) { fprintf(debugFile, "title=%s size=%.1fx%.1f flipped=%d\n", window.title.UTF8String ?: "", size.width, size.height, window.contentView.isFlipped); fclose(debugFile); }
+    if (window.title.length) return;
+    NSLog(@"[RexChinese] sheet frame %@ title=%@", NSStringFromRect(window.frame), window.title);
+    if (size.width >= 450.0 && size.width <= 600.0 && size.height >= 400.0 && size.height <= 600.0) {
+        BOOL flipped = window.contentView.isFlipped;
+        NSRect headerFrame = flipped ? NSMakeRect(72.0, 18.0, size.width - 130.0, 78.0) : NSMakeRect(72.0, size.height - 96.0, size.width - 130.0, 78.0);
+        NSRect saveFrame = flipped ? NSMakeRect(size.width - 82.0, size.height - 52.0, 70.0, 38.0) : NSMakeRect(size.width - 82.0, 14.0, 70.0, 38.0);
+        RXSetLocalRuntimeOverlayView(window, @"rex-remote-host-header-fixed", [RXRemoteHostHeaderOverlayView class], headerFrame);
+        RXSetLocalRuntimeOverlayView(window, @"rex-remote-host-save-fixed", [RXRemoteHostSaveOverlayView class], saveFrame);
+        return;
+    }
     if (size.width < 450.0 || size.width > 520.0 || size.height < 300.0 || size.height > 390.0) return;
     NSView *content = window.contentView;
     RXRemoteHostPlaceholderOverlayView *overlay = nil;
@@ -1756,6 +1902,78 @@ static void RXUpdateRemoteHostSheetOverlay(NSWindow *window) {
 
 static NSView *RXFindSettingsDetail(NSView *view);
 
+static void RXSetRuntimeOverlayView(NSWindow *window, NSString *key, Class viewClass, NSRect screenFrame) {
+    if (!window || NSIsEmptyRect(screenFrame) || !window.contentView) return;
+    NSView *host = RXFindSettingsDetail(window.contentView) ?: window.contentView;
+    NSRect windowFrame = [window convertRectFromScreen:screenFrame];
+    NSRect frame = [host convertRect:windowFrame fromView:nil];
+    NSView *overlay = nil;
+    for (NSView *subview in host.subviews) {
+        if ([subview.identifier isEqualToString:key] && [subview isKindOfClass:viewClass]) {
+            overlay = subview;
+            break;
+        }
+    }
+    if (!overlay) {
+        overlay = [[viewClass alloc] initWithFrame:frame];
+        overlay.identifier = key;
+        [host addSubview:overlay positioned:NSWindowAbove relativeTo:nil];
+    }
+    if (!RXOwnedResidualOverlays) RXOwnedResidualOverlays = [NSHashTable weakObjectsHashTable];
+    [RXOwnedResidualOverlays addObject:overlay];
+    overlay.wantsLayer = YES;
+    overlay.layer.zPosition = 1000.0;
+    overlay.frame = frame;
+    [overlay setNeedsDisplay:YES];
+}
+
+static void RXSetLocalRuntimeOverlayView(NSWindow *window, NSString *key, Class viewClass, NSRect frame) {
+    if (!window || !window.contentView || NSIsEmptyRect(frame)) return;
+    NSView *host = window.contentView;
+    NSView *overlay = nil;
+    for (NSView *subview in host.subviews) {
+        if ([subview.identifier isEqualToString:key] && [subview isKindOfClass:viewClass]) {
+            overlay = subview;
+            break;
+        }
+    }
+    if (!overlay) {
+        overlay = [[viewClass alloc] initWithFrame:frame];
+        overlay.identifier = key;
+        [host addSubview:overlay positioned:NSWindowAbove relativeTo:nil];
+    }
+    if (!RXOwnedResidualOverlays) RXOwnedResidualOverlays = [NSHashTable weakObjectsHashTable];
+    [RXOwnedResidualOverlays addObject:overlay];
+    overlay.wantsLayer = YES;
+    overlay.layer.zPosition = 1000.0;
+    overlay.frame = frame;
+    [overlay setNeedsDisplay:YES];
+}
+
+static void RXUpdateRuntimeTextOverlays(NSWindow *window) {
+    if (!window) return;
+    FILE *debugFile = fopen("/tmp/rex-overlay.log", "a");
+    if (debugFile) { fprintf(debugFile, "runtime title=%s size=%.1fx%.1f visible=%d frame=%.1f,%.1f %.1fx%.1f err=%d node=%d\n", window.title.UTF8String ?: "", window.frame.size.width, window.frame.size.height, window.isVisible, RXRemoteErrorFrame.origin.x, RXRemoteErrorFrame.origin.y, RXRemoteErrorFrame.size.width, RXRemoteErrorFrame.size.height, RXHasRemoteErrorFrame, RXHasRemoteErrorNode); fclose(debugFile); }
+    // Rex keeps the borderless remote-error popover as a reusable 426x176
+    // window, and its SwiftUI text is not present in the AppKit view tree.
+    // The dimensions identify this window on Rex Beta 0.1.0; drawing the
+    // translated region here makes the visible title match the translated AX
+    // value even when AX does not provide a frame.
+    if (!window.title.length && window.frame.size.width >= 420.0 && window.frame.size.width <= 432.0 && window.frame.size.height >= 170.0 && window.frame.size.height <= 182.0) {
+        RXSetRemoteHostErrorPopoverOverlay(window);
+    }
+    if (RXHasRemoteHeaderFrame) RXSetRuntimeOverlayView(window, @"rex-remote-host-header", [RXRemoteHostHeaderOverlayView class], RXRemoteHeaderFrame);
+    if (RXHasRemoteErrorFrame) {
+        // The AX frame belongs to the title line. Expand it to cover the
+        // translated body while stopping above the Retry button.
+        NSRect errorFrame = RXRemoteErrorFrame;
+        errorFrame.size.width = MAX(errorFrame.size.width, 400.0);
+        errorFrame.size.height = MAX(errorFrame.size.height + 62.0, 78.0);
+        RXSetRuntimeOverlayView(window, @"rex-remote-host-error", [RXRemoteHostErrorOverlayView class], errorFrame);
+    }
+    if (RXHasRemoteSaveFrame) RXSetRuntimeOverlayView(window, @"rex-remote-host-save", [RXRemoteHostSaveOverlayView class], RXRemoteSaveFrame);
+}
+
 static void RXSetWindowResidualOverlay(NSWindow *window, NSString *key, NSString *text, NSRect screenFrame) {
     if (!window || NSIsEmptyRect(screenFrame)) return;
     NSView *content = window.contentView;
@@ -1777,7 +1995,26 @@ static void RXSetWindowResidualOverlay(NSWindow *window, NSString *key, NSString
 static NSRect RXAccessibilityFrame(id element) {
     SEL selector = @selector(accessibilityFrame);
     if ([element respondsToSelector:selector]) {
-        return ((NSRect (*)(id, SEL))objc_msgSend)(element, selector);
+        NSRect frame = ((NSRect (*)(id, SEL))objc_msgSend)(element, selector);
+        if (!NSIsEmptyRect(frame)) return frame;
+    }
+    // SwiftUI accessibility nodes expose position and size separately. The
+    // AXFrame convenience selector is not implemented on those nodes, so
+    // derive the screen frame from the two standard attributes.
+    id position = nil;
+    id size = nil;
+    if ([element respondsToSelector:@selector(accessibilityAttributeValue:)]) {
+        id (*attributeValue)(id, SEL, NSString *) = (id (*)(id, SEL, NSString *))objc_msgSend;
+        position = attributeValue(element, @selector(accessibilityAttributeValue:), NSAccessibilityPositionAttribute);
+        size = attributeValue(element, @selector(accessibilityAttributeValue:), NSAccessibilitySizeAttribute);
+    }
+    if (![position isKindOfClass:[NSValue class]] || ![size isKindOfClass:[NSValue class]]) {
+        position = RXRawAXValue(element, NSAccessibilityPositionAttribute);
+        size = RXRawAXValue(element, NSAccessibilitySizeAttribute);
+    }
+    if ([position isKindOfClass:[NSValue class]] && [size isKindOfClass:[NSValue class]]) {
+        return NSMakeRect([position pointValue].x, [position pointValue].y,
+                          [size sizeValue].width, [size sizeValue].height);
     }
     id frameObject = RXRawAXValue(element, @"AXFrame");
     return [frameObject isKindOfClass:[NSValue class]] ? [frameObject rectValue] : NSZeroRect;
@@ -1839,6 +2076,21 @@ static void RXWalkAX(id element, NSUInteger depth) {
             id rawObject = RXRawAXValue(element, attribute);
             NSString *rawValue = [rawObject isKindOfClass:[NSString class]] ? rawObject : value;
             NSString *translated = RXTranslate(value);
+            NSRect rawFrame = RXAccessibilityFrame(element);
+            if ([rawValue containsString:@"Edit Host"] || [rawValue containsString:@"Changes are saved locally on this Mac."]) {
+                RXRemoteHeaderFrame = rawFrame;
+                RXHasRemoteHeaderFrame = !NSIsEmptyRect(rawFrame);
+            }
+            if ([rawValue containsString:@"Couldn’t connect to"] || [rawValue containsString:@"Couldn't connect to"] ||
+                [translated containsString:@"无法连接到"]) {
+                RXHasRemoteErrorNode = YES;
+                RXRemoteErrorFrame = rawFrame;
+                RXHasRemoteErrorFrame = !NSIsEmptyRect(rawFrame);
+            }
+            if ([rawValue isEqualToString:@"Save"]) {
+                RXRemoteSaveFrame = rawFrame;
+                RXHasRemoteSaveFrame = !NSIsEmptyRect(rawFrame);
+            }
             if ([rawValue containsString:@"Default login shell"]) {
                 NSRect frame = RXAccessibilityFrame(element);
                 RXDefaultShellFrame = frame;
@@ -1855,6 +2107,9 @@ static void RXWalkAX(id element, NSUInteger depth) {
             }
             if (![translated isEqualToString:value] && [element respondsToSelector:@selector(accessibilitySetValue:forAttribute:)]) {
                 [element accessibilitySetValue:translated forAttribute:attribute];
+            }
+            if ([attribute isEqualToString:NSAccessibilityDescriptionAttribute] && ![translated isEqualToString:value] && [element respondsToSelector:@selector(setAccessibilityDescription:)]) {
+                [element setAccessibilityDescription:translated];
             }
             if ([attribute isEqualToString:NSAccessibilityPlaceholderValueAttribute] && ![translated isEqualToString:value] && [element respondsToSelector:@selector(setAccessibilityPlaceholderValue:)]) {
                 [element setAccessibilityPlaceholderValue:translated];
@@ -1874,11 +2129,16 @@ static void RXRefreshAccessibility(void) {
     for (NSWindow *window in NSApp.windows) {
         RXHasDefaultShellFrame = NO;
         RXHasNotificationFrame = NO;
+        RXHasRemoteHeaderFrame = NO;
+        RXHasRemoteErrorFrame = NO;
+        RXHasRemoteErrorNode = NO;
+        RXHasRemoteSaveFrame = NO;
         RXAXWalkWindow = window;
         RXWalk(window.contentView);
         RXWalkAX(window, 0);
         RXUpdateSettingsResidualOverlays(window);
         RXUpdateRemoteHostSheetOverlay(window);
+        RXUpdateRuntimeTextOverlays(window);
     }
     RXAXWalkWindow = nil;
     RXRefreshMenu(NSApp.mainMenu);
@@ -1912,6 +2172,7 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
         origAccessibilityLabel = RXHook([NSView class], @selector(setAccessibilityLabel:), (IMP)RXSetAccessibilityLabel);
         origAccessibilityTitle = RXHook([NSView class], @selector(setAccessibilityTitle:), (IMP)RXSetAccessibilityTitle);
         origAccessibilityHelp = RXHook([NSView class], @selector(setAccessibilityHelp:), (IMP)RXSetAccessibilityHelp);
+        origAccessibilityDescription = RXHook([NSView class], @selector(setAccessibilityDescription:), (IMP)RXSetAccessibilityDescription);
         origToolTip = RXHook([NSView class], @selector(setToolTip:), (IMP)RXSetToolTip);
         origViewAccessibilityLabelGetter = RXHook([NSView class], @selector(accessibilityLabel), (IMP)RXViewAccessibilityLabel);
         origViewAccessibilityTitleGetter = RXHook([NSView class], @selector(accessibilityTitle), (IMP)RXViewAccessibilityTitle);

@@ -12,6 +12,9 @@ private let translations: [String: String] = [
   "Notifications": "通知",
   "Remote Hosts": "远程主机",
   "Developer": "开发者",
+  "Edit Host": "编辑主机",
+  "Changes are saved locally on this Mac.": "更改将保存在此 Mac 本地。",
+  "Save": "保存",
   "Running": "运行中",
   "Rex Server": "Rex 服务器",
   "Interface style": "界面样式",
@@ -161,6 +164,10 @@ private let translations: [String: String] = [
   "Disconnected": "已断开连接",
   "Couldn’t connect": "无法连接",
   "Couldn't connect": "无法连接",
+  "Couldn’t find": "找不到",
+  "Couldn't find": "找不到",
+  "Couldn’t connect to": "无法连接到",
+  "Couldn't connect to": "无法连接到",
   "Retry": "重试",
   "Copy": "复制",
   "Copy ": "复制 ",
@@ -490,6 +497,14 @@ private func translate(_ value: String) -> String {
   if value.hasPrefix("Reconnecting to ") { return "正在重新连接 " + value.dropFirst("Reconnecting to ".count) }
   if value.hasPrefix("Connecting to ") { return "正在连接 " + value.dropFirst("Connecting to ".count) }
   if value.hasPrefix("Connected to ") { return "已连接到 " + value.dropFirst("Connected to ".count) }
+  var remoteHostError = value
+  remoteHostError = remoteHostError.replacingOccurrences(of: "Couldn’t connect to ", with: "无法连接到 ")
+  remoteHostError = remoteHostError.replacingOccurrences(of: "Couldn't connect to ", with: "无法连接到 ")
+  remoteHostError = remoteHostError.replacingOccurrences(of: "Couldn’t find ", with: "找不到 ")
+  remoteHostError = remoteHostError.replacingOccurrences(of: "Couldn't find ", with: "找不到 ")
+  remoteHostError = remoteHostError.replacingOccurrences(of: ". Check your network connection and the host’s address, and make sure Rex is running on the host, then retry.", with: "。请检查网络连接和主机地址，并确保主机上的 Rex 正在运行，然后重试。")
+  remoteHostError = remoteHostError.replacingOccurrences(of: ". Check your network connection and the host's address, and make sure Rex is running on the host, then retry.", with: "。请检查网络连接和主机地址，并确保主机上的 Rex 正在运行，然后重试。")
+  if remoteHostError != value { return remoteHostError }
   if value.hasPrefix("Create a session on ") { return "在 " + translate(String(value.dropFirst("Create a session on ".count))) + " 上创建会话" }
   if value.hasPrefix("Loading Sessions on ") { return "正在加载 " + value.dropFirst("Loading Sessions on ".count) + " 上的会话" }
   if value.hasPrefix("Running for ") { return "已运行" + value.dropFirst("Running for ".count) }
