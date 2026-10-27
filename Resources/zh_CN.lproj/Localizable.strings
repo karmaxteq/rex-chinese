@@ -121,6 +121,9 @@
 "Import Theme File" = "导入主题文件";
 "Switch Appearance Mode" = "切换外观模式";
 "Copy Config File Path" = "复制配置文件路径";
+"No GUI Overrides Yet" = "还没有图形界面覆盖";
+"Copy Shortcuts as Lua" = "将快捷键复制为 Lua";
+"Reset All…" = "全部重置…";
 "Reload Config" = "重新加载配置";
 "Default login shell" = "默认登录 Shell";
 "Search fonts" = "搜索字体";
@@ -251,6 +254,7 @@
 "Check for Updates" = "检查更新";
 "An update is available" = "有可用更新";
 "Download" = "下载";
+"Download Update" = "下载更新";
 "Stop" = "停止";
 "Stop the Rex server?" = "停止 Rex 服务器？";
 "All processes running on Rex will be stopped. Anything you have running in your sessions will be lost." = "Rex 中正在运行的所有进程都会被停止。会话中正在运行的任务将丢失。";
@@ -386,5 +390,6 @@
 "Server Version" = "服务器版本";
 "API Version" = "API 版本";
 "Revision" = "修订版";
+"Rex Beta Version" = "Rex Beta 版本";
 "Move Tab Left" = "向左移动标签页";
 "Move Tab Right" = "向右移动标签页";

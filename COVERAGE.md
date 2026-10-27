@@ -8,6 +8,7 @@
 | --- | --- | --- |
 | 主工作区 | 通过 | 会话、标签页、活动、新建标签页、分栏、移动窗格、缩放、关闭窗格 |
 | 应用菜单 | 通过 | 关于、检查更新、设置、服务、隐藏、退出 |
+| 关于面板 | 通过 | 标题“Rex Beta”和版本行“版本 0.1.0 (1408)”；视觉截图和 Accessibility 树均核验 |
 | 文件 / 编辑 / 显示菜单 | 通过 | 新建、关闭、目录、查找、命令面板、分栏、外观、全屏等菜单项 |
 | 窗口 / 帮助菜单 | 通过 | 诊断、复制信息、上下一个标签页、向左/向右移动标签页、会话切换、Rex 帮助 |
 | 设置侧栏 | 通过 | 服务器、界面、主题、终端、快捷键、集成、通知、远程主机、开发者 |
@@ -26,6 +27,8 @@
 ## 验证证据
 
 - 补丁副本 Accessibility 树在上述区域显示中文；窗口菜单中的两个漏项已回归为“向左移动标签页”和“向右移动标签页”。
+- 关于面板的视觉截图显示 `Rex Beta` 和 `版本 0.1.0 (1408)`；Accessibility 树显示 `Rex Beta 版本 0.1.0 (1408)`。
+- 九个设置页面逐页切换后，搜索框、页面标题、控件标签、说明、动态状态和工具栏帮助均显示中文；扫描中保留的英文仅是 Rex、Tailscale、Shell、Display P3、URL、主机名、路径、协议、命令和辅助功能角色/属性等技术标识。
 - 运行中的进程实际加载 `Contents/Frameworks/libRexChinese.dylib` 和 `Contents/Frameworks/libRexTextHook.dylib`。
 - `Resources/zh_CN.lproj/Localizable.strings` 通过 `plutil -lint`。
 - `RexTextHook.swift` 通过 `swiftc -typecheck`。
@@ -37,4 +40,5 @@
 
 - Rex、Tailscale、Shell、Menlo、Display P3、Option、Ghostty、iTerm、URL、主机名、会话名和终端真实输出属于品牌、技术标识或用户数据，保留原文。
 - 设置窗口工具栏的两个图标在 Accessibility 树中仍返回 `Back` / `Forward`；视觉上只有左右箭头，帮助文本已是中文。
-- 本轮没有执行真实 Tailscale 登录、真实更新下载、服务器重启或远程主机成功连接流程；这些状态不应被当作已验证。
+- `Download Update` → `下载更新` 已加入资源和运行时映射，但当前没有可用更新，未执行真实下载/安装。
+- 本轮没有执行真实 Tailscale 登录、服务器重启或远程主机成功连接流程；这些状态不应被当作已验证。

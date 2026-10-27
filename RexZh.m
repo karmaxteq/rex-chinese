@@ -129,6 +129,7 @@ static NSString *RXTranslate(NSString *s) {
             @"Check for Updates…": @"检查更新…",
             @"An update is available": @"有可用更新",
             @"Download": @"下载",
+            @"Download Update": @"下载更新",
             @"Stop": @"停止",
             @"Stop the Rex server?": @"停止 Rex 服务器？",
             @"All processes running on Rex will be stopped. Anything you have running in your sessions will be lost.": @"Rex 中正在运行的所有进程都会被停止。会话中正在运行的任务将丢失。",
@@ -448,6 +449,9 @@ static NSString *RXTranslate(NSString *s) {
             @"Import Theme File": @"导入主题文件",
             @"Switch Appearance Mode": @"切换外观模式",
             @"Copy Config File Path": @"复制配置文件路径",
+            @"No GUI Overrides Yet": @"还没有图形界面覆盖",
+            @"Copy Shortcuts as Lua": @"将快捷键复制为 Lua",
+            @"Reset All…": @"全部重置…",
             @"Reload Config": @"重新加载配置",
             @"View": @"显示",
             @"Color Scheme": @"配色方案",
@@ -473,6 +477,7 @@ static NSString *RXTranslate(NSString *s) {
             @"Previous Session": @"上一个会话",
             @"Next Session": @"下一个会话",
             @"Rex Beta Diagnostics": @"Rex Beta 诊断",
+            @"Rex Beta Version": @"Rex Beta 版本",
             @"Minimize All": @"全部最小化",
             @"Zoom All": @"全部缩放",
             @"Fill": @"填充",
@@ -622,6 +627,16 @@ static NSString *RXTranslate(NSString *s) {
     NSString *exact = map[s];
     if (exact) return exact;
     if ([s isEqualToString:@"theme"]) return @"主题";
+    if ([s hasPrefix:@"Rex Beta Version "]) {
+        return [NSString stringWithFormat:@"Rex Beta 版本 %@", [s substringFromIndex:17]];
+    }
+    if ([s hasPrefix:@"Version "]) {
+        return [NSString stringWithFormat:@"版本 %@", [s substringFromIndex:8]];
+    }
+    if ([s hasPrefix:@"Copy "]) {
+        NSString *suffix = [s substringFromIndex:5];
+        return [NSString stringWithFormat:@"复制%@", RXTranslate(suffix)];
+    }
     if ([s hasPrefix:@"Hex value for "]) {
         NSString *label = [s substringFromIndex:14];
         return [NSString stringWithFormat:@"%@的十六进制值", RXTranslate(label)];
@@ -1782,6 +1797,17 @@ static void RXTranslatePopupMenu(NSMenu *menu) {
 
 static void RXWalkAX(id element, NSUInteger depth);
 
+// Runtime overlays are implementation views owned by this patch. They are
+// deliberately non-interactive and must not be sent through Rex's recursive
+// accessibility walk: AppKit can ask an overlay for its children while the
+// walk is already servicing the same attribute, which re-enters the hook.
+static BOOL RXIsOwnedOverlayObject(id object) {
+    if (!object) return NO;
+    Class cls = object_getClass(object);
+    const char *name = cls ? class_getName(cls) : NULL;
+    return name && strncmp(name, "RX", 2) == 0;
+}
+
 static id RXRawAXValue(id element, NSString *attribute) {
     if ([element isKindOfClass:[NSView class]] && origAccessibilityValue) {
         return ((id (*)(id, SEL, NSString *))origAccessibilityValue)(element, @selector(accessibilityAttributeValue:), attribute);
@@ -1794,6 +1820,7 @@ static id RXRawAXValue(id element, NSString *attribute) {
 
 static void RXWalk(NSView *view) {
     if (![view isKindOfClass:[NSView class]]) return;
+    if (RXIsOwnedOverlayObject(view)) return;
     if ([view isKindOfClass:[NSTextField class]]) {
         NSTextField *field = (NSTextField *)view;
         if (!field.isEditable) {
@@ -1994,6 +2021,73 @@ static void RXWalk(NSView *view) {
     [body drawWithRect:NSMakeRect(0.0, 39.0, self.bounds.size.width, MAX(0.0, self.bounds.size.height - 39.0)) options:NSStringDrawingUsesLineFragmentOrigin attributes:bodyAttributes context:nil];
 }
 @end
+
+// Rex's standard About panel is a borderless SwiftUI window. Its two visible
+// lines are rendered outside the AppKit/SwiftUI text nodes that the normal
+// translation hooks can reach, so cover only the lower text region while
+// leaving the native icon and close button untouched.
+@interface RXAboutOverlayView : NSView
+@end
+
+@implementation RXAboutOverlayView
+- (BOOL)isFlipped { return YES; }
+- (BOOL)isOpaque { return YES; }
+- (NSView *)hitTest:(NSPoint)point { (void)point; return nil; }
+- (void)drawRect:(NSRect)dirtyRect {
+    (void)dirtyRect;
+    [NSColor.windowBackgroundColor setFill];
+    NSRectFill(self.bounds);
+    NSDictionary *titleAttributes = @{
+        NSFontAttributeName: [NSFont systemFontOfSize:16.0 weight:NSFontWeightSemibold],
+        NSForegroundColorAttributeName: NSColor.labelColor
+    };
+    NSDictionary *versionAttributes = @{
+        NSFontAttributeName: [NSFont systemFontOfSize:12.0],
+        NSForegroundColorAttributeName: NSColor.labelColor
+    };
+    NSString *title = @"Rex Beta";
+    NSString *version = @"版本 0.1.0 (1408)";
+    NSSize titleSize = [title sizeWithAttributes:titleAttributes];
+    NSSize versionSize = [version sizeWithAttributes:versionAttributes];
+    [title drawAtPoint:NSMakePoint((self.bounds.size.width - titleSize.width) / 2.0, 3.0)
+        withAttributes:titleAttributes];
+    [version drawAtPoint:NSMakePoint((self.bounds.size.width - versionSize.width) / 2.0, 36.0)
+          withAttributes:versionAttributes];
+}
+@end
+
+static void RXSetAboutOverlay(NSWindow *window) {
+    if (!window || window.title.length || !window.contentView) return;
+    NSSize size = window.frame.size;
+    // On Rex Beta 0.1.0 the standard About panel is a borderless 284x170pt
+    // window (retina screenshots are 568x340px). Keep this check narrow so a
+    // blank auxiliary window is never covered accidentally.
+    if (size.width < 278.0 || size.width > 290.0 || size.height < 164.0 || size.height > 176.0) return;
+    NSView *host = window.contentView;
+    NSString *identifier = @"rex-about-text";
+    RXAboutOverlayView *overlay = nil;
+    for (NSView *subview in host.subviews) {
+        if ([subview isKindOfClass:[RXAboutOverlayView class]] && [subview.identifier isEqualToString:identifier]) {
+            overlay = (RXAboutOverlayView *)subview;
+            break;
+        }
+    }
+    // The SwiftUI hosting view is bottom-left-origin, while this overlay is
+    // flipped. A y=0 frame therefore maps to the lower text band in the
+    // screenshot (the panel's titlebar/icon remain above it).
+    NSRect frame = NSMakeRect(0.0, 0.0, size.width, MIN(66.0, size.height));
+    if (!overlay) {
+        overlay = [[RXAboutOverlayView alloc] initWithFrame:frame];
+        overlay.identifier = identifier;
+        [host addSubview:overlay positioned:NSWindowAbove relativeTo:nil];
+    }
+    if (!RXOwnedResidualOverlays) RXOwnedResidualOverlays = [NSHashTable weakObjectsHashTable];
+    [RXOwnedResidualOverlays addObject:overlay];
+    overlay.wantsLayer = YES;
+    overlay.layer.zPosition = 1000.0;
+    overlay.frame = frame;
+    [overlay setNeedsDisplay:YES];
+}
 
 // SwiftUI presents the remote-host failure details in a borderless auxiliary
 // window (426x176 on Rex Beta 0.1.0). Its title is drawn by SwiftUI rather than
@@ -2227,6 +2321,7 @@ static void RXUpdateRuntimeTextOverlays(NSWindow *window) {
     if (!window) return;
     FILE *debugFile = fopen("/tmp/rex-overlay.log", "a");
     if (debugFile) { fprintf(debugFile, "runtime title=%s size=%.1fx%.1f visible=%d frame=%.1f,%.1f %.1fx%.1f err=%d node=%d\n", window.title.UTF8String ?: "", window.frame.size.width, window.frame.size.height, window.isVisible, RXRemoteErrorFrame.origin.x, RXRemoteErrorFrame.origin.y, RXRemoteErrorFrame.size.width, RXRemoteErrorFrame.size.height, RXHasRemoteErrorFrame, RXHasRemoteErrorNode); fclose(debugFile); }
+    RXSetAboutOverlay(window);
     if (!window.title.length && RXHasThemeEditorNameFrame) RXSetThemeEditorNameOverlay(window, YES);
     else if (!window.title.length) RXSetThemeEditorNameOverlay(window, NO);
     if (!window.title.length && window.frame.size.width >= 580.0 && window.frame.size.width <= 650.0 && window.frame.size.height >= 560.0 && window.frame.size.height <= 630.0) {
@@ -2347,6 +2442,7 @@ static void RXUpdateSettingsResidualOverlays(NSWindow *window) {
 
 static void RXWalkAX(id element, NSUInteger depth) {
     if (!element || depth > 20 || ![element respondsToSelector:@selector(accessibilityAttributeValue:)]) return;
+    if (RXIsOwnedOverlayObject(element)) return;
     NSArray *attrs = @[NSAccessibilityDescriptionAttribute, NSAccessibilityTitleAttribute, NSAccessibilityHelpAttribute, NSAccessibilityPlaceholderValueAttribute, NSAccessibilityValueAttribute, NSAccessibilityValueDescriptionAttribute, NSAccessibilityRoleDescriptionAttribute];
     for (NSString *attribute in attrs) {
         id value = [element accessibilityAttributeValue:attribute];
