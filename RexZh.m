@@ -64,6 +64,29 @@ static NSString *RXTranslate(NSString *s) {
             @"Hide Sidebar": @"隐藏侧边栏",
             @"More": @"更多",
             @"New Session": @"新建会话",
+            @"This Mac": @"此 Mac",
+            @"Session Filter": @"会话筛选",
+            @"Filter or create": @"筛选或创建…",
+            @"Filter or create...": @"筛选或创建…",
+            @"Filter or create…": @"筛选或创建…",
+            @"Create a session on This Mac": @"在此 Mac 上创建会话",
+            @"Disconnected": @"已断开连接",
+            @"Couldn’t connect": @"无法连接",
+            @"Couldn't connect": @"无法连接",
+            @"Retry": @"重试",
+            @"Copy": @"复制",
+            @"Copy ": @"复制 ",
+            @"Shows connection details and Retry": @"显示连接详情并重试",
+            @"Hide Details": @"隐藏详情",
+            @"Show Details": @"显示详情",
+            @"Version": @"版本",
+            @"Commit": @"提交",
+            @"Final SHA-256": @"最终 SHA-256",
+            @"Copy Version": @"复制版本",
+            @"Copy Commit": @"复制提交",
+            @"Copy Final SHA-256": @"复制最终 SHA-256",
+            @"this button also has an action to zoom the window": @"此按钮还可用于缩放窗口",
+            @"zoom the window": @"缩放窗口",
             @"Rename Session": @"重命名会话",
             @"Rename Tab": @"重命名标签页",
             @"Search commands": @"搜索命令",
@@ -504,6 +527,12 @@ static NSString *RXTranslate(NSString *s) {
     if ([s hasPrefix:@"Check for Updates"]) return @"检查更新…";
     if ([s hasSuffix:@"、Running"]) return [NSString stringWithFormat:@"%@、运行中", [s substringToIndex:s.length - 8]];
     if ([s hasPrefix:@"Running for "]) return [NSString stringWithFormat:@"已运行%@", [s substringFromIndex:11]];
+    if ([s hasPrefix:@"Create a session on "]) {
+        return [NSString stringWithFormat:@"在 %@ 上创建会话", RXTranslate([s substringFromIndex:20])];
+    }
+    if ([s hasPrefix:@"Connection warning for "]) {
+        return [NSString stringWithFormat:@"连接警告：%@", RXTranslate([s substringFromIndex:23])];
+    }
     if ([s hasPrefix:@"登录 Tailscale、Access Rex securely from your other devices."]) return @"登录 Tailscale、从其他设备安全访问 Rex。";
     if ([s hasPrefix:@"Settings - "]) {
         return [NSString stringWithFormat:@"设置 - %@", RXTranslate([s substringFromIndex:11])];
@@ -1545,6 +1574,14 @@ static void RXWalk(NSView *view) {
             if (attributedText.length && ![attributedText isEqualToString:attributed.string]) {
                 [field setAttributedStringValue:[[NSAttributedString alloc] initWithString:attributedText attributes:[attributed attributesAtIndex:0 effectiveRange:NULL]]];
             }
+        }
+    }
+    if ([view isKindOfClass:[NSTextView class]]) {
+        NSTextView *textView = (NSTextView *)view;
+        if (!textView.isEditable) {
+            NSString *value = textView.string;
+            NSString *translated = RXTranslate(value);
+            if (translated.length && ![translated isEqualToString:value]) [textView setString:translated];
         }
     }
     if ([view isKindOfClass:[NSButton class]]) {

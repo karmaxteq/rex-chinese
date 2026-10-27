@@ -27,7 +27,7 @@ open "$HOME/Applications/Rex Beta 中文版.app"
 
 ## 当前实测覆盖
 
-2026-10-27 在 macOS 上对补丁副本做了像素截图和 Accessibility 树回归，确认：
+2026-10-27 在 macOS 上对补丁副本做了像素截图和 Accessibility 树回归，确认补丁副本退出后重新启动仍会加载两个动态库，并确认：
 
 - 主工作区：会话、活动、新建标签页、分栏、移动窗格、缩放和关闭窗格。
 - 应用菜单及文件、编辑、显示、窗口、帮助菜单；设置、诊断、更新、全屏等菜单项。
@@ -36,6 +36,15 @@ open "$HOME/Applications/Rex Beta 中文版.app"
 - 快捷键页的筛选框、固定项目、动态“修改/录制快捷键”描述，以及“在网页上打开会话”“切换主机”“移除主机”等动态项目。
 - 通知页位置说明、状态组合说明和命令面板的搜索占位符、默认列表及 `tab` 筛选列表。
 - 已回归检查设置页快速切换：通知页的视觉覆盖会在离开页面时立即移除，不会残留到远程主机或其他详情页。
+
+本轮重新启动后的进程还确认加载了：
+
+```text
+~/Applications/Rex Beta 中文版.app/Contents/Frameworks/libRexChinese.dylib
+~/Applications/Rex Beta 中文版.app/Contents/Frameworks/libRexTextHook.dylib
+```
+
+仍存在的边界：设置窗口工具栏的两个图标按钮在 Accessibility 树中仍返回 `Back` 和 `Forward`；它们没有可见文字。动态错误、更新、Tailscale 状态和远程主机连接失败等流程未在本轮触发，因此不把这些状态声称为已完整覆盖。
 
 验证时确认补丁进程实际加载了：
 

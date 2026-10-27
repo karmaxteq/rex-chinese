@@ -226,6 +226,13 @@
 "Filter or create" = "筛选或创建…";
 "Filter or create..." = "筛选或创建…";
 "Filter or create…" = "筛选或创建…";
+"This Mac" = "此 Mac";
+"Disconnected" = "已断开连接";
+"Couldn’t connect" = "无法连接";
+"Couldn't connect" = "无法连接";
+"Retry" = "重试";
+"Copy" = "复制";
+"Shows connection details and Retry" = "显示连接详情并重试";
 "Add Remote Host" = "添加远程主机";
 "Rex connects to the address and saves it on this Mac." = "Rex 会连接到该地址，并将其保存在此 Mac 上。";
 "Host Details" = "主机详情";
@@ -249,6 +256,13 @@
 "Included with Rex.app" = "Rex.app 随附";
 "Included Rex ready" = "随附的 Rex 已就绪";
 "Show Details" = "显示详情";
+"Hide Details" = "隐藏详情";
+"Version" = "版本";
+"Commit" = "提交";
+"Final SHA-256" = "最终 SHA-256";
+"Copy Version" = "复制版本";
+"Copy Commit" = "复制提交";
+"Copy Final SHA-256" = "复制最终 SHA-256";
 "Local API" = "本地 API";
 "Copy local Rex endpoint" = "复制本地 Rex 端点";
 "Web Client Origins" = "Web 客户端来源";

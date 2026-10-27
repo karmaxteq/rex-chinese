@@ -152,6 +152,29 @@ private let translations: [String: String] = [
   "Error、标签页、通知、Dock Badge和Sound": "错误、标签页、通知、程序坞标记和声音",
   "Done、标签页、通知、Dock Badge和Sound": "已完成、标签页、通知、程序坞标记和声音",
   "New Session": "新建会话",
+  "This Mac": "此 Mac",
+  "Session Filter": "会话筛选",
+  "Filter or create": "筛选或创建…",
+  "Filter or create...": "筛选或创建…",
+  "Filter or create…": "筛选或创建…",
+  "Create a session on This Mac": "在此 Mac 上创建会话",
+  "Disconnected": "已断开连接",
+  "Couldn’t connect": "无法连接",
+  "Couldn't connect": "无法连接",
+  "Retry": "重试",
+  "Copy": "复制",
+  "Copy ": "复制 ",
+  "Shows connection details and Retry": "显示连接详情并重试",
+  "Hide Details": "隐藏详情",
+  "Show Details": "显示详情",
+  "Version": "版本",
+  "Commit": "提交",
+  "Final SHA-256": "最终 SHA-256",
+  "Copy Version": "复制版本",
+  "Copy Commit": "复制提交",
+  "Copy Final SHA-256": "复制最终 SHA-256",
+  "this button also has an action to zoom the window": "此按钮还可用于缩放窗口",
+  "zoom the window": "缩放窗口",
   "Add Remote Host…": "添加远程主机…",
   "Add Remote Host...": "添加远程主机…",
   "New Tab": "新建标签页",
@@ -467,7 +490,7 @@ private func translate(_ value: String) -> String {
   if value.hasPrefix("Reconnecting to ") { return "正在重新连接 " + value.dropFirst("Reconnecting to ".count) }
   if value.hasPrefix("Connecting to ") { return "正在连接 " + value.dropFirst("Connecting to ".count) }
   if value.hasPrefix("Connected to ") { return "已连接到 " + value.dropFirst("Connected to ".count) }
-  if value.hasPrefix("Create a session on ") { return "在 " + value.dropFirst("Create a session on ".count) + " 上创建会话" }
+  if value.hasPrefix("Create a session on ") { return "在 " + translate(String(value.dropFirst("Create a session on ".count))) + " 上创建会话" }
   if value.hasPrefix("Loading Sessions on ") { return "正在加载 " + value.dropFirst("Loading Sessions on ".count) + " 上的会话" }
   if value.hasPrefix("Running for ") { return "已运行" + value.dropFirst("Running for ".count) }
   if value.hasPrefix("Exited with status ") { return "已退出，状态码 " + value.dropFirst("Exited with status ".count) }
