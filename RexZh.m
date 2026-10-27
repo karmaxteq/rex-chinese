@@ -626,6 +626,18 @@ static NSString *RXTranslate(NSString *s) {
     });
     NSString *exact = map[s];
     if (exact) return exact;
+    // Workspace notifications append the copied payload to the English
+    // sentence. Keep the payload (version, commit, or path) untouched while
+    // translating the sentence prefix used by both visible and AX surfaces.
+    if ([s hasPrefix:@"Copied version info. "]) {
+        return [NSString stringWithFormat:@"已复制版本信息 %@", [s substringFromIndex:21]];
+    }
+    if ([s hasPrefix:@"Copied debug info. "]) {
+        return [NSString stringWithFormat:@"已复制调试信息 %@", [s substringFromIndex:19]];
+    }
+    if ([s hasPrefix:@"Copied config file path. "]) {
+        return [NSString stringWithFormat:@"已复制配置文件路径 %@", [s substringFromIndex:25]];
+    }
     if ([s isEqualToString:@"theme"]) return @"主题";
     if ([s hasPrefix:@"Rex Beta Version "]) {
         return [NSString stringWithFormat:@"Rex Beta 版本 %@", [s substringFromIndex:17]];

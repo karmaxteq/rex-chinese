@@ -596,6 +596,17 @@ private let translations: [String: String] = [
 
 private func translate(_ value: String) -> String {
   if let translated = translations[value] { return translated }
+  // Workspace notifications append a technical payload to the English
+  // sentence. Translate the visible/AX prefix and preserve the payload.
+  if value.hasPrefix("Copied version info. ") {
+    return "已复制版本信息 " + value.dropFirst("Copied version info. ".count)
+  }
+  if value.hasPrefix("Copied debug info. ") {
+    return "已复制调试信息 " + value.dropFirst("Copied debug info. ".count)
+  }
+  if value.hasPrefix("Copied config file path. ") {
+    return "已复制配置文件路径 " + value.dropFirst("Copied config file path. ".count)
+  }
   if value == "theme" { return "主题" }
   if value.hasPrefix("Hex value for ") {
     let label = String(value.dropFirst("Hex value for ".count))
