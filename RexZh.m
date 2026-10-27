@@ -25,6 +25,13 @@ static NSString *RXTranslate(NSString *s) {
             @"Search Settings": @"搜索设置",
             @"Developer Mode": @"开发者模式",
             @"Sign in to Tailscale": @"登录 Tailscale",
+            @"Preferred Hostname": @"首选主机名",
+            @"Tailscale hostname": @"Tailscale 主机名",
+            @"Used to generate the Tailscale address.": @"用于生成 Tailscale 地址。",
+            @"Tags": @"标签",
+            @"Tailscale tags": @"Tailscale 标签",
+            @"Optional. Run as a tagged device so your tailnet’s policy decides who can connect.": @"可选。作为带标签的设备运行，由 tailnet 策略决定谁可以连接。",
+            @"Optional. Run as a tagged device so your tailnet's policy decides who can connect.": @"可选。作为带标签的设备运行，由 tailnet 策略决定谁可以连接。",
             @"Client Info": @"客户端信息",
             @"Label": @"标签",
             @"Terminal": @"终端",
@@ -120,6 +127,12 @@ static NSString *RXTranslate(NSString *s) {
             @"About Rex Beta…": @"关于Rex Beta…",
             @"Check for Updates...": @"检查更新…",
             @"Check for Updates…": @"检查更新…",
+            @"An update is available": @"有可用更新",
+            @"Download": @"下载",
+            @"Stop": @"停止",
+            @"Stop the Rex server?": @"停止 Rex 服务器？",
+            @"All processes running on Rex will be stopped. Anything you have running in your sessions will be lost.": @"Rex 中正在运行的所有进程都会被停止。会话中正在运行的任务将丢失。",
+            @"Stop the Rex server? All processes running on Rex will be stopped. Anything you have running in your sessions will be lost.": @"停止 Rex 服务器？Rex 中正在运行的所有进程都会被停止。会话中正在运行的任务将丢失。",
             @"Settings…": @"设置…",
             @"Services": @"服务",
             @"Services Settings…": @"服务设置…",
@@ -170,9 +183,30 @@ static NSString *RXTranslate(NSString *s) {
             @"Normal": @"正常",
             @"Automatic (by keyboard layout)": @"自动（根据键盘布局）",
             @"Extend": @"扩展",
+            @"Extend Always": @"始终扩展",
             @"Theme": @"主题",
             @"Ask First": @"先询问",
             @"Default login shell": @"默认登录 Shell",
+            @"Search fonts": @"搜索字体",
+            @"Monospaced": @"等宽字体",
+            @"All Fonts": @"所有字体",
+            @"Italic": @"斜体",
+            @"Bold": @"粗体",
+            @"Bold Italic": @"粗斜体",
+            @"Bar": @"竖线",
+            @"Underline": @"下划线",
+            @"Off": @"关闭",
+            @"Slow": @"慢",
+            @"Fast": @"快",
+            @"Custom": @"自定义",
+            @"Composes characters": @"组合字符",
+            @"Sends Alt": @"发送 Alt",
+            @"Left sends Alt": @"左侧发送 Alt",
+            @"Right sends Alt": @"右侧发送 Alt",
+            @"Cell Foreground": @"单元格前景",
+            @"Cell Background": @"单元格背景",
+            @"Always Open": @"始终打开",
+            @"Never Open": @"从不打开",
             @"App icon": @"应用图标",
             @"Show app icon": @"显示应用图标",
             @"Dock and menu bar": @"程序坞和菜单栏",
@@ -315,6 +349,43 @@ static NSString *RXTranslate(NSString *s) {
             @"— Active": @"— 当前",
             @"New Light Theme": @"新建浅色主题",
             @"New Dark Theme": @"新建深色主题",
+            @"New Theme Name": @"新主题名称",
+            @"Untitled Light Theme": @"未命名浅色主题",
+            @"**Untitled Light Theme**": @"**未命名浅色主题**",
+            @"Theme name": @"主题名称",
+            @"Light Theme": @"浅色主题",
+            @"Determined by the theme’s background color.": @"由主题背景颜色决定。",
+            @"Determined by the theme's background color.": @"由主题背景颜色决定。",
+            @"Update the sheet’s appearance as you edit. Turn off to restore the Settings appearance.": @"编辑时更新面板外观。关闭后恢复设置外观。",
+            @"Update the sheet's appearance as you edit. Turn off to restore the Settings appearance.": @"编辑时更新面板外观。关闭后恢复设置外观。",
+            @"Click to choose a color. Drag onto another swatch to swap.": @"点击选择颜色。拖动到另一个色板上以交换。",
+            @"Text": @"文本",
+            @"Cursor Text": @"光标文本",
+            @"Selected Text": @"选中文本",
+            @"ANSI Standard": @"ANSI 标准",
+            @"ANSI Bright": @"ANSI 亮色",
+            @"Black": @"黑色",
+            @"Red": @"红色",
+            @"Green": @"绿色",
+            @"Yellow": @"黄色",
+            @"Blue": @"蓝色",
+            @"Magenta": @"品红色",
+            @"Cyan": @"青色",
+            @"White": @"白色",
+            @"Bright Black": @"亮黑色",
+            @"Bright Red": @"亮红色",
+            @"Bright Green": @"亮绿色",
+            @"Bright Yellow": @"亮黄色",
+            @"Bright Blue": @"亮蓝色",
+            @"Bright Magenta": @"亮品红色",
+            @"Bright Cyan": @"亮青色",
+            @"Bright White": @"亮白色",
+            @"Show extended palette": @"显示扩展调色板",
+            @"Collapsed": @"已折叠",
+            @"Revert…": @"还原…",
+            @"Revert to the initially loaded palette": @"还原到最初加载的调色板",
+            @"Save & Apply": @"保存并应用",
+            @"Save this theme and use it as your light theme": @"保存此主题并将其用于浅色主题",
             @"Light theme": @"浅色主题",
             @"Dark theme": @"深色主题",
             @"Built-in": @"内置",
@@ -397,6 +468,8 @@ static NSString *RXTranslate(NSString *s) {
             @"Show Next Tab": @"显示下一个标签页",
             @"Move Tab Backward": @"向后移动标签页",
             @"Move Tab Forward": @"向前移动标签页",
+            @"Move Tab Left": @"向左移动标签页",
+            @"Move Tab Right": @"向右移动标签页",
             @"Previous Session": @"上一个会话",
             @"Next Session": @"下一个会话",
             @"Rex Beta Diagnostics": @"Rex Beta 诊断",
@@ -501,6 +574,43 @@ static NSString *RXTranslate(NSString *s) {
             @"Globe": @"地球",
             @"Tagged builds for testers.": @"供测试人员使用的标记版本。",
             @"Preview": @"预览版",
+            @"Bleeding Edge": @"前沿版",
+            @"Source Checkout": @"源代码检出",
+            @"Allow Automatic Update Checks": @"允许自动检查更新",
+            @"Check for updates automatically?": @"是否自动检查更新？",
+            @"Checking Included Rex": @"正在检查随附的 Rex",
+            @"Checking Rex App Updates": @"正在检查 Rex 应用更新",
+            @"Checking included Rex": @"正在检查随附的 Rex",
+            @"Checking source checkout": @"正在检查源代码检出",
+            @"Checkout Required": @"需要检出",
+            @"Downloading Rex App Update": @"正在下载 Rex 应用更新",
+            @"Rex App Update Available": @"Rex 应用有可用更新",
+            @"Connecting to Rex Server": @"正在连接 Rex 服务器",
+            @"Rex Server Exited": @"Rex 服务器已退出",
+            @"Rex Server Failed": @"Rex 服务器失败",
+            @"Rex Server Restart Required": @"Rex 服务器需要重新启动",
+            @"Sign out of Tailscale?": @"退出 Tailscale？",
+            @"Change Cursor Blink Interval": @"修改光标闪烁间隔",
+            @"Change Cursor Style": @"修改光标样式",
+            @"Change Interface Style": @"修改界面样式",
+            @"Change Option Key Behavior": @"修改 Option 键行为",
+            @"Change Terminal Font": @"修改终端字体",
+            @"Change Terminal Font Size": @"修改终端字体大小",
+            @"Change Terminal Padding Color": @"修改终端内边距颜色",
+            @"Change Update Channel": @"修改更新频道",
+            @"Collapse Session": @"折叠会话",
+            @"Compact Pane Style": @"紧凑窗格样式",
+            @"Background Color": @"背景颜色",
+            @"Delete Custom Theme": @"删除自定义主题",
+            @"Discard unsaved theme changes?": @"放弃未保存的主题更改？",
+            @"Copied config file path": @"已复制配置文件路径",
+            @"Copied debug info": @"已复制调试信息",
+            @"Copied version info": @"已复制版本信息",
+            @"Copy Configuration File Path": @"复制配置文件路径",
+            @"Copy Remote Address": @"复制远程地址",
+            @"Copy Rex server process identifier": @"复制 Rex 服务器进程标识",
+            @"Copy Rex server version": @"复制 Rex 服务器版本",
+            @"Creating Session": @"正在创建会话",
             @"Local API": @"本地 API",
             @"Local API URL": @"本地 API URL",
             @"Allowed origin": @"允许的来源",
@@ -512,6 +622,26 @@ static NSString *RXTranslate(NSString *s) {
     NSString *exact = map[s];
     if (exact) return exact;
     if ([s isEqualToString:@"theme"]) return @"主题";
+    if ([s hasPrefix:@"Hex value for "]) {
+        NSString *label = [s substringFromIndex:14];
+        return [NSString stringWithFormat:@"%@的十六进制值", RXTranslate(label)];
+    }
+    if ([s hasPrefix:@"Black #"]) return [NSString stringWithFormat:@"黑色%@", [s substringFromIndex:5]];
+    if ([s hasPrefix:@"Red #"]) return [NSString stringWithFormat:@"红色%@", [s substringFromIndex:4]];
+    if ([s hasPrefix:@"Green #"]) return [NSString stringWithFormat:@"绿色%@", [s substringFromIndex:6]];
+    if ([s hasPrefix:@"Yellow #"]) return [NSString stringWithFormat:@"黄色%@", [s substringFromIndex:7]];
+    if ([s hasPrefix:@"Blue #"]) return [NSString stringWithFormat:@"蓝色%@", [s substringFromIndex:5]];
+    if ([s hasPrefix:@"Magenta #"]) return [NSString stringWithFormat:@"品红色%@", [s substringFromIndex:8]];
+    if ([s hasPrefix:@"Cyan #"]) return [NSString stringWithFormat:@"青色%@", [s substringFromIndex:4]];
+    if ([s hasPrefix:@"White #"]) return [NSString stringWithFormat:@"白色%@", [s substringFromIndex:5]];
+    if ([s hasPrefix:@"Bright Black #"]) return [NSString stringWithFormat:@"亮黑色%@", [s substringFromIndex:12]];
+    if ([s hasPrefix:@"Bright Red #"]) return [NSString stringWithFormat:@"亮红色%@", [s substringFromIndex:10]];
+    if ([s hasPrefix:@"Bright Green #"]) return [NSString stringWithFormat:@"亮绿色%@", [s substringFromIndex:12]];
+    if ([s hasPrefix:@"Bright Yellow #"]) return [NSString stringWithFormat:@"亮黄色%@", [s substringFromIndex:13]];
+    if ([s hasPrefix:@"Bright Blue #"]) return [NSString stringWithFormat:@"亮蓝色%@", [s substringFromIndex:11]];
+    if ([s hasPrefix:@"Bright Magenta #"]) return [NSString stringWithFormat:@"亮品红色%@", [s substringFromIndex:14]];
+    if ([s hasPrefix:@"Bright Cyan #"]) return [NSString stringWithFormat:@"亮青色%@", [s substringFromIndex:11]];
+    if ([s hasPrefix:@"Bright White #"]) return [NSString stringWithFormat:@"亮白色%@", [s substringFromIndex:12]];
     if ([s hasSuffix:@" theme"]) {
         NSString *base = [s substringToIndex:s.length - 6];
         NSString *translatedBase = RXTranslate(base);
@@ -743,6 +873,8 @@ static BOOL RXHasRemoteErrorFrame;
 static BOOL RXHasRemoteErrorNode;
 static NSRect RXRemoteSaveFrame;
 static BOOL RXHasRemoteSaveFrame;
+static NSRect RXThemeEditorNameFrame;
+static BOOL RXHasThemeEditorNameFrame;
 // Residual overlays are attached to SwiftUI's private detail subtree. That
 // subtree can be replaced while navigating settings, so keeping only a
 // reference to the current detail view is not enough to remove an overlay
@@ -1183,7 +1315,29 @@ static IMP RXHook(Class cls, SEL sel, IMP replacement) {
 }
 
 static id RXRawAXValue(id element, NSString *attribute);
-static IMP origTextFieldTextViewDraw;
+static IMP origTextFieldTextViewDraw, origNSTextViewDraw, origNSTextViewSetString;
+
+static void RXDrawTranslatedTextViewContent(NSTextView *textView) {
+    NSString *raw = textView.string ?: @"";
+    NSString *translated = RXTranslate(raw);
+    if (!translated.length || [translated isEqualToString:raw]) return;
+    [NSColor.controlBackgroundColor setFill];
+    NSRectFill(textView.bounds);
+    NSDictionary *attributes = @{
+        NSFontAttributeName: textView.font ?: [NSFont systemFontOfSize:16.0],
+        NSForegroundColorAttributeName: textView.textColor ?: NSColor.labelColor
+    };
+    [translated drawAtPoint:NSMakePoint(NSMinX(textView.bounds) + 1.0, NSMinY(textView.bounds) - 1.0) withAttributes:attributes];
+}
+
+static void RXNSTextViewDraw(id self, SEL _cmd, NSRect rect) {
+    if (origNSTextViewDraw) ((void (*)(id, SEL, NSRect))origNSTextViewDraw)(self, _cmd, rect);
+    if ([self isKindOfClass:[NSTextView class]]) RXDrawTranslatedTextViewContent((NSTextView *)self);
+}
+
+static void RXNSTextViewSetString(id self, SEL _cmd, NSString *value) {
+    if (origNSTextViewSetString) ((void (*)(id, SEL, NSString *))origNSTextViewSetString)(self, _cmd, RXTranslate(value));
+}
 
 static void RXTextFieldTextViewDraw(id self, SEL _cmd, NSRect rect) {
     if (origTextFieldTextViewDraw) ((void (*)(id, SEL, NSRect))origTextFieldTextViewDraw)(self, _cmd, rect);
@@ -1772,6 +1926,26 @@ static void RXWalk(NSView *view) {
 }
 @end
 
+@interface RXThemeEditorNameOverlayView : NSView
+@property(nonatomic, copy) NSString *text;
+@end
+
+@implementation RXThemeEditorNameOverlayView
+- (BOOL)isFlipped { return YES; }
+- (BOOL)isOpaque { return YES; }
+- (NSView *)hitTest:(NSPoint)point { (void)point; return nil; }
+- (void)drawRect:(NSRect)dirtyRect {
+    (void)dirtyRect;
+    [NSColor.textBackgroundColor setFill];
+    NSRectFill(self.bounds);
+    NSDictionary *attributes = @{
+        NSFontAttributeName: [NSFont systemFontOfSize:21.0 weight:NSFontWeightSemibold],
+        NSForegroundColorAttributeName: NSColor.textColor
+    };
+    [self.text drawAtPoint:NSMakePoint(2.0, 1.0) withAttributes:attributes];
+}
+@end
+
 @interface RXRemoteHostHeaderOverlayView : NSView
 @end
 
@@ -1916,6 +2090,35 @@ static void RXRemoveResidualOverlays(NSView *view) {
 
 static void RXSetLocalRuntimeOverlayView(NSWindow *window, NSString *key, Class viewClass, NSRect frame);
 
+static void RXSetThemeEditorNameOverlay(NSWindow *window, BOOL visible) {
+    if (!window || !window.contentView) return;
+    NSView *host = window.contentView;
+    RXThemeEditorNameOverlayView *overlay = nil;
+    for (NSView *subview in host.subviews) {
+        if ([subview isKindOfClass:[RXThemeEditorNameOverlayView class]] && [subview.identifier isEqualToString:@"rex-theme-editor-name"]) {
+            overlay = (RXThemeEditorNameOverlayView *)subview;
+            break;
+        }
+    }
+    if (!visible || NSIsEmptyRect(RXThemeEditorNameFrame)) {
+        [overlay removeFromSuperview];
+        return;
+    }
+    NSRect frame = [window convertRectFromScreen:RXThemeEditorNameFrame];
+    if (!overlay) {
+        overlay = [[RXThemeEditorNameOverlayView alloc] initWithFrame:frame];
+        overlay.identifier = @"rex-theme-editor-name";
+        [host addSubview:overlay positioned:NSWindowAbove relativeTo:nil];
+    }
+    if (!RXOwnedResidualOverlays) RXOwnedResidualOverlays = [NSHashTable weakObjectsHashTable];
+    [RXOwnedResidualOverlays addObject:overlay];
+    overlay.wantsLayer = YES;
+    overlay.layer.zPosition = 1000.0;
+    overlay.text = @"未命名浅色主题";
+    overlay.frame = [host convertRect:frame fromView:nil];
+    [overlay setNeedsDisplay:YES];
+}
+
 static void RXUpdateRemoteHostSheetOverlay(NSWindow *window) {
     if (!window || !window.contentView) return;
     NSSize size = window.frame.size;
@@ -2001,10 +2204,34 @@ static void RXSetLocalRuntimeOverlayView(NSWindow *window, NSString *key, Class 
     [overlay setNeedsDisplay:YES];
 }
 
+static void RXTranslateThemeEditorNameInView(NSView *view) {
+    if (![view isKindOfClass:[NSView class]]) return;
+    if ([view isKindOfClass:[NSTextField class]]) {
+        NSTextField *field = (NSTextField *)view;
+        NSString *value = field.stringValue;
+        if ([value isEqualToString:@"Untitled Light Theme"] || [value isEqualToString:@"**Untitled Light Theme**"]) {
+            [field setStringValue:@"未命名浅色主题"];
+        }
+    }
+    if ([view isKindOfClass:[NSTextView class]]) {
+        NSTextView *textView = (NSTextView *)view;
+        NSString *value = textView.string;
+        if ([value isEqualToString:@"Untitled Light Theme"] || [value isEqualToString:@"**Untitled Light Theme**"]) {
+            [textView setString:@"未命名浅色主题"];
+        }
+    }
+    for (NSView *child in view.subviews) RXTranslateThemeEditorNameInView(child);
+}
+
 static void RXUpdateRuntimeTextOverlays(NSWindow *window) {
     if (!window) return;
     FILE *debugFile = fopen("/tmp/rex-overlay.log", "a");
     if (debugFile) { fprintf(debugFile, "runtime title=%s size=%.1fx%.1f visible=%d frame=%.1f,%.1f %.1fx%.1f err=%d node=%d\n", window.title.UTF8String ?: "", window.frame.size.width, window.frame.size.height, window.isVisible, RXRemoteErrorFrame.origin.x, RXRemoteErrorFrame.origin.y, RXRemoteErrorFrame.size.width, RXRemoteErrorFrame.size.height, RXHasRemoteErrorFrame, RXHasRemoteErrorNode); fclose(debugFile); }
+    if (!window.title.length && RXHasThemeEditorNameFrame) RXSetThemeEditorNameOverlay(window, YES);
+    else if (!window.title.length) RXSetThemeEditorNameOverlay(window, NO);
+    if (!window.title.length && window.frame.size.width >= 580.0 && window.frame.size.width <= 650.0 && window.frame.size.height >= 560.0 && window.frame.size.height <= 630.0) {
+        RXTranslateThemeEditorNameInView(window.contentView);
+    }
     // Rex keeps the borderless remote-error popover as a reusable 426x176
     // window, and its SwiftUI text is not present in the AppKit view tree.
     // The dimensions identify this window on Rex Beta 0.1.0; drawing the
@@ -2128,6 +2355,10 @@ static void RXWalkAX(id element, NSUInteger depth) {
             NSString *rawValue = [rawObject isKindOfClass:[NSString class]] ? rawObject : value;
             NSString *translated = RXTranslate(value);
             NSRect rawFrame = RXAccessibilityFrame(element);
+            if ([rawValue isEqualToString:@"Untitled Light Theme"] || [rawValue isEqualToString:@"**Untitled Light Theme**"]) {
+                RXThemeEditorNameFrame = rawFrame;
+                RXHasThemeEditorNameFrame = !NSIsEmptyRect(rawFrame);
+            }
             if ([rawValue containsString:@"Edit Host"] || [rawValue containsString:@"Changes are saved locally on this Mac."]) {
                 RXRemoteHeaderFrame = rawFrame;
                 RXHasRemoteHeaderFrame = !NSIsEmptyRect(rawFrame);
@@ -2230,6 +2461,8 @@ static void RXRefreshAccessibility(void) {
         RXHasRemoteErrorFrame = NO;
         RXHasRemoteErrorNode = NO;
         RXHasRemoteSaveFrame = NO;
+        RXHasThemeEditorNameFrame = NO;
+        RXThemeEditorNameFrame = NSZeroRect;
         RXAXWalkWindow = window;
         RXRefreshToolbar(window.toolbar);
         RXWalk(window.contentView);
@@ -2271,6 +2504,8 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
         origMenuAccessibilityDescription = RXHook([NSMenuItem class], @selector(accessibilityDescription), (IMP)RXMenuAccessibilityDescription);
         origWindowTitle = RXHook([NSWindow class], @selector(setTitle:), (IMP)RXSetWindowTitle);
         origStringValue = RXHook([NSControl class], @selector(setStringValue:), (IMP)RXSetStringValue);
+        origNSTextViewSetString = RXHook([NSTextView class], @selector(setString:), (IMP)RXNSTextViewSetString);
+        origNSTextViewDraw = RXHook([NSTextView class], @selector(drawRect:), (IMP)RXNSTextViewDraw);
         origPlaceholder = RXHook([NSTextField class], @selector(setPlaceholderString:), (IMP)RXSetPlaceholder);
         origPlaceholderGetter = RXHook([NSTextField class], @selector(placeholderString), (IMP)RXPlaceholder);
         origAccessibilityLabel = RXHook([NSView class], @selector(setAccessibilityLabel:), (IMP)RXSetAccessibilityLabel);
