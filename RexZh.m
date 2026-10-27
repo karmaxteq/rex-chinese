@@ -23,6 +23,7 @@ static NSString *RXTranslate(NSString *s) {
             @"Zoom Pane": @"缩放窗格",
             @"Close Pane": @"关闭窗格",
             @"Search Settings": @"搜索设置",
+            @"Settings categories": @"设置类别",
             @"Developer Mode": @"开发者模式",
             @"Sign in to Tailscale": @"登录 Tailscale",
             @"Preferred Hostname": @"首选主机名",
@@ -620,6 +621,279 @@ static NSString *RXTranslate(NSString *s) {
             @"Local API URL": @"本地 API URL",
             @"Allowed origin": @"允许的来源",
             @"Add Origin": @"添加来源",
+            @"Waiting for the next key after": @"正在等待下一个按键，当前按键：",
+            @"Waiting for a key.": @"正在等待按键。",
+            @"Exit Full Screen": @"退出全屏",
+            @"Migrate theme from Ghostty config": @"从 Ghostty 配置迁移主题",
+            @"Filter custom themes": @"筛选自定义主题",
+            @"Choose a Ghostty theme or an iTerm color file.": @"选择 Ghostty 主题或 iTerm 颜色文件。",
+            @"Enable Terminal Font Smoothing": @"启用终端字体平滑",
+            @"Enable Terminal Font Ligatures": @"启用终端连字",
+            @"Enable Display P3 Color Space": @"启用 Display P3 色彩空间",
+            @"Enable Force Cursor Style": @"启用强制光标样式",
+            @"Enable Autobalance Splits": @"启用自动平衡分栏",
+            @"Enable Focus Follows Mouse": @"启用焦点跟随鼠标",
+            @"Enable Highlight Active Pane": @"启用突出显示活动窗格",
+            @"Enable Text Contrast Correction": @"启用文本对比度校正",
+            @"Show Pane Headers": @"显示窗格标题",
+            @"Hide Pane Headers": @"隐藏窗格标题",
+            @"Disable Text Contrast Correction": @"停用文本对比度校正",
+            @"Disable Highlight Active Pane": @"停用突出显示活动窗格",
+            @"Disable Focus Follows Mouse": @"停用焦点跟随鼠标",
+            @"Disable Autobalance Splits": @"停用自动平衡分栏",
+            @"Disable Force Cursor Style": @"停用强制光标样式",
+            @"Disable Display P3 Color Space": @"停用 Display P3 色彩空间",
+            @"Disable Terminal Font Ligatures": @"停用终端连字",
+            @"Disable Terminal Font Smoothing": @"停用终端字体平滑",
+            @"Disable Rounded Selection Corners": @"停用选区圆角",
+            @"Cursor Blink Interval": @"光标闪烁间隔",
+            @"Set Cursor Blink Interval to": @"将光标闪烁间隔设为",
+            @"Choose a preset or enter a whole number from": @"选择预设，或输入一个整数，范围为",
+            @"Option Key Behavior": @"Option 键行为",
+            @"Select Option Key Behavior": @"选择 Option 键行为",
+            @"Select Cursor Style": @"选择光标样式",
+            @"Keyboard Shortcut": @"键盘快捷键",
+            @"Cancel Recording": @"取消录制",
+            @"Change Shortcut": @"更改快捷键",
+            @"Record Shortcut": @"录制快捷键",
+            @"Restore the default shortcut.": @"恢复默认快捷键。",
+            @"Restore Default Shortcut": @"恢复默认快捷键",
+            @"Keep the shortcut as it was.": @"保留原快捷键。",
+            @"Record a shortcut": @"录制快捷键",
+            @"Type Shortcut": @"输入快捷键",
+            @"This release cannot be installed on this Mac.": @"此版本无法安装在此 Mac 上。",
+            @"Rex App Update Failed": @"Rex 应用更新失败",
+            @"Retry Rex App Update": @"重试 Rex 应用更新",
+            @"Check Rex App for Updates": @"检查 Rex 应用更新",
+            @"Rex App Is Up to Date": @"Rex 应用已是最新版本",
+            @"Installing Rex App Update": @"正在安装 Rex 应用更新",
+            @"Preparing Rex App Update": @"正在准备 Rex 应用更新",
+            @"Download Rex Update": @"下载 Rex 更新",
+            @"Restart to Update Rex": @"重新启动以更新 Rex",
+            @"Ready to Check for Updates": @"可以检查更新",
+            @"Installing update": @"正在安装更新",
+            @"Update installed.": @"更新已安装。",
+            @"Your terminal tabs won't be lost": @"终端标签页不会丢失",
+            @"Preparing update": @"正在准备更新",
+            @"Checking for updates": @"正在检查更新",
+            @"Relaunch to Update": @"重新启动以更新",
+            @"Waiting for Rex Server to start.": @"正在等待 Rex 服务器启动。",
+            @"Approve this device in the Tailscale admin console.": @"在 Tailscale 管理控制台中批准此设备。",
+            @"HTTPS status isn’t available.": @"HTTPS 状态不可用。",
+            @"HTTPS status isn't available.": @"HTTPS 状态不可用。",
+            @"Serving over Tailscale.": @"正在通过 Tailscale 提供服务。",
+            @"Waiting for an HTTPS certificate": @"正在等待 HTTPS 证书",
+            @"Then retry serving.": @"然后重试共享。",
+            @"Tailscale isn’t available in this version of Rex.": @"此版本的 Rex 不支持 Tailscale。",
+            @"Tailscale isn't available in this version of Rex.": @"此版本的 Rex 不支持 Tailscale。",
+            @"Not serving over Tailscale.": @"未通过 Tailscale 提供服务。",
+            @"Sign in to Tailscale to start serving.": @"登录 Tailscale 以开始共享。",
+            @"Show pairing QR code": @"显示配对二维码",
+            @"Show QR code to pair a device": @"显示用于配对设备的二维码",
+            @"Signed in to Tailscale": @"已登录 Tailscale",
+            @"Signing out of Tailscale": @"正在退出 Tailscale",
+            @"Removing this Mac’s saved Tailscale login": @"正在移除此 Mac 保存的 Tailscale 登录信息",
+            @"Removing this Mac's saved Tailscale login": @"正在移除此 Mac 保存的 Tailscale 登录信息",
+            @"Ready to connect...": @"准备连接…",
+            @"Finish the process in your browser.": @"在浏览器中完成此流程。",
+            @"Preparing to sign in...": @"正在准备登录…",
+            @"This may take a moment.": @"可能需要一点时间。",
+            @"Start the Rex Server to sign in.": @"启动 Rex 服务器以登录。",
+            @"Choose a hostname and optional tags for this Mac.": @"为此 Mac 选择主机名和可选标签。",
+            @"Use tags like tag:name. A name starts with a letter and uses only letters, numbers, or hyphens.": @"使用 tag:name 之类的标签。名称以字母开头，只能包含字母、数字或连字符。",
+            @"Compatibility hasn’t been checked yet.": @"尚未检查兼容性。",
+            @"Compatibility hasn't been checked yet.": @"尚未检查兼容性。",
+            @"Restart using the server included with this app.": @"使用此应用随附的服务器重新启动。",
+            @"Update Rex.app, or restart from source.": @"更新 Rex.app，或从源代码重新启动。",
+            @"Update Rex.app, or restart using its included server.": @"更新 Rex.app，或使用其随附服务器重新启动。",
+            @"Update the app, or restart from source.": @"更新应用，或从源代码重新启动。",
+            @"Restart from source to reconnect.": @"从源代码重新启动以重新连接。",
+            @"Restart to apply them.": @"重新启动以应用更改。",
+            @"Restart to apply them and enable newer features.": @"重新启动以应用更改并启用新功能。",
+            @"Restart the server to enable them.": @"重新启动服务器以启用这些功能。",
+            @"Running from source checkout": @"正在从源代码检出运行",
+            @"less than a minute": @"不到一分钟",
+            @"Server supports": @"服务器支持",
+            @"Rex.app supports": @"Rex.app 支持",
+            @"Rex.app uses Revision": @"Rex.app 使用修订版",
+            @"Built from source on restart": @"重新启动时从源代码构建",
+            @"Restarting is optional.": @"重新启动是可选的。",
+            @"Choose the Rex server to send calls to": @"选择要发送调用的 Rex 服务器",
+            @"retrying in": @"将在…后重试",
+            @"Start the managed Rex server to open its API stream.": @"启动受管理的 Rex 服务器以打开 API 流。",
+            @"Retry Subscription": @"重试订阅",
+            @"No events received.": @"未收到事件。",
+            @"Subscribing to all sessions": @"正在订阅所有会话",
+            @"Waiting for Rex events.": @"正在等待 Rex 事件。",
+            @"Subscription Failed": @"订阅失败",
+            @"No API calls yet.": @"尚无 API 调用。",
+            @"Blank input is distinct from an empty JSON object.": @"空输入不同于空 JSON 对象。",
+            @"Optional; blank sends no payload": @"可选；留空时不发送载荷",
+            @"Resolved endpoint": @"已解析端点",
+            @"Attached clients": @"已附加客户端",
+            @"Attached at an unknown time": @"附加时间未知",
+            @"Pending Mutations": @"待处理变更",
+            @"Pending Pane Commands": @"待处理窗格命令",
+            @"Launch to First Drawable": @"启动到首个可绘制帧",
+            @"Rex not connected": @"Rex 未连接",
+            @"connection lost": @"连接已丢失",
+            @"Not inspected yet": @"尚未检查",
+            @"Rex installation": @"Rex 安装",
+            @"Grant Permissions for Rex": @"授予 Rex 权限",
+            @"Drag into the list in System Settings to grant access.": @"将其拖入系统设置中的列表以授予访问权限。",
+            @"Full Disk Access": @"完全磁盘访问权限",
+            @"Couldn’t read Rex Server’s permissions:": @"无法读取 Rex 服务器的权限：",
+            @"Couldn't read Rex Server's permissions:": @"无法读取 Rex 服务器的权限：",
+            @"Update Rex to see whether Rex Server has these permissions. You can still grant them in System Settings.": @"更新 Rex 以查看 Rex 服务器是否拥有这些权限。你仍可在系统设置中授予这些权限。",
+            @"Rex Server is too old to report its permissions. You can still grant them, and you’ll see their status after Rex updates.": @"Rex 服务器版本过旧，无法报告权限。你仍可授予权限，Rex 更新后即可查看状态。",
+            @"Rex Server is too old to report its permissions. You can still grant them, and you'll see their status after Rex updates.": @"Rex 服务器版本过旧，无法报告权限。你仍可授予权限，Rex 更新后即可查看状态。",
+            @"Waiting for Rex Server on this Mac to start": @"正在等待此 Mac 上的 Rex 服务器启动",
+            @"Lets command-line tools and agents reach devices on your local network.": @"允许命令行工具和智能体访问本地网络上的设备。",
+            @"Lets command-line tools and agents use the camera.": @"允许命令行工具和智能体使用摄像头。",
+            @"Lets command-line tools and agents record from the microphone.": @"允许命令行工具和智能体使用麦克风录音。",
+            @"Lets command-line tools and agents capture the screen, windows, and system audio.": @"允许命令行工具和智能体录制屏幕、窗口和系统音频。",
+            @"Lets command-line tools and agents open files in protected folders, like ~/Downloads and sandboxed apps’ containers.": @"允许命令行工具和智能体打开受保护文件夹中的文件，例如 ~/Downloads 和沙盒应用容器中的文件。",
+            @"Rex.app is not accepting actions. Turn on Remote Control in its Settings under Rex Server.": @"Rex.app 不接受操作。请在“Rex 服务器”设置中打开“远程控制”。",
+            @"does not offer": @"不提供",
+            @"has no window to act in.": @"没有可执行操作的窗口。",
+            @"isn’t available here right now.": @"当前无法使用。",
+            @"isn't available here right now.": @"当前无法使用。",
+            @"Browser origins allowed to open Rex WebSocket streams.": @"允许打开 Rex WebSocket 流的浏览器来源。",
+            @"Default origin, always allowed": @"默认来源，始终允许",
+            @"No folder selected": @"未选择文件夹",
+            @"Source Checkout Unavailable": @"源代码检出不可用",
+            @"Preparing Source Checkout": @"正在准备源代码检出",
+            @"Runs directly from a local checkout.": @"直接从本地检出运行。",
+            @"Uses the Rex helper included with this app.": @"使用此应用中随附的 Rex 辅助程序。",
+            @"Updates are unavailable in development builds.": @"开发版本无法更新。",
+            @"Finish the current update before changing channels.": @"完成当前更新后才能更改频道。",
+            @"Preparing Rex": @"正在准备 Rex",
+            @"The Rex server is already running.": @"Rex 服务器已在运行。",
+            @"A Rex CLI process actor cannot be launched more than once.": @"Rex CLI 进程执行器不能启动多次。",
+            @"rex server start failed": @"rex server 启动失败",
+            @"Rex returned an invalid start timestamp": @"Rex 返回了无效的启动时间戳",
+            @"Rex returned an invalid server endpoint": @"Rex 返回了无效的服务器端点",
+            @"Rex returned an unsupported server endpoint scheme": @"Rex 返回了不受支持的服务器端点协议",
+            @"Rex returned a Unix socket endpoint in an unsupported format": @"Rex 返回了格式不受支持的 Unix 套接字端点",
+            @"Rex returned an invalid Unix socket endpoint": @"Rex 返回了无效的 Unix 套接字端点",
+            @"this Rex binary does not provide the required server JSON API": @"此 Rex 二进制文件不提供所需的服务器 JSON API",
+            @"Unable to follow Rex server logs:": @"无法跟踪 Rex 服务器日志：",
+            @"Unable to observe Rex server status:": @"无法观察 Rex 服务器状态：",
+            @"the Rex CLI ended without a status": @"Rex CLI 结束时没有状态",
+            @"No Rex launch configuration has been provided.": @"未提供 Rex 启动配置。",
+            @"Remove Host": @"移除主机",
+            @"Remove “": @"移除“",
+            @"”? Removing a host leaves its sessions running on the remote server.": @"”？移除主机会使其会话继续在远程服务器上运行。",
+            @"Removing a host leaves its sessions running on the remote server.": @"移除主机会使其会话继续在远程服务器上运行。",
+            @"Remove “foo”?": @"移除“foo”？",
+            @"Action center": @"操作中心",
+            @"Show full message": @"显示完整消息",
+            @"Collapse message": @"折叠消息",
+            @"No custom themes": @"没有自定义主题",
+            @"Couldn’t load folders": @"无法加载文件夹",
+            @"Couldn't load folders": @"无法加载文件夹",
+            @"Couldn’t load": @"无法加载",
+            @"Couldn't load": @"无法加载",
+            @"You don’t have permission to view": @"你没有权限查看",
+            @"You don't have permission to view": @"你没有权限查看",
+            @"is not a folder": @"不是文件夹",
+            @"No folders named": @"没有名为",
+            @"Loading folders": @"正在加载文件夹",
+            @"Add Remote Host": @"添加远程主机",
+            @"is not an HTTP or HTTPS address": @"不是 HTTP 或 HTTPS 地址",
+            @"Type the address of a Rex host": @"输入 Rex 主机地址",
+            @"Couldn’t Connect": @"无法连接",
+            @"Couldn't Connect": @"无法连接",
+            @"Select Interface Style": @"选择界面样式",
+            @"Press a shortcut for": @"按下用于",
+            @"Choose a Key to Remove It": @"选择要移除的按键",
+            @"Reset to Default": @"重置为默认值",
+            @"Search actions": @"搜索操作",
+            @"Selection Foreground": @"选区前景色",
+            @"Selection Background": @"选区背景色",
+            @"Set copy on selection": @"设置选择后复制",
+            @"Enable Rounded Selection Corners": @"启用选区圆角",
+            @"Select Terminal Padding Color": @"选择终端内边距颜色",
+            @"Select Update Channel": @"选择更新频道",
+            @"Every commit that passes CI. Expect some instability.": @"每个通过 CI 的提交。预计会有不稳定。",
+            @"A native notification when terminal programs send notifications.": @"终端程序发送通知时显示系统通知。",
+            @"Let programs send native notifications with OSC 9 or OSC 777.": @"允许程序通过 OSC 9 或 OSC 777 发送系统通知。",
+            @"A native notification when Rex needs you to sign in to Tailscale.": @"Rex 需要你登录 Tailscale 时显示系统通知。",
+            @"A native notification when a tailnet administrator must approve this Mac.": @"Tailscale 网络管理员必须批准此 Mac 时显示系统通知。",
+            @"A native notification when Tailscale stops or reports an error.": @"Tailscale 停止或报告错误时显示系统通知。",
+            @"A tailnet administrator must approve this device.": @"Tailscale 网络管理员必须批准此设备。",
+            @"Open Rex to finish signing in.": @"打开 Rex 以完成登录。",
+            @"Retry serving over Tailscale": @"通过 Tailscale 重试共享",
+            @"Open Tailscale DNS settings": @"打开 Tailscale DNS 设置",
+            @"Sign out and back in to modify tags.": @"退出再重新登录以修改标签。",
+            @"Check your account and sign-out progress, configure a hostname and sign in, reopen or cancel enrollment, or sign out.": @"检查账户和退出登录进度，配置主机名并登录，重新打开或取消注册，或退出登录。",
+            @"Reopen Tailscale sign-in in your browser": @"在浏览器中重新打开 Tailscale 登录",
+            @"Cancel Tailscale sign-in": @"取消 Tailscale 登录",
+            @"A newer server is available": @"有更新的服务器可用",
+            @"Server and app are incompatible": @"服务器与应用不兼容",
+            @"This server requires a newer Rex.app": @"此服务器需要更新版本的 Rex.app",
+            @"Server settings have changed": @"服务器设置已更改",
+            @"New API features are available": @"有新的 API 功能可用",
+            @"Cannot connect to this server": @"无法连接到此服务器",
+            @"System permissions": @"系统权限",
+            @"Grant System Permissions": @"授予系统权限",
+            @"Pane Action Failed": @"窗格操作失败",
+            @"The pane action failed.": @"窗格操作失败。",
+            @"Terminal Attachment Failed": @"终端附加失败",
+            @"Paste Unsafe Text?": @"粘贴不安全文本？",
+            @"This paste could run commands before you can review them. Paste it anyway?": @"此粘贴可能会在你查看前运行命令。仍要粘贴吗？",
+            @"The terminal stream was interrupted. Reconnecting automatically.": @"终端流已中断。正在自动重新连接。",
+            @"The connection dropped. This terminal keeps its contents and continues where it left off.": @"连接已断开。此终端会保留内容并从中断处继续。",
+            @"Reconnecting": @"正在重新连接",
+            @"Content preserved.": @"内容已保留。",
+            @"No match selected": @"未选择匹配项",
+            @"Searching, no matches yet": @"正在搜索，尚无匹配项",
+            @"Click to resize it to fit this window.": @"点击以调整大小，使其适应此窗口。",
+            @"Sized by another client": @"由另一个客户端调整大小",
+            @"Rex returned an incomplete pane layout.": @"Rex 返回了不完整的窗格布局。",
+            @"The terminal could not be reset.": @"无法重置终端。",
+            @"The tab could not be activated.": @"无法激活标签页。",
+            @"The session could not be moved.": @"无法移动会话。",
+            @"The tab could not be moved.": @"无法移动标签页。",
+            @"The tab could not be closed.": @"无法关闭标签页。",
+            @"The tab could not be created.": @"无法创建标签页。",
+            @"The name could not be changed.": @"无法更改名称。",
+            @"The session could not be closed.": @"无法关闭会话。",
+            @"The session could not be created.": @"无法创建会话。",
+            @"Waiting for the shared server connection to be replaced.": @"正在等待共享服务器连接被替换。",
+            @"Preparing Rex Server": @"正在准备 Rex 服务器",
+            @"Waiting for the local control API to become available.": @"正在等待本地控制 API 可用。",
+            @"Stopping Rex Server": @"正在停止 Rex 服务器",
+            @"Starting Rex Server": @"正在启动 Rex 服务器",
+            @"Rex Server Is Unavailable": @"Rex 服务器不可用",
+            @"Rex Server Is Stopped": @"Rex 服务器已停止",
+            @"Restart the server to use new features": @"重新启动服务器以使用新功能",
+            @"The running Rex server is incompatible with this version of Rex.app.": @"正在运行的 Rex 服务器与此版本的 Rex.app 不兼容。",
+            @"Restart is required.": @"需要重新启动。",
+            @"Restart the Rex server?": @"重新启动 Rex 服务器？",
+            @"This needs the newer server. Restart it and try again.": @"需要使用更新的服务器。请重新启动后重试。",
+            @"Restart Rex Server": @"重新启动 Rex 服务器",
+            @"Rex.app Can’t Talk to the Server": @"Rex.app 无法与服务器通信",
+            @"Rex.app Can't Talk to the Server": @"Rex.app 无法与服务器通信",
+            @"Rex.app Is Older Than the Server": @"Rex.app 版本低于服务器",
+            @"The Rex Server Needs a Restart": @"Rex 服务器需要重新启动",
+            @"No attached clients": @"没有附加客户端",
+            @"Select a session": @"选择会话",
+            @"Inspect the hub's servers and sessions in the main diagnostics view.": @"在主诊断视图中检查 Hub 的服务器和会话。",
+            @"Working Directory": @"工作目录",
+            @"Copy launch command": @"复制启动命令",
+            @"Copy server build commit": @"复制服务器构建提交",
+            @"Copy server build version": @"复制服务器构建版本",
+            @"Connection details are available when the server is ready.": @"服务器就绪后即可查看连接详情。",
+            @"Waiting for server": @"正在等待服务器",
+            @"Not available until the server is ready": @"服务器就绪前不可用",
+            @"Tailscale stopped": @"Tailscale 已停止",
+            @"Approve this device in Tailscale": @"在 Tailscale 中批准此设备",
+            @"Tailscale assigned": @"Tailscale 已分配",
+            @"The Tailscale request timed out. Try again.": @"Tailscale 请求超时。请重试。",
+            @"Tailscale is taking longer than usual. You can keep waiting or cancel.": @"Tailscale 所需时间比平时长。你可以继续等待或取消。",
+            @"Taking longer than usual. If you’ve finished in your browser, Rex is still waiting for Tailscale to confirm.": @"所需时间比平时长。如果你已在浏览器中完成操作，Rex 仍在等待 Tailscale 确认。",
+            @"Taking longer than usual. If you've finished in your browser, Rex is still waiting for Tailscale to confirm.": @"所需时间比平时长。如果你已在浏览器中完成操作，Rex 仍在等待 Tailscale 确认。",
             @"Update Channel Tagged builds for testers.": @"更新频道 供测试人员使用的标记版本。",
             @"Local API URL unix:///Users/a1/Library/Application Support/rex/server.sock": @"本地 API URL unix:///Users/a1/Library/Application Support/rex/server.sock",
         };
@@ -637,6 +911,89 @@ static NSString *RXTranslate(NSString *s) {
     }
     if ([s hasPrefix:@"Copied config file path. "]) {
         return [NSString stringWithFormat:@"已复制配置文件路径 %@", [s substringFromIndex:25]];
+    }
+    if ([s hasPrefix:@"You don’t have permission to view "]) {
+        return [NSString stringWithFormat:@"你没有权限查看 %@", [s substringFromIndex:33]];
+    }
+    if ([s hasPrefix:@"You don't have permission to view "]) {
+        return [NSString stringWithFormat:@"你没有权限查看 %@", [s substringFromIndex:33]];
+    }
+    if ([s hasPrefix:@"No folders named "]) {
+        return [NSString stringWithFormat:@"没有名为 %@ 的文件夹", [s substringFromIndex:16]];
+    }
+    if ([s hasSuffix:@" is not a folder"]) {
+        return [NSString stringWithFormat:@"%@ 不是文件夹", [s substringToIndex:s.length - 17]];
+    }
+    if ([s hasPrefix:@" is not an HTTP or HTTPS address"]) {
+        return [NSString stringWithFormat:@"不是 HTTP 或 HTTPS 地址%@", [s substringFromIndex:35]];
+    }
+    if ([s hasPrefix:@"Couldn’t Connect to "]) {
+        return [NSString stringWithFormat:@"无法连接到 %@", [s substringFromIndex:20]];
+    }
+    if ([s hasPrefix:@"Couldn't Connect to "]) {
+        return [NSString stringWithFormat:@"无法连接到 %@", [s substringFromIndex:20]];
+    }
+    if ([s hasPrefix:@"Press a shortcut for "]) {
+        return [NSString stringWithFormat:@"按下用于%@", [s substringFromIndex:22]];
+    }
+    if ([s hasPrefix:@"Another client resized this terminal to "]) {
+        return [NSString stringWithFormat:@"另一个客户端已将此终端调整为 %@", [s substringFromIndex:41]];
+    }
+    if ([s hasPrefix:@"Rex.app includes version "]) {
+        return [NSString stringWithFormat:@"Rex.app 包含版本 %@", [s substringFromIndex:25]];
+    }
+    if ([s hasPrefix:@"Running server version: "]) {
+        return [NSString stringWithFormat:@"运行中服务器版本：%@", [s substringFromIndex:24]];
+    }
+    if ([s hasPrefix:@"Connection attempt "] && [s hasSuffix:@" failed. Choose to try again now."]) {
+        NSString *attempt = [s substringWithRange:NSMakeRange(19, s.length - 19 - 35)];
+        return [NSString stringWithFormat:@"连接尝试 %@ 失败。请选择立即重试。", attempt];
+    }
+    if ([s hasPrefix:@"Rex must be updated: "]) {
+        return [NSString stringWithFormat:@"Rex 必须更新：%@", [s substringFromIndex:21]];
+    }
+    if ([s hasPrefix:@"The Rex server command failed: "]) {
+        return [NSString stringWithFormat:@"Rex 服务器命令失败：%@", [s substringFromIndex:31]];
+    }
+    if ([s hasPrefix:@"The Rex server did not become ready: "]) {
+        return [NSString stringWithFormat:@"Rex 服务器未能就绪：%@", [s substringFromIndex:36]];
+    }
+    if ([s hasPrefix:@"The Rex server could not be launched: "]) {
+        return [NSString stringWithFormat:@"Rex 服务器无法启动：%@", [s substringFromIndex:38]];
+    }
+    if ([s hasPrefix:@"The Rex server working directory could not be prepared: "]) {
+        return [NSString stringWithFormat:@"Rex 服务器工作目录无法准备：%@", [s substringFromIndex:57]];
+    }
+    if ([s hasPrefix:@"The durable host ID is "]) {
+        return [NSString stringWithFormat:@"持久主机 ID 为 %@", [s substringFromIndex:23]];
+    }
+    if ([s hasPrefix:@"Set Cursor Blink Interval to "]) {
+        return [NSString stringWithFormat:@"将光标闪烁间隔设为 %@", [s substringFromIndex:29]];
+    }
+    if ([s hasPrefix:@"Choose a preset or enter a whole number from "]) {
+        return [NSString stringWithFormat:@"选择预设，或输入一个整数，范围为 %@", [s substringFromIndex:45]];
+    }
+    if ([s hasPrefix:@"Server supports "]) return [NSString stringWithFormat:@"服务器支持 %@", [s substringFromIndex:16]];
+    if ([s hasPrefix:@"Rex.app supports "]) return [NSString stringWithFormat:@"Rex.app 支持 %@", [s substringFromIndex:17]];
+    if ([s hasPrefix:@"Rex.app uses Revision "]) return [NSString stringWithFormat:@"Rex.app 使用修订版 %@", [s substringFromIndex:22]];
+    if ([s hasPrefix:@"Couldn’t read Rex Server’s permissions: "]) return [NSString stringWithFormat:@"无法读取 Rex 服务器的权限：%@", [s substringFromIndex:40]];
+    if ([s hasPrefix:@"Couldn't read Rex Server's permissions: "]) return [NSString stringWithFormat:@"无法读取 Rex 服务器的权限：%@", [s substringFromIndex:40]];
+    if ([s hasPrefix:@"Unable to follow Rex server logs: "]) return [NSString stringWithFormat:@"无法跟踪 Rex 服务器日志：%@", [s substringFromIndex:34]];
+    if ([s hasPrefix:@"Unable to observe Rex server status: "]) return [NSString stringWithFormat:@"无法观察 Rex 服务器状态：%@", [s substringFromIndex:37]];
+    if ([s hasPrefix:@"status exited with "]) return [NSString stringWithFormat:@"状态退出，结果为 %@", [s substringFromIndex:19]];
+    if ([s hasPrefix:@"Rex server status is ambiguous ("]) return [NSString stringWithFormat:@"Rex 服务器状态不明确（%@", [s substringFromIndex:32]];
+    if ([s hasPrefix:@"Rex server status could not be verified. "]) return [NSString stringWithFormat:@"无法验证 Rex 服务器状态。%@", [s substringFromIndex:41]];
+    if ([s hasPrefix:@"The running Rex server and this Rex.app share no version of the control API."]) return [NSString stringWithFormat:@"正在运行的 Rex 服务器与此 Rex.app 没有共同的控制 API 版本。%@", [s substringFromIndex:76]];
+    if ([s hasPrefix:@"The running Rex server is older than this Rex.app. "]) return [NSString stringWithFormat:@"正在运行的 Rex 服务器版本低于此 Rex.app。%@", [s substringFromIndex:51]];
+    if ([s hasPrefix:@"Signing out of Tailscale timed out. "]) return [NSString stringWithFormat:@"退出 Tailscale 超时。%@", [s substringFromIndex:36]];
+    if ([s hasPrefix:@"Changing Tailscale tags timed out. "]) return [NSString stringWithFormat:@"更改 Tailscale 标签超时。%@", [s substringFromIndex:35]];
+    if ([s hasPrefix:@"Rex couldn’t start Tailscale to remove the saved login. "]) return [NSString stringWithFormat:@"Rex 无法启动 Tailscale 以移除保存的登录信息。%@", [s substringFromIndex:56]];
+    if ([s hasPrefix:@"Rex couldn't start Tailscale to remove the saved login. "]) return [NSString stringWithFormat:@"Rex 无法启动 Tailscale 以移除保存的登录信息。%@", [s substringFromIndex:56]];
+    if ([s hasPrefix:@"Remove “"] && [s hasSuffix:@"”?"]) {
+        return [NSString stringWithFormat:@"移除%@", [s substringFromIndex:7]];
+    }
+    if ([s hasPrefix:@"Remove '"] && [s hasSuffix:@"'?"]) {
+        return [NSString stringWithFormat:@"移除%@", [s substringFromIndex:7]];
     }
     if ([s isEqualToString:@"theme"]) return @"主题";
     if ([s hasPrefix:@"Rex Beta Version "]) {
@@ -898,6 +1255,8 @@ static BOOL RXHasRemoteHeaderFrame;
 static NSRect RXRemoteErrorFrame;
 static BOOL RXHasRemoteErrorFrame;
 static BOOL RXHasRemoteErrorNode;
+static NSString *RXRemoteErrorTitleText;
+static NSString *RXRemoteErrorBodyText;
 static NSRect RXRemoteSaveFrame;
 static BOOL RXHasRemoteSaveFrame;
 static NSRect RXThemeEditorNameFrame;
@@ -2010,6 +2369,8 @@ static void RXWalk(NSView *view) {
 @end
 
 @interface RXRemoteHostErrorOverlayView : NSView
+@property(nonatomic, copy) NSString *titleText;
+@property(nonatomic, copy) NSString *bodyText;
 @end
 
 @implementation RXRemoteHostErrorOverlayView
@@ -2028,8 +2389,9 @@ static void RXWalk(NSView *view) {
         NSFontAttributeName: [NSFont systemFontOfSize:18.0],
         NSForegroundColorAttributeName: NSColor.labelColor
     };
-    [@"无法连接到 添加远程主机" drawAtPoint:NSMakePoint(0.0, 0.0) withAttributes:titleAttributes];
-    NSString *body = @"找不到 添加远程主机。请检查网络连接和主机地址，并确保 Rex 正在运行，然后重试。";
+    NSString *title = self.titleText.length ? self.titleText : @"无法连接";
+    NSString *body = self.bodyText.length ? self.bodyText : @"请检查网络连接和主机地址，并确保 Rex 正在运行，然后重试。";
+    [title drawAtPoint:NSMakePoint(0.0, 0.0) withAttributes:titleAttributes];
     [body drawWithRect:NSMakeRect(0.0, 39.0, self.bounds.size.width, MAX(0.0, self.bounds.size.height - 39.0)) options:NSStringDrawingUsesLineFragmentOrigin attributes:bodyAttributes context:nil];
 }
 @end
@@ -2127,7 +2489,12 @@ static void RXSetRemoteHostErrorPopoverOverlay(NSWindow *window) {
     [RXOwnedResidualOverlays addObject:overlay];
     overlay.wantsLayer = YES;
     overlay.layer.zPosition = 1000.0;
-    overlay.frame = NSMakeRect(16.0, 8.0, MAX(0.0, size.width - 32.0), 84.0);
+    // The borderless popover's content view is flipped, but SwiftUI places
+    // the title above the body. Cover both lines so the original English
+    // title cannot remain visible above the translated body.
+    overlay.frame = NSMakeRect(16.0, 8.0, MAX(0.0, size.width - 32.0), MIN(124.0, size.height - 16.0));
+    overlay.titleText = RXRemoteErrorTitleText;
+    overlay.bodyText = RXRemoteErrorBodyText;
     [overlay setNeedsDisplay:YES];
 }
 
@@ -2476,7 +2843,18 @@ static void RXWalkAX(id element, NSUInteger depth) {
                 RXHasRemoteErrorNode = YES;
                 RXRemoteErrorFrame = rawFrame;
                 RXHasRemoteErrorFrame = !NSIsEmptyRect(rawFrame);
+                // SwiftUI may expose the full remote-host error as one
+                // attributed string. Keep the translated title/body for the
+                // borderless visual overlay as well as the AX tree.
+                NSRange bodyMarker = [translated rangeOfString:@" 找不到 "];
+                if (bodyMarker.location != NSNotFound) {
+                    RXRemoteErrorTitleText = [translated substringToIndex:bodyMarker.location];
+                    RXRemoteErrorBodyText = [translated substringFromIndex:bodyMarker.location + 1];
+                } else if ([translated hasPrefix:@"无法连接到 "]) {
+                    RXRemoteErrorTitleText = translated;
+                }
             }
+            if ([translated hasPrefix:@"找不到 "] && !RXRemoteErrorBodyText.length) RXRemoteErrorBodyText = translated;
             if ([rawValue isEqualToString:@"Save"]) {
                 RXRemoteSaveFrame = rawFrame;
                 RXHasRemoteSaveFrame = !NSIsEmptyRect(rawFrame);
@@ -2568,6 +2946,8 @@ static void RXRefreshAccessibility(void) {
         RXHasRemoteHeaderFrame = NO;
         RXHasRemoteErrorFrame = NO;
         RXHasRemoteErrorNode = NO;
+        RXRemoteErrorTitleText = nil;
+        RXRemoteErrorBodyText = nil;
         RXHasRemoteSaveFrame = NO;
         RXHasThemeEditorNameFrame = NO;
         RXThemeEditorNameFrame = NSZeroRect;
