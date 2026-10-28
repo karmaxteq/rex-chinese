@@ -1117,4 +1117,16 @@
 "Ready" = "就绪";
 "Loading" = "加载中";
 "Tap" = "点击";
+"Attachment Status" = "附件状态";
+"Cursor Style" = "光标样式";
+"Cursor Text Color" = "光标文本颜色";
+"Display P3 gamut" = "Display P3 色域";
+"Foreground Color" = "前景颜色";
+"Search commands, sessions, and tabs" = "搜索命令、会话和标签页";
+"Select Terminal Font" = "选择终端字体";
+"Selected Text Color" = "选中文本颜色";
+"Settings search results" = "设置搜索结果";
+"Terminal Font" = "终端字体";
+"Terminal Font Size" = "终端字体大小";
+"Terminal Padding Color" = "终端内边距颜色";
 "None" = "无";
