@@ -351,6 +351,7 @@ private let translations: [String: String] = [
   "Zoom Pane": "缩放窗格",
   "Close Pane": "关闭窗格",
   "Search Settings": "搜索设置",
+  "Dismiss editing": "结束编辑",
   "Settings categories": "设置类别",
   "Appearance": "外观",
   "Create Session": "创建会话",
@@ -765,6 +766,10 @@ private let translations: [String: String] = [
   "has no window to act in.": "没有可执行操作的窗口。",
   "isn’t available here right now.": "当前无法使用。",
   "isn't available here right now.": "当前无法使用。",
+  " is still running.": "仍在运行。",
+  " isn't available here right now.": "当前无法使用。",
+  " is not a valid JSON pointer to a member.": "不是有效的 JSON 指针成员。",
+  " is not a valid JSON pointer to a member. It must start with \"/\", write \"~\" as \"~0\", and not end in \"-\".": "不是有效的 JSON 指针成员。必须以“/”开头，将“~”写作“~0”，且不能以“-”结尾。",
   "Browser origins allowed to open Rex WebSocket streams.": "允许打开 Rex WebSocket 流的浏览器来源。",
   "Default origin, always allowed": "默认来源，始终允许",
   "No folder selected": "未选择文件夹",
@@ -1412,6 +1417,65 @@ private let translations: [String: String] = [
   "Unsupported surface style version": "不受支持的表面样式版本",
   "Unknown surface style key:": "未知的表面样式键：",
   "Unsupported or malformed Sequoia surface overrides.": "Sequoia 表面样式覆盖不受支持或格式错误。",
+  "in app notifications": "应用内通知",
+  "customize notifications": "自定义通知",
+  "always show idle processes in activity": "始终在活动中显示空闲进程",
+  "each process in activity": "活动中的每个进程",
+  "program notifications": "程序通知",
+  "agent notifications": "智能体通知",
+  "background notifications": "后台通知",
+  "claude notification": "Claude 通知",
+  "notify when done": "完成时通知",
+  "notify when blocked": "阻塞时通知",
+  "notifications without tab indicators": "不显示标签页指示器的通知",
+  "badge application icon": "在应用图标上显示标记",
+  "native notifications": "原生通知",
+  "mac notifications": "Mac 通知",
+  "tailscale alerts": "Tailscale 警报",
+  "terminal notifications": "终端通知",
+  "desktop notification": "桌面通知",
+  "tailscale login notification": "Tailscale 登录通知",
+  "device approval notification": "设备批准通知",
+  "tailnet administrator": "Tailnet 管理员",
+  "tailscale failure notification": "Tailscale 故障通知",
+  "tailscale stopped": "Tailscale 已停止",
+  "connection error": "连接错误",
+  "preparing server": "准备服务器",
+  "incompatible server": "不兼容的服务器",
+  "available version": "可用版本",
+  "use bundled server": "使用随附的服务器",
+  "backward compatible": "向后兼容",
+  "a newer server is available": "有可用的新服务器",
+  "restarting is optional": "可选重新启动",
+  "unavailable features": "不可用功能",
+  "server settings have changed": "服务器设置已更改",
+  "cannot connect to this server": "无法连接到此服务器",
+  "this server requires a newer rex app": "此服务器需要较新的 Rex app",
+  "server and app are incompatible": "服务器与应用不兼容",
+  "server compatibility": "服务器兼容性",
+  "Revision": "修订版",
+  "Revision ": "修订版 ",
+  "restart using included server": "使用随附的服务器重新启动",
+  "restart from source": "从源代码重新启动",
+  "copy remote address": "复制远程地址",
+  "tailscale connection progress": "Tailscale 连接进度",
+  "waiting for certificate": "正在等待证书",
+  "connection progress": "连接进度",
+  "assigned address": "已分配地址",
+  "machine identity": "设备身份",
+  "sign in to tailscale": "登录 Tailscale",
+  "signed in to tailscale": "已登录 Tailscale",
+  "enrolled account": "已注册账户",
+  "signing in to tailscale": "正在登录 Tailscale",
+  "preparing to sign in": "正在准备登录",
+  "this may take a moment": "这可能需要一些时间",
+  "ready to connect": "已准备好连接",
+  "awaiting connection": "正在等待连接",
+  "finish the process in your browser": "在浏览器中完成此流程",
+  "taking longer than usual": "所需时间比平时长",
+  "signing out of tailscale": "正在退出 Tailscale",
+  "remove saved login": "移除保存的登录信息",
+  "sign out progress": "退出登录进度",
   "None": "无",
 ]
 
@@ -1437,6 +1501,18 @@ private func translate(_ value: String) -> String {
   }
   if value.hasPrefix("Dismiss notice (") {
     return "关闭通知 (" + value.dropFirst("Dismiss notice (".count)
+  }
+  if value.hasSuffix("\" is still running.") {
+    return value.dropLast("\" is still running.".count) + "”仍在运行。"
+  }
+  if value.hasSuffix("\" isn't available here right now.") {
+    return value.dropLast("\" isn't available here right now.".count) + "”当前无法使用。"
+  }
+  if value.hasSuffix("\" is not a valid JSON pointer to a member.") {
+    return value.dropLast("\" is not a valid JSON pointer to a member.".count) + "”不是有效的 JSON 指针成员。"
+  }
+  if value.hasSuffix("\" is not a valid JSON pointer to a member. It must start with \\\"/\\\", write \\\"~\\\" as \\\"~0\\\", and not end in \\\"-\\\".") {
+    return value.dropLast("\" is not a valid JSON pointer to a member. It must start with \\\"/\\\", write \\\"~\\\" as \\\"~0\\\", and not end in \\\"-\\\".".count) + "”不是有效的 JSON 指针成员。必须以“/”开头，将“~”写作“~0”，且不能以“-”结尾。"
   }
   if value.hasPrefix("Enter a size from ") {
     return "输入大小，范围为 " + value.dropFirst("Enter a size from ".count)
@@ -1711,6 +1787,9 @@ private func translate(_ value: String) -> String {
     if translatedBase != base { return translatedBase + "主题" }
   }
   if value == "Session Filter" { return "会话筛选" }
+  if value.hasPrefix("New Session ") {
+    return "新建会话 " + value.dropFirst("New Session ".count)
+  }
   if value == "Filter or create" || value == "Filter or create..." || value == "Filter or create…" { return "筛选或创建…" }
   if value.hasPrefix("Reconnecting to ") { return "正在重新连接 " + value.dropFirst("Reconnecting to ".count) }
   if value.hasPrefix("Connecting to ") { return "正在连接 " + value.dropFirst("Connecting to ".count) }
@@ -1741,6 +1820,15 @@ private func translate(_ value: String) -> String {
   if value.hasPrefix("Set Cursor Blink Interval to ") { return "将光标闪烁间隔设为 " + value.dropFirst("Set Cursor Blink Interval to ".count) }
   if value.hasPrefix("Set Terminal Font Size to ") { return "将终端字体大小设为 " + value.dropFirst("Set Terminal Font Size to ".count) }
   if value.hasPrefix("Server Version ") { return value.replacingOccurrences(of: "Server Version", with: "服务器版本").replacingOccurrences(of: "API Version", with: "API 版本").replacingOccurrences(of: "Revision", with: "修订版") }
+  if value.hasPrefix("Revision ") {
+    return "修订版 " + value.dropFirst("Revision ".count)
+  }
+  if value.contains("API 版本 Revision ") {
+    return value.replacingOccurrences(of: "Revision ", with: "修订版 ")
+  }
+  if value.contains("API Version Revision ") {
+    return value.replacingOccurrences(of: "API Version", with: "API 版本").replacingOccurrences(of: "Revision ", with: "修订版 ")
+  }
   if value.hasPrefix("Change the shortcut for ") {
     return "修改 " + translate(String(value.dropFirst("Change the shortcut for ".count))) + " 的快捷键"
   }

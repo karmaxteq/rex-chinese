@@ -23,6 +23,7 @@ static NSString *RXTranslate(NSString *s) {
             @"Zoom Pane": @"缩放窗格",
             @"Close Pane": @"关闭窗格",
             @"Search Settings": @"搜索设置",
+            @"Dismiss editing": @"结束编辑",
             @"Settings categories": @"设置类别",
             @"Developer Mode": @"开发者模式",
             @"Sign in to Tailscale": @"登录 Tailscale",
@@ -792,6 +793,10 @@ static NSString *RXTranslate(NSString *s) {
             @"has no window to act in.": @"没有可执行操作的窗口。",
             @"isn’t available here right now.": @"当前无法使用。",
             @"isn't available here right now.": @"当前无法使用。",
+            @" is still running.": @"仍在运行。",
+            @" isn't available here right now.": @"当前无法使用。",
+            @" is not a valid JSON pointer to a member.": @"不是有效的 JSON 指针成员。",
+            @" is not a valid JSON pointer to a member. It must start with \"/\", write \"~\" as \"~0\", and not end in \"-\".": @"不是有效的 JSON 指针成员。必须以“/”开头，将“~”写作“~0”，且不能以“-”结尾。",
             @"Browser origins allowed to open Rex WebSocket streams.": @"允许打开 Rex WebSocket 流的浏览器来源。",
             @"Default origin, always allowed": @"默认来源，始终允许",
             @"No folder selected": @"未选择文件夹",
@@ -1443,6 +1448,65 @@ static NSString *RXTranslate(NSString *s) {
             @"Unsupported surface style version": @"不受支持的表面样式版本",
             @"Unknown surface style key:": @"未知的表面样式键：",
             @"Unsupported or malformed Sequoia surface overrides.": @"Sequoia 表面样式覆盖不受支持或格式错误。",
+            @"in app notifications": @"应用内通知",
+            @"customize notifications": @"自定义通知",
+            @"always show idle processes in activity": @"始终在活动中显示空闲进程",
+            @"each process in activity": @"活动中的每个进程",
+            @"program notifications": @"程序通知",
+            @"agent notifications": @"智能体通知",
+            @"background notifications": @"后台通知",
+            @"claude notification": @"Claude 通知",
+            @"notify when done": @"完成时通知",
+            @"notify when blocked": @"阻塞时通知",
+            @"notifications without tab indicators": @"不显示标签页指示器的通知",
+            @"badge application icon": @"在应用图标上显示标记",
+            @"native notifications": @"原生通知",
+            @"mac notifications": @"Mac 通知",
+            @"tailscale alerts": @"Tailscale 警报",
+            @"terminal notifications": @"终端通知",
+            @"desktop notification": @"桌面通知",
+            @"tailscale login notification": @"Tailscale 登录通知",
+            @"device approval notification": @"设备批准通知",
+            @"tailnet administrator": @"Tailnet 管理员",
+            @"tailscale failure notification": @"Tailscale 故障通知",
+            @"tailscale stopped": @"Tailscale 已停止",
+            @"connection error": @"连接错误",
+            @"preparing server": @"准备服务器",
+            @"incompatible server": @"不兼容的服务器",
+            @"available version": @"可用版本",
+            @"use bundled server": @"使用随附的服务器",
+            @"backward compatible": @"向后兼容",
+            @"a newer server is available": @"有可用的新服务器",
+            @"restarting is optional": @"可选重新启动",
+            @"unavailable features": @"不可用功能",
+            @"server settings have changed": @"服务器设置已更改",
+            @"cannot connect to this server": @"无法连接到此服务器",
+            @"this server requires a newer rex app": @"此服务器需要较新的 Rex app",
+            @"server and app are incompatible": @"服务器与应用不兼容",
+            @"server compatibility": @"服务器兼容性",
+            @"Revision": @"修订版",
+            @"Revision ": @"修订版 ",
+            @"restart using included server": @"使用随附的服务器重新启动",
+            @"restart from source": @"从源代码重新启动",
+            @"copy remote address": @"复制远程地址",
+            @"tailscale connection progress": @"Tailscale 连接进度",
+            @"waiting for certificate": @"正在等待证书",
+            @"connection progress": @"连接进度",
+            @"assigned address": @"已分配地址",
+            @"machine identity": @"设备身份",
+            @"sign in to tailscale": @"登录 Tailscale",
+            @"signed in to tailscale": @"已登录 Tailscale",
+            @"enrolled account": @"已注册账户",
+            @"signing in to tailscale": @"正在登录 Tailscale",
+            @"preparing to sign in": @"正在准备登录",
+            @"this may take a moment": @"这可能需要一些时间",
+            @"ready to connect": @"已准备好连接",
+            @"awaiting connection": @"正在等待连接",
+            @"finish the process in your browser": @"在浏览器中完成此流程",
+            @"taking longer than usual": @"所需时间比平时长",
+            @"signing out of tailscale": @"正在退出 Tailscale",
+            @"remove saved login": @"移除保存的登录信息",
+            @"sign out progress": @"退出登录进度",
             @"None": @"无",
         };
     });
@@ -1469,6 +1533,18 @@ static NSString *RXTranslate(NSString *s) {
     }
     if ([s hasPrefix:@"Dismiss notice ("]) {
         return [NSString stringWithFormat:@"关闭通知 (%@", [s substringFromIndex:[@"Dismiss notice (" length]]];
+    }
+    if ([s hasSuffix:@"\" is still running."]) {
+        return [[s substringToIndex:s.length - [@"\" is still running." length]] stringByAppendingString:@"”仍在运行。"];
+    }
+    if ([s hasSuffix:@"\" isn't available here right now."]) {
+        return [[s substringToIndex:s.length - [@"\" isn't available here right now." length]] stringByAppendingString:@"”当前无法使用。"];
+    }
+    if ([s hasSuffix:@"\" is not a valid JSON pointer to a member."]) {
+        return [[s substringToIndex:s.length - [@"\" is not a valid JSON pointer to a member." length]] stringByAppendingString:@"”不是有效的 JSON 指针成员。"];
+    }
+    if ([s hasSuffix:@"\" is not a valid JSON pointer to a member. It must start with \\\"/\\\", write \\\"~\\\" as \\\"~0\\\", and not end in \\\"-\\\"."]) {
+        return [[s substringToIndex:s.length - [@"\" is not a valid JSON pointer to a member. It must start with \\\"/\\\", write \\\"~\\\" as \\\"~0\\\", and not end in \\\"-\\\"." length]] stringByAppendingString:@"”不是有效的 JSON 指针成员。必须以“/”开头，将“~”写作“~0”，且不能以“-”结尾。"];
     }
     if ([s hasPrefix:@"Enter a size from "]) {
         return [NSString stringWithFormat:@"输入大小，范围为 %@", [s substringFromIndex:[@"Enter a size from " length]]];
@@ -1713,6 +1789,9 @@ static NSString *RXTranslate(NSString *s) {
         NSString *translatedBase = RXTranslate(base);
         if (translatedBase.length && ![translatedBase isEqualToString:base]) return [translatedBase stringByAppendingString:@"主题"];
     }
+    if ([s hasPrefix:@"New Session "]) {
+        return [NSString stringWithFormat:@"新建会话 %@", [s substringFromIndex:[@"New Session " length]]];
+    }
     NSString *original = s;
     if ([s containsString:@"Light Mode"]) s = [s stringByReplacingOccurrencesOfString:@"Light Mode" withString:@"浅色模式"];
     if ([s containsString:@"Dark Mode"]) s = [s stringByReplacingOccurrencesOfString:@"Dark Mode" withString:@"深色模式"];
@@ -1744,8 +1823,60 @@ static NSString *RXTranslate(NSString *s) {
     if ([s hasPrefix:@"Create a session on "]) {
         return [NSString stringWithFormat:@"在 %@ 上创建会话", RXTranslate([s substringFromIndex:20])];
     }
+    if ([s hasPrefix:@"Reconnecting to "]) {
+        return [NSString stringWithFormat:@"正在重新连接 %@", [s substringFromIndex:[@"Reconnecting to " length]]];
+    }
+    if ([s hasPrefix:@"Connecting to "]) {
+        return [NSString stringWithFormat:@"正在连接 %@", [s substringFromIndex:[@"Connecting to " length]]];
+    }
+    if ([s hasPrefix:@"Connected to "]) {
+        return [NSString stringWithFormat:@"已连接到 %@", [s substringFromIndex:[@"Connected to " length]]];
+    }
+    if ([s hasPrefix:@"Loading Sessions on "]) {
+        return [NSString stringWithFormat:@"正在加载 %@ 上的会话", [s substringFromIndex:[@"Loading Sessions on " length]]];
+    }
+    if ([s hasPrefix:@"Exited with status "]) {
+        return [NSString stringWithFormat:@"已退出，状态码 %@", [s substringFromIndex:[@"Exited with status " length]]];
+    }
     if ([s hasPrefix:@"Connection warning for "]) {
         return [NSString stringWithFormat:@"连接警告：%@", RXTranslate([s substringFromIndex:23])];
+    }
+    if ([s hasPrefix:@"Connection errors: "]) {
+        return [NSString stringWithFormat:@"连接错误：%@", [s substringFromIndex:[@"Connection errors: " length]]];
+    }
+    if ([s hasPrefix:@"Tailscale failed: "]) {
+        return [NSString stringWithFormat:@"Tailscale 失败：%@", [s substringFromIndex:[@"Tailscale failed: " length]]];
+    }
+    if ([s hasPrefix:@"Tailscale assigned "]) {
+        return [NSString stringWithFormat:@"Tailscale 已分配 %@", [s substringFromIndex:[@"Tailscale assigned " length]]];
+    }
+    if ([s hasPrefix:@"Restart required: "]) {
+        return [NSString stringWithFormat:@"需要重新启动：%@", [s substringFromIndex:[@"Restart required: " length]]];
+    }
+    if ([s hasPrefix:@"Restarted the Rex server for Rex "]) {
+        return [NSString stringWithFormat:@"已为 Rex %@ 重新启动服务器", [s substringFromIndex:[@"Restarted the Rex server for Rex " length]]];
+    }
+    if ([s hasPrefix:@"Update Rex on the server to use "]) {
+        return [NSString stringWithFormat:@"更新服务器上的 Rex 以使用 %@", [s substringFromIndex:[@"Update Rex on the server to use " length]]];
+    }
+    if ([s hasPrefix:@"Set Terminal Font Size to "]) {
+        return [NSString stringWithFormat:@"将终端字体大小设为 %@", [s substringFromIndex:[@"Set Terminal Font Size to " length]]];
+    }
+    if ([s hasPrefix:@"Server Version "]) {
+        NSString *translatedVersion = [s stringByReplacingOccurrencesOfString:@"Server Version" withString:@"服务器版本"];
+        translatedVersion = [translatedVersion stringByReplacingOccurrencesOfString:@"API Version" withString:@"API 版本"];
+        translatedVersion = [translatedVersion stringByReplacingOccurrencesOfString:@"Revision" withString:@"修订版"];
+        return translatedVersion;
+    }
+    if ([s hasPrefix:@"Revision "]) {
+        return [NSString stringWithFormat:@"修订版 %@", [s substringFromIndex:[@"Revision " length]]];
+    }
+    if ([s containsString:@"API 版本 Revision "]) {
+        return [s stringByReplacingOccurrencesOfString:@"Revision " withString:@"修订版 "];
+    }
+    if ([s containsString:@"API Version Revision "]) {
+        NSString *translatedVersion = [s stringByReplacingOccurrencesOfString:@"API Version" withString:@"API 版本"];
+        return [translatedVersion stringByReplacingOccurrencesOfString:@"Revision " withString:@"修订版 "];
     }
     if ([s hasPrefix:@"登录 Tailscale、Access Rex securely from your other devices."]) return @"登录 Tailscale、从其他设备安全访问 Rex。";
     if ([s hasPrefix:@"Settings - "]) {
