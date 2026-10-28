@@ -249,6 +249,8 @@ private let translations: [String: String] = [
   "Couldn't find": "找不到",
   "Couldn’t connect to": "无法连接到",
   "Couldn't connect to": "无法连接到",
+  "Couldn’t reach": "无法连接到",
+  "Couldn't reach": "无法连接到",
   "Retry": "重试",
   "Copy": "复制",
   "Copy ": "复制 ",
@@ -1139,6 +1141,8 @@ private func translate(_ value: String) -> String {
   var remoteHostError = value
   remoteHostError = remoteHostError.replacingOccurrences(of: "Couldn’t connect to ", with: "无法连接到 ")
   remoteHostError = remoteHostError.replacingOccurrences(of: "Couldn't connect to ", with: "无法连接到 ")
+  remoteHostError = remoteHostError.replacingOccurrences(of: "Couldn’t reach ", with: "无法连接到 ")
+  remoteHostError = remoteHostError.replacingOccurrences(of: "Couldn't reach ", with: "无法连接到 ")
   remoteHostError = remoteHostError.replacingOccurrences(of: "Couldn’t find ", with: "找不到 ")
   remoteHostError = remoteHostError.replacingOccurrences(of: "Couldn't find ", with: "找不到 ")
   remoteHostError = remoteHostError.replacingOccurrences(of: ". Check your network connection and the host’s address, and make sure Rex is running on the host, then retry.", with: "。请检查网络连接和主机地址，并确保主机上的 Rex 正在运行，然后重试。")

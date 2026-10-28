@@ -630,6 +630,8 @@
 "Couldn't find" = "找不到";
 "Couldn’t connect to" = "无法连接到";
 "Couldn't connect to" = "无法连接到";
+"Couldn’t reach" = "无法连接到";
+"Couldn't reach" = "无法连接到";
 "Retry" = "重试";
 "Copy" = "复制";
 "Shows connection details and Retry" = "显示连接详情并重试";

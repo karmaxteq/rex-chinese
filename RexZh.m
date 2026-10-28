@@ -104,6 +104,8 @@ static NSString *RXTranslate(NSString *s) {
             @"Couldn't find": @"找不到",
             @"Couldn’t connect to": @"无法连接到",
             @"Couldn't connect to": @"无法连接到",
+            @"Couldn’t reach": @"无法连接到",
+            @"Couldn't reach": @"无法连接到",
             @"Retry": @"重试",
             @"Copy": @"复制",
             @"Copy ": @"复制 ",
@@ -1156,6 +1158,8 @@ static NSString *RXTranslate(NSString *s) {
     NSString *remoteHostError = s;
     remoteHostError = [remoteHostError stringByReplacingOccurrencesOfString:@"Couldn’t connect to " withString:@"无法连接到 "];
     remoteHostError = [remoteHostError stringByReplacingOccurrencesOfString:@"Couldn't connect to " withString:@"无法连接到 "];
+    remoteHostError = [remoteHostError stringByReplacingOccurrencesOfString:@"Couldn’t reach " withString:@"无法连接到 "];
+    remoteHostError = [remoteHostError stringByReplacingOccurrencesOfString:@"Couldn't reach " withString:@"无法连接到 "];
     remoteHostError = [remoteHostError stringByReplacingOccurrencesOfString:@"Couldn’t find " withString:@"找不到 "];
     remoteHostError = [remoteHostError stringByReplacingOccurrencesOfString:@"Couldn't find " withString:@"找不到 "];
     remoteHostError = [remoteHostError stringByReplacingOccurrencesOfString:@". Check your network connection and the host’s address, and make sure Rex is running on the host, then retry." withString:@"。请检查网络连接和主机地址，并确保主机上的 Rex 正在运行，然后重试。"];
@@ -3228,11 +3232,16 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
                 RXRefreshMenu(note.object);
                 RXRefreshMenu(NSApp.mainMenu);
             }];
-            [NSTimer scheduledTimerWithTimeInterval:0.2 repeats:YES block:^(NSTimer *timer) {
+            // Refresh the dynamic overlays on the common run-loop modes so
+            // popovers and menus do not leave an English frame visible for
+            // the old two-second polling interval. The same timer also keeps
+            // the command-palette and text-field hooks installed as views are
+            // created lazily by SwiftUI.
+            NSTimer *timer = [NSTimer timerWithTimeInterval:0.2 repeats:YES block:^(NSTimer *timer) {
                 RXInstallCommandPaletteHooks();
                 RXInstallTextFieldTextViewHook();
+                RXRefreshAccessibility();
             }];
-            NSTimer *timer = [NSTimer timerWithTimeInterval:2.0 repeats:YES block:^(NSTimer *timer) { RXRefreshAccessibility(); }];
             [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
         });
     }
