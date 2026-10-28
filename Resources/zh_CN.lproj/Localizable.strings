@@ -1191,4 +1191,13 @@
 "Couldn’t find the Ghostty theme " = "找不到 Ghostty 主题 ";
 "Couldn't find the Ghostty theme " = "找不到 Ghostty 主题 ";
 "Melt preview failed" = "预览合成失败";
+"Type a terminal font size" = "输入终端字体大小";
+"Tagged devices have no owner. Your tailnet’s policy decides who can connect." = "带标签的设备没有所有者。你的 tailnet 策略决定谁可以连接。";
+"Tagged devices have no owner. Your tailnet's policy decides who can connect." = "带标签的设备没有所有者。你的 tailnet 策略决定谁可以连接。";
+"Publishing failed and the package could not be restored:" = "发布失败，无法恢复软件包：";
+"Migrated from Ghostty" = "已从 Ghostty 迁移";
+"Missing bundled surface styles resource" = "缺少随附的表面样式资源";
+"Unsupported surface style version" = "不受支持的表面样式版本";
+"Unknown surface style key:" = "未知的表面样式键：";
+"Unsupported or malformed Sequoia surface overrides." = "Sequoia 表面样式覆盖不受支持或格式错误。";
 "None" = "无";

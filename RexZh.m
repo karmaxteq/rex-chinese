@@ -1434,6 +1434,15 @@ static NSString *RXTranslate(NSString *s) {
             @"Recorded here. It takes priority over your configuration file and Rex’s defaults.": @"此处记录的快捷键优先于配置文件和 Rex 的默认设置。",
             @"Recorded here. It takes priority over your configuration file and Rex's defaults.": @"此处记录的快捷键优先于配置文件和 Rex 的默认设置。",
             @"Melt preview failed": @"预览合成失败",
+            @"Type a terminal font size": @"输入终端字体大小",
+            @"Tagged devices have no owner. Your tailnet’s policy decides who can connect.": @"带标签的设备没有所有者。你的 tailnet 策略决定谁可以连接。",
+            @"Tagged devices have no owner. Your tailnet's policy decides who can connect.": @"带标签的设备没有所有者。你的 tailnet 策略决定谁可以连接。",
+            @"Publishing failed and the package could not be restored:": @"发布失败，无法恢复软件包：",
+            @"Migrated from Ghostty": @"已从 Ghostty 迁移",
+            @"Missing bundled surface styles resource": @"缺少随附的表面样式资源",
+            @"Unsupported surface style version": @"不受支持的表面样式版本",
+            @"Unknown surface style key:": @"未知的表面样式键：",
+            @"Unsupported or malformed Sequoia surface overrides.": @"Sequoia 表面样式覆盖不受支持或格式错误。",
             @"None": @"无",
         };
     });
@@ -1509,6 +1518,21 @@ static NSString *RXTranslate(NSString *s) {
     }
     if ([s hasPrefix:@"Runtime directory: "]) {
         return [NSString stringWithFormat:@"运行时目录：%@", [s substringFromIndex:[@"Runtime directory: " length]]];
+    }
+    if ([s hasPrefix:@"Unable to load surface styles at "]) {
+        return [NSString stringWithFormat:@"无法加载表面样式：%@", [s substringFromIndex:[@"Unable to load surface styles at " length]]];
+    }
+    if ([s hasPrefix:@"Ghostty configuration includes are nested more than eight levels deep at "]) {
+        return [NSString stringWithFormat:@"Ghostty 配置包含嵌套超过八层：%@", [s substringFromIndex:[@"Ghostty configuration includes are nested more than eight levels deep at " length]]];
+    }
+    if ([s hasPrefix:@"Remove the shortcuts recorded here for "]) {
+        return [NSString stringWithFormat:@"移除此处记录的快捷键：%@", [s substringFromIndex:[@"Remove the shortcuts recorded here for " length]]];
+    }
+    if ([s hasPrefix:@"Publishing failed and the package could not be restored: "]) {
+        return [NSString stringWithFormat:@"发布失败，无法恢复软件包：%@", [s substringFromIndex:[@"Publishing failed and the package could not be restored: " length]]];
+    }
+    if ([s hasPrefix:@"Migrated from Ghostty"]) {
+        return [NSString stringWithFormat:@"已从 Ghostty 迁移%@", [s substringFromIndex:[@"Migrated from Ghostty" length]]];
     }
     if ([s hasPrefix:@"Waiting for the next key after "]) {
         return [NSString stringWithFormat:@"正在等待下一个按键，当前按键：%@", [s substringFromIndex:31]];

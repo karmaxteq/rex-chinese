@@ -1403,6 +1403,15 @@ private let translations: [String: String] = [
   "Recorded here. It takes priority over your configuration file and Rex’s defaults.": "此处记录的快捷键优先于配置文件和 Rex 的默认设置。",
   "Recorded here. It takes priority over your configuration file and Rex's defaults.": "此处记录的快捷键优先于配置文件和 Rex 的默认设置。",
   "Melt preview failed": "预览合成失败",
+  "Type a terminal font size": "输入终端字体大小",
+  "Tagged devices have no owner. Your tailnet’s policy decides who can connect.": "带标签的设备没有所有者。你的 tailnet 策略决定谁可以连接。",
+  "Tagged devices have no owner. Your tailnet's policy decides who can connect.": "带标签的设备没有所有者。你的 tailnet 策略决定谁可以连接。",
+  "Publishing failed and the package could not be restored:": "发布失败，无法恢复软件包：",
+  "Migrated from Ghostty": "已从 Ghostty 迁移",
+  "Missing bundled surface styles resource": "缺少随附的表面样式资源",
+  "Unsupported surface style version": "不受支持的表面样式版本",
+  "Unknown surface style key:": "未知的表面样式键：",
+  "Unsupported or malformed Sequoia surface overrides.": "Sequoia 表面样式覆盖不受支持或格式错误。",
   "None": "无",
 ]
 
@@ -1473,6 +1482,21 @@ private func translate(_ value: String) -> String {
   }
   if value.hasPrefix("Runtime directory: ") {
     return "运行时目录：" + value.dropFirst("Runtime directory: ".count)
+  }
+  if value.hasPrefix("Unable to load surface styles at ") {
+    return "无法加载表面样式：" + value.dropFirst("Unable to load surface styles at ".count)
+  }
+  if value.hasPrefix("Ghostty configuration includes are nested more than eight levels deep at ") {
+    return "Ghostty 配置包含嵌套超过八层：" + value.dropFirst("Ghostty configuration includes are nested more than eight levels deep at ".count)
+  }
+  if value.hasPrefix("Remove the shortcuts recorded here for ") {
+    return "移除此处记录的快捷键：" + value.dropFirst("Remove the shortcuts recorded here for ".count)
+  }
+  if value.hasPrefix("Publishing failed and the package could not be restored: ") {
+    return "发布失败，无法恢复软件包：" + value.dropFirst("Publishing failed and the package could not be restored: ".count)
+  }
+  if value.hasPrefix("Migrated from Ghostty") {
+    return "已从 Ghostty 迁移" + value.dropFirst("Migrated from Ghostty".count)
   }
   if value.hasPrefix("Waiting for the next key after ") {
     return "正在等待下一个按键，当前按键：" + value.dropFirst("Waiting for the next key after ".count)
