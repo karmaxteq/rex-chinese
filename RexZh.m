@@ -87,6 +87,8 @@ static NSString *RXTranslate(NSString *s) {
             @"Move Pane": @"移动窗格",
             @"Close Tab": @"关闭标签页",
             @"Clear Filter": @"清除筛选",
+            @"Clear text": @"清除文本",
+            @"All Settings": @"所有设置",
             @"Filter Hosts": @"筛选主机",
             @"Filter hosts": @"筛选主机",
             @"All hosts": @"所有主机",

@@ -1,11 +1,24 @@
 # Rex Beta 0.1.0 简体中文覆盖回归
 
-最后回归：2026-10-28（macOS，`Rex Beta 中文版.app`）。验证对象是补丁副本，并用原版 `/Applications/Rex Beta.app` 做路径对照。
+最后回归：2026-10-29（macOS，`Rex Beta 中文版.app`）。验证对象是补丁副本，并用原版 `/Applications/Rex Beta.app` 做路径对照。
+
+## 2026-10-29 冷启动覆盖审计
+
+本次先完全退出原版和补丁副本，再分别冷启动。原版 `/Applications/Rex Beta.app`
+的 Accessibility 树仍返回 `Tabs`、`Change Session`、`Command Palette`、`File`、
+`Edit`、`View`、`Window`、`Help`；补丁副本 `~/Applications/Rex Beta 中文版.app`
+返回“标签页”“切换会话”“命令面板”“文件”“编辑”“显示”“窗口”“帮助”。补丁进程
+PID 为 `73415`，`vmmap` 读回 `libRexChinese.dylib` 和 `libRexTextHook.dylib`，应用
+`codesign --verify --deep --strict` 通过。
+
+本次还实际打开并读回了：设置搜索无匹配页（截图显示“未找到……的相关结果”）、命令面板默认列表和
+无匹配查询、Tailscale 登录表单、服务器详情弹层、停止服务器确认框、远程主机添加表单和连接错误弹层。
+这些路径的用户可见文案均为中文；没有提交 Tailscale 登录，也没有确认停止服务器。
 
 ## 本轮针对“看不到覆盖”的复测
 
 本轮从当前工作树重新构建并运行了补丁副本，冷启动进程为
-`~/Applications/Rex Beta 中文版.app/Contents/MacOS/Rex`（PID 67980）。`vmmap`
+`~/Applications/Rex Beta 中文版.app/Contents/MacOS/Rex`（PID 74119）。`vmmap`
 读回该进程实际加载了 `libRexChinese.dylib` 和 `libRexTextHook.dylib`；签名校验也通过。
 随后用 Accessibility 树逐项读回主工作区、应用菜单、9 个设置页、通知 4 个状态页、
 通知声音菜单、界面 4 个弹出菜单、添加远程主机表单/失败弹层、服务器详情、主题编辑器、
@@ -32,17 +45,17 @@ open "$HOME/Applications/Rex Beta 中文版.app"
 | 层级 | 当前结论 | 证据 |
 | --- | --- | --- |
 | 主路径运行时 | 已覆盖 | 冷启动后主工作区、应用菜单、命令面板 `tab` 筛选、9 个设置页的 Accessibility 树读回中文；命令面板另有截图核验 |
-| 资源与静态字典 | 已写入 | `Localizable.strings` 1,104 条（去重 1,098），Swift 1,332 条，AppKit 1,347 条；三处合并去重 1,462 个字面量键 |
+| 资源与静态字典 | 已写入 | `Localizable.strings` 1,109 条（去重 1,103），Swift 1,338 条，AppKit 1,353 条；三处合并去重 1,467 个字面量键 |
 | 动态异常路径 | 部分覆盖 | 主题导入失败、远程主机失败、停止服务器确认框已触发；Tailscale 登录、服务器重启/兼容性和下载/安装更新仍未逐项触发 |
 | 明确残留 | 仅系统面板角色文本 | Rex 自绘界面和 Rex 设置页未发现英文；原生文件选择器目录行的 AX role 仍返回 `folder`，另可能返回系统 `Search` |
 | 系统边界 | 不计入 Rex 文案 | macOS 原生文件选择器的系统 AX provider 负责目录行角色和搜索标签；其可见“打开/取消/新建文件夹”已中文 |
 
-这里的 1,462 是补丁字典的去重键数，不是应用全部字符串的百分比；Rex 的终端输出、路径、主机名和用户创建的会话名属于运行数据，按原文保留。
+这里的 1,467 是补丁字典的去重键数，不是应用全部字符串的百分比；Rex 的终端输出、路径、主机名和用户创建的会话名属于运行数据，按原文保留。
 
 ## 当前冷启动结论
 
-- 2026-10-28 冷启动验证的进程路径为 `~/Applications/Rex Beta 中文版.app`，实际加载 `libRexChinese.dylib` 和 `libRexTextHook.dylib`；直接打开 `/Applications/Rex Beta.app` 仍是英文原版。
-- 当前工作树中有 1,107 条资源条目（去重后 1,101 条）、1,336 条 Swift 文本映射、1,351 条 AppKit 文本映射，三处合并去重后为 1,465 个字面量键。这是补丁的映射规模，不等于应用全部文本的百分比。
+- 2026-10-29 冷启动验证的进程路径为 `~/Applications/Rex Beta 中文版.app`，实际加载 `libRexChinese.dylib` 和 `libRexTextHook.dylib`；直接打开 `/Applications/Rex Beta.app` 仍是英文原版。
+- 当前工作树中有 1,109 条资源条目（去重后 1,103 条）、1,338 条 Swift 文本映射、1,353 条 AppKit 文本映射，三处合并去重后为 1,467 个字面量键。这是补丁的映射规模，不等于应用全部文本的百分比。
 - 主工作区、菜单和 9 个设置页面已在冷启动后重新读回；终端的 `Last login`、Shell 提示符、命令输出、主机名和路径属于运行数据，按原文保留。
 - 运行时仍需单独触发的路径见文末；静态映射存在不代表对应异常流程已经完成运行时回归。
 
