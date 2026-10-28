@@ -51,6 +51,17 @@ static NSString *RXTranslate(NSString *s) {
             @"Edit Host": @"编辑主机",
             @"Changes are saved locally on this Mac.": @"更改将保存在此 Mac 本地。",
             @"Save": @"保存",
+            @"Color": @"颜色",
+            @"Background color": @"背景色",
+            @"Text color": @"文本色",
+            @"Cursor color": @"光标颜色",
+            @"Cursor text color": @"光标文本颜色",
+            @"Selection color": @"选择颜色",
+            @"Selected text color": @"选中文本颜色",
+            @"Hue": @"色相",
+            @"Chroma": @"色度",
+            @"Lightness": @"亮度",
+            @"degrees": @"度",
             @"OK": @"好",
             @"Open": @"打开",
             @"Search": @"搜索",
@@ -964,6 +975,13 @@ static NSString *RXTranslate(NSString *s) {
     });
     NSString *exact = map[s];
     if (exact) return exact;
+    if ([s containsString:@"Hue "] || [s containsString:@"chroma "] || [s containsString:@"Lightness "]) {
+        NSString *translatedDetails = [s stringByReplacingOccurrencesOfString:@"Hue " withString:@"色相 "];
+        translatedDetails = [translatedDetails stringByReplacingOccurrencesOfString:@" degrees" withString:@"°"];
+        translatedDetails = [translatedDetails stringByReplacingOccurrencesOfString:@"chroma " withString:@"色度 "];
+        translatedDetails = [translatedDetails stringByReplacingOccurrencesOfString:@"Lightness " withString:@"亮度 "];
+        return translatedDetails;
+    }
     // Workspace notifications append the copied payload to the English
     // sentence. Keep the payload (version, commit, or path) untouched while
     // translating the sentence prefix used by both visible and AX surfaces.
@@ -1353,6 +1371,15 @@ static NSRect RXRemoteSaveFrame;
 static BOOL RXHasRemoteSaveFrame;
 static NSRect RXThemeEditorNameFrame;
 static BOOL RXHasThemeEditorNameFrame;
+// The native SwiftUI color picker renders these three labels outside the
+// normal Text/AX hooks. Keep their frames so the visual overlay can replace
+// the English labels without touching the picker controls themselves.
+static NSRect RXHueFrame;
+static NSRect RXChromaFrame;
+static NSRect RXLightnessFrame;
+static BOOL RXHasHueFrame;
+static BOOL RXHasChromaFrame;
+static BOOL RXHasLightnessFrame;
 // Residual overlays are attached to SwiftUI's private detail subtree. That
 // subtree can be replaced while navigating settings, so keeping only a
 // reference to the current detail view is not enough to remove an overlay
@@ -2382,6 +2409,12 @@ static void RXWalk(NSView *view) {
 }
 @end
 
+// SwiftUI's ColorPicker uses private controls for the Hue/Chroma/Lightness
+// labels. They are visible in the rendered popover but are not exposed as
+// ordinary Text views, so draw the translated labels over their exact AX
+// frames. The overlay is transparent to mouse hit testing.
+static void RXSetColorPickerLabelOverlay(NSWindow *window, NSString *key, NSString *text, NSRect screenFrame);
+
 @interface RXRemoteHostPlaceholderOverlayView : NSView
 @property(nonatomic, copy) NSString *text;
 @end
@@ -2781,6 +2814,46 @@ static void RXSetLocalRuntimeOverlayView(NSWindow *window, NSString *key, Class 
     [overlay setNeedsDisplay:YES];
 }
 
+static void RXSetColorPickerLabelOverlay(NSWindow *window, NSString *key, NSString *text, NSRect screenFrame) {
+    if (!window || !window.contentView || NSIsEmptyRect(screenFrame)) return;
+    NSView *host = window.contentView;
+    NSRect windowFrame = [window convertRectFromScreen:screenFrame];
+    NSRect frame = [host convertRect:windowFrame fromView:nil];
+    RXResidualOverlayView *overlay = nil;
+    for (NSView *subview in host.subviews) {
+        if ([subview isKindOfClass:[RXResidualOverlayView class]] && [subview.identifier isEqualToString:key]) {
+            overlay = (RXResidualOverlayView *)subview;
+            break;
+        }
+    }
+    if (!overlay) {
+        overlay = [[RXResidualOverlayView alloc] initWithFrame:frame];
+        overlay.identifier = key;
+        [host addSubview:overlay positioned:NSWindowAbove relativeTo:nil];
+    }
+    if (!RXOwnedResidualOverlays) RXOwnedResidualOverlays = [NSHashTable weakObjectsHashTable];
+    [RXOwnedResidualOverlays addObject:overlay];
+    overlay.wantsLayer = YES;
+    overlay.layer.zPosition = 1000.0;
+    overlay.text = text;
+    overlay.frame = frame;
+    overlay.hidden = NO;
+    [overlay setNeedsDisplay:YES];
+}
+
+static void RXRemoveColorPickerLabelOverlays(NSWindow *window) {
+    if (!window || !window.contentView) return;
+    for (NSView *subview in [window.contentView.subviews copy]) {
+        if (![subview isKindOfClass:[RXResidualOverlayView class]]) continue;
+        NSString *identifier = subview.identifier;
+        if ([identifier isEqualToString:@"rex-color-picker-hue"] ||
+            [identifier isEqualToString:@"rex-color-picker-chroma"] ||
+            [identifier isEqualToString:@"rex-color-picker-lightness"]) {
+            [subview removeFromSuperview];
+        }
+    }
+}
+
 static void RXTranslateThemeEditorNameInView(NSView *view) {
     if (![view isKindOfClass:[NSView class]]) return;
     if ([view isKindOfClass:[NSTextField class]]) {
@@ -2802,6 +2875,10 @@ static void RXTranslateThemeEditorNameInView(NSView *view) {
 
 static void RXUpdateRuntimeTextOverlays(NSWindow *window) {
     if (!window) return;
+    if (RXHasHueFrame) RXSetColorPickerLabelOverlay(window, @"rex-color-picker-hue", @"色相", RXHueFrame);
+    if (RXHasChromaFrame) RXSetColorPickerLabelOverlay(window, @"rex-color-picker-chroma", @"色度", RXChromaFrame);
+    if (RXHasLightnessFrame) RXSetColorPickerLabelOverlay(window, @"rex-color-picker-lightness", @"亮度", RXLightnessFrame);
+    if (!RXHasHueFrame && !RXHasChromaFrame && !RXHasLightnessFrame) RXRemoveColorPickerLabelOverlays(window);
     RXSetAboutOverlay(window);
     if (!window.title.length && RXHasThemeEditorNameFrame) RXSetThemeEditorNameOverlay(window, YES);
     else if (!window.title.length) RXSetThemeEditorNameOverlay(window, NO);
@@ -2932,6 +3009,16 @@ static void RXWalkAX(id element, NSUInteger depth) {
             NSString *rawValue = [rawObject isKindOfClass:[NSString class]] ? rawObject : value;
             NSString *translated = RXTranslate(value);
             NSRect rawFrame = RXAccessibilityFrame(element);
+            if ([rawValue isEqualToString:@"Hue"]) {
+                RXHueFrame = rawFrame;
+                RXHasHueFrame = !NSIsEmptyRect(rawFrame);
+            } else if ([rawValue isEqualToString:@"Chroma"]) {
+                RXChromaFrame = rawFrame;
+                RXHasChromaFrame = !NSIsEmptyRect(rawFrame);
+            } else if ([rawValue isEqualToString:@"Lightness"]) {
+                RXLightnessFrame = rawFrame;
+                RXHasLightnessFrame = !NSIsEmptyRect(rawFrame);
+            }
             if ([rawValue isEqualToString:@"Untitled Light Theme"] || [rawValue isEqualToString:@"**Untitled Light Theme**"]) {
                 RXThemeEditorNameFrame = rawFrame;
                 RXHasThemeEditorNameFrame = !NSIsEmptyRect(rawFrame);
@@ -3053,6 +3140,12 @@ static void RXRefreshAccessibility(void) {
         RXHasRemoteSaveFrame = NO;
         RXHasThemeEditorNameFrame = NO;
         RXThemeEditorNameFrame = NSZeroRect;
+        RXHasHueFrame = NO;
+        RXHasChromaFrame = NO;
+        RXHasLightnessFrame = NO;
+        RXHueFrame = NSZeroRect;
+        RXChromaFrame = NSZeroRect;
+        RXLightnessFrame = NSZeroRect;
         RXAXWalkWindow = window;
         RXRefreshToolbar(window.toolbar);
         RXWalk(window.contentView);

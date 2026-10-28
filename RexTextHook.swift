@@ -15,6 +15,17 @@ private let translations: [String: String] = [
   "Edit Host": "编辑主机",
   "Changes are saved locally on this Mac.": "更改将保存在此 Mac 本地。",
   "Save": "保存",
+  "Color": "颜色",
+  "Background color": "背景色",
+  "Text color": "文本色",
+  "Cursor color": "光标颜色",
+  "Cursor text color": "光标文本颜色",
+  "Selection color": "选择颜色",
+  "Selected text color": "选中文本颜色",
+  "Hue": "色相",
+  "Chroma": "色度",
+  "Lightness": "亮度",
+  "degrees": "度",
   "OK": "好",
   "Open": "打开",
   "Search": "搜索",
@@ -935,6 +946,13 @@ private let translations: [String: String] = [
 
 private func translate(_ value: String) -> String {
   if let translated = translations[value] { return translated }
+  if value.contains("Hue ") || value.contains("chroma ") || value.contains("Lightness ") {
+    return value
+      .replacingOccurrences(of: "Hue ", with: "色相 ")
+      .replacingOccurrences(of: " degrees", with: "°")
+      .replacingOccurrences(of: "chroma ", with: "色度 ")
+      .replacingOccurrences(of: "Lightness ", with: "亮度 ")
+  }
   // Workspace notifications append a technical payload to the English
   // sentence. Translate the visible/AX prefix and preserve the payload.
   if value.hasPrefix("Copied version info. ") {
