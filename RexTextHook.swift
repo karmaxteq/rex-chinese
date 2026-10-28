@@ -412,6 +412,7 @@ private let translations: [String: String] = [
   "Map text colors to the nearest theme color.": "将文本颜色映射到最接近的主题颜色。",
   "Cursor preview: the selected cursor at a terminal prompt.": "光标预览：终端提示符处的选定光标。",
   "Blink interval": "闪烁间隔",
+  "Blink interval in milliseconds": "闪烁间隔（毫秒）",
   "Padding": "内边距",
   "Padding color": "内边距颜色",
   "Background uses the pane background. Extend carries edge-cell backgrounds into the padding when appropriate. Extend Always extends them without those checks.": "背景使用窗格背景。适用时，“扩展”会将边缘单元格背景延伸到内边距；“始终扩展”会跳过这些检查。",
@@ -620,6 +621,9 @@ private let translations: [String: String] = [
   "Add Origin": "添加来源",
   "No GUI Overrides Yet": "还没有图形界面覆盖",
   "Waiting for the next key after": "正在等待下一个按键，当前按键：",
+  "Tailscale isn't connected.": "Tailscale 未连接。",
+  "Tailscale isn’t connected.": "Tailscale 未连接。",
+  "Tailscale notifications denied; attention remains in the menu bar": "Tailscale 通知已被拒绝；请在菜单栏中处理。",
   "Waiting for a key.": "正在等待按键。",
   "Exit Full Screen": "退出全屏",
   "Change Keybinding": "更改快捷键",
@@ -1355,6 +1359,12 @@ private func translate(_ value: String) -> String {
   }
   if value.hasPrefix("Copied config file path. ") {
     return "已复制配置文件路径 " + value.dropFirst("Copied config file path. ".count)
+  }
+  if value.hasPrefix("Waiting for the next key after ") {
+    return "正在等待下一个按键，当前按键：" + value.dropFirst("Waiting for the next key after ".count)
+  }
+  if value.hasPrefix("The running Rex server is incompatible with this version of Rex.app.") {
+    return "正在运行的 Rex 服务器与此版本的 Rex.app 不兼容。" + value.dropFirst("The running Rex server is incompatible with this version of Rex.app.".count)
   }
   if value.hasPrefix("The theme is missing valid colors for: ") {
     let suffix = value.dropFirst("The theme is missing valid colors for: ".count)

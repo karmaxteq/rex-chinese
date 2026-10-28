@@ -265,6 +265,9 @@
 /* Server, update, Tailscale, diagnostics, and permission states */
 
 "Waiting for the next key after" = "正在等待下一个按键，当前按键：";
+"Tailscale isn't connected." = "Tailscale 未连接。";
+"Tailscale isn’t connected." = "Tailscale 未连接。";
+"Tailscale notifications denied; attention remains in the menu bar" = "Tailscale 通知已被拒绝；请在菜单栏中处理。";
 "Waiting for a key." = "正在等待按键。";
 "Enter Full Screen" = "进入全屏";
 "Exit Full Screen" = "退出全屏";

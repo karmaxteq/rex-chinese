@@ -264,6 +264,7 @@ static NSString *RXTranslate(NSString *s) {
             @"Cursor style": @"光标样式",
             @"Blink speed": @"闪烁速度",
             @"Blink interval": @"闪烁间隔",
+            @"Blink interval in milliseconds": @"闪烁间隔（毫秒）",
             @"Ignore application requests to change cursor shape.": @"忽略应用更改光标形状的请求。",
             @"Force style": @"强制样式",
             @"Keyboard": @"键盘",
@@ -649,6 +650,9 @@ static NSString *RXTranslate(NSString *s) {
             @"Allowed origin": @"允许的来源",
             @"Add Origin": @"添加来源",
             @"Waiting for the next key after": @"正在等待下一个按键，当前按键：",
+            @"Tailscale isn't connected.": @"Tailscale 未连接。",
+            @"Tailscale isn’t connected.": @"Tailscale 未连接。",
+            @"Tailscale notifications denied; attention remains in the menu bar": @"Tailscale 通知已被拒绝；请在菜单栏中处理。",
             @"Waiting for a key.": @"正在等待按键。",
             @"Exit Full Screen": @"退出全屏",
             @"Migrate theme from Ghostty config": @"从 Ghostty 配置迁移主题",
@@ -1387,6 +1391,12 @@ static NSString *RXTranslate(NSString *s) {
     }
     if ([s hasPrefix:@"Copied config file path. "]) {
         return [NSString stringWithFormat:@"已复制配置文件路径 %@", [s substringFromIndex:25]];
+    }
+    if ([s hasPrefix:@"Waiting for the next key after "]) {
+        return [NSString stringWithFormat:@"正在等待下一个按键，当前按键：%@", [s substringFromIndex:31]];
+    }
+    if ([s hasPrefix:@"The running Rex server is incompatible with this version of Rex.app."]) {
+        return [NSString stringWithFormat:@"正在运行的 Rex 服务器与此版本的 Rex.app 不兼容。%@", [s substringFromIndex:68]];
     }
     if ([s hasPrefix:@"The theme is missing valid colors for: "]) {
         NSString *suffix = [s substringFromIndex:39];
