@@ -19,6 +19,12 @@ for lang in zh-Hans zh-Hans-CN; do
   mkdir -p "$DST/Contents/Resources/RexApp_RexMacOS.bundle/Contents/Resources/$lang.lproj"
   cp "$(dirname "$0")/Resources/zh_CN.lproj/Localizable.strings" "$DST/Contents/Resources/RexApp_RexMacOS.bundle/Contents/Resources/$lang.lproj/Localizable.strings"
 done
+# Give the patched copy its own LaunchServices identity.  The upstream app and
+# the copy otherwise share com.superlogical.rex, so Dock/Cursor can reopen the
+# unpatched app when the user selects the Chinese copy.
+/usr/libexec/PlistBuddy -c 'Set :CFBundleIdentifier com.superlogical.rex.chinese' "$DST/Contents/Info.plist"
+/usr/libexec/PlistBuddy -c 'Set :CFBundleDisplayName Rex Beta 中文版' "$DST/Contents/Info.plist"
+/usr/libexec/PlistBuddy -c 'Set :CFBundleName Rex Beta 中文版' "$DST/Contents/Info.plist"
 /usr/libexec/PlistBuddy -c 'Add :CFBundleLocalizations array' "$DST/Contents/Info.plist" 2>/dev/null || true
 /usr/libexec/PlistBuddy -c 'Add :CFBundleLocalizations:0 string zh_CN' "$DST/Contents/Info.plist" 2>/dev/null || true
 xattr -dr com.apple.quarantine "$DST" 2>/dev/null || true

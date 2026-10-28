@@ -2,6 +2,20 @@
 
 最后回归：2026-10-29（macOS，`Rex Beta 中文版.app`）。验证对象是补丁副本，并用原版 `/Applications/Rex Beta.app` 做路径对照。
 
+## 2026-10-29 最新冷启动：独立应用标识
+
+本轮复测还修复了一个容易让用户“看不到覆盖”的启动问题：原版和补丁副本此前共用
+`com.superlogical.rex`，Dock、Cursor 或 LaunchServices 可能把副本请求交给原版。现在
+`patch.sh` 会把副本写成 `com.superlogical.rex.chinese`，并设置显示名“Rex Beta 中文版”。
+重新生成并冷启动后，PID `76323` 的进程路径为
+`~/Applications/Rex Beta 中文版.app/Contents/MacOS/Rex`，`vmmap` 实际读回了
+`libRexChinese.dylib` 和 `libRexTextHook.dylib`。同一台机器上用
+`/Applications/Rex Beta.app` 启动的对照进程仍返回英文的 `Tabs`、`Change Session`、
+`Command Palette`、`File`、`Edit`、`View`、`Window`、`Help`。
+
+独立标识的临时副本也已实际启动验证：主窗口的“标签页”“切换会话”“命令面板”“文件”“编辑”
+等 Accessibility 文案仍为中文，因此这项改动只解决启动路由歧义，没有改变翻译注入方式。
+
 ## 2026-10-29 冷启动覆盖审计
 
 本次先完全退出原版和补丁副本，再分别冷启动。原版 `/Applications/Rex Beta.app`

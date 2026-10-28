@@ -6,7 +6,9 @@
 补丁由三层组成：`zh_CN.lproj/Localizable.strings` 覆盖资源翻译，
 `libRexChinese.dylib` 翻译 AppKit/SwiftUI 辅助功能、菜单、控件和动态文本，
 `libRexTextHook.dylib` 翻译 SwiftUI 自绘文本。应用通过 `RexLauncher` 启动，
-自动设置简体中文环境并加载两个动态库。
+自动设置简体中文环境并加载两个动态库。补丁副本使用独立的
+`com.superlogical.rex.chinese` bundle 标识，避免 Dock、Cursor 或 LaunchServices
+把它误路由回未修改的原版。
 
 ## 安装和启动
 
@@ -27,6 +29,14 @@ pgrep -af 'Rex Beta 中文版.app/Contents/MacOS/Rex'
 
 输出中必须包含 `~/Applications/Rex Beta 中文版.app`。如果看到的是
 `/Applications/Rex Beta.app`，请先退出原版，再重新运行上面的 `open` 命令。
+
+补丁副本的 bundle 标识是 `com.superlogical.rex.chinese`；可以用下面的命令读取副本
+自身的 plist，确认没有仍使用原版的 bundle 标识：
+
+```sh
+plutil -p "$HOME/Applications/Rex Beta 中文版.app/Contents/Info.plist" \
+  | rg CFBundleIdentifier
+```
 
 主工作区里的终端内容（例如 `Last login`、Shell 提示符、命令输出）来自系统
 Shell 或用户会话，补丁不会改写这些运行数据。要直接查看中文覆盖，请从菜单栏
