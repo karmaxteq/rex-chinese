@@ -13,9 +13,14 @@
 ## 安装和启动
 
 ```sh
+./build.sh
 ./patch.sh "/Applications/Rex Beta.app"
 open "$HOME/Applications/Rex Beta 中文版.app"
 ```
+
+修改 `RexTextHook.swift`、`RexZh.m` 或资源翻译后，先运行 `./build.sh`；它会重新生成
+`arm64`/`x86_64` universal 动态库并同步到 `bin/`，然后再运行 `./patch.sh`。`patch.sh`
+只负责从原版复制并安装 `bin/` 中的当前构建，不会自动编译源码。
 
 如果仍看到全英文，请确认打开的是上面的 `~/Applications/...` 副本；直接打开
 `/Applications/Rex Beta.app` 是原版，不会加载补丁。也可以先退出两个 Rex 进程，
@@ -53,7 +58,7 @@ Shell 或用户会话，补丁不会改写这些运行数据。要直接查看�
 
 2026-10-29 在 macOS 上对补丁副本做了冷启动、像素截图和 Accessibility 树回归，确认补丁副本退出后重新启动仍会加载两个动态库，并确认：
 
-当前工作树映射规模为：资源文件 1,121 条（去重后 1,115 条）、Swift 文本映射 1,350 条、AppKit 文本映射 1,365 条，三处合并去重后 1,479 个字面量键。这是补丁字典规模，不是应用全部文本的百分比；实际运行覆盖以 [COVERAGE.md](COVERAGE.md) 的“已实测覆盖”和“未执行路径”为准。
+当前工作树映射规模为：资源文件 1,183 条（去重后 1,177 条）、Swift 文本映射 1,402 条、AppKit 文本映射 1,417 条，三处合并去重后 1,541 个字面量键。这是补丁字典规模，不是应用全部文本的百分比；实际运行覆盖以 [COVERAGE.md](COVERAGE.md) 的“已实测覆盖”和“未执行路径”为准。
 
 本轮还专门复测了终端设置“闪烁速度 → 自定义”：此前仍可见的 `Blink interval in milliseconds`
 已修复，输入框和步进器现在都显示“闪烁间隔（毫秒）”。如果启动后仍看到整套英文，请检查进程

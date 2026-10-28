@@ -1351,6 +1351,58 @@ private let translations: [String: String] = [
   "Terminal Font": "终端字体",
   "Terminal Font Size": "终端字体大小",
   "Terminal Padding Color": "终端内边距颜色",
+  "Shortcut store": "快捷键存储",
+  "Keymap client": "按键映射客户端",
+  "Keymap install": "按键映射安装",
+  "Client actions": "客户端操作",
+  "Key routing": "按键路由",
+  "Key resolve": "按键解析",
+  "Key translate": "按键转换",
+  "Key replay": "按键重放",
+  "Fatal error": "严重错误",
+  "Monospaced Fonts": "等宽字体",
+  "Rex needs you to sign in to Tailscale": "Rex 需要你登录 Tailscale",
+  "Rex server is running": "Rex 服务器正在运行",
+  "The Rex server is running": "Rex 服务器正在运行",
+  "Runtime directory:": "运行时目录：",
+  "Just a moment...": "请稍候…",
+  "Allows tailnet members": "允许 Tailnet 成员",
+  "Needs machine approval": "需要设备批准",
+  "Working directory": "工作目录",
+  "None (development build)": "无（开发构建）",
+  "Built for channel": "构建频道",
+  "Last update check": "上次检查更新",
+  "GPU Sample": "GPU 采样",
+  "None using the GPU": "没有程序使用 GPU",
+  "Tailnet Preference": "Tailnet 偏好设置",
+  "Tailnet Hostname": "Tailnet 主机名",
+  "Tailnet DNS Name": "Tailnet DNS 名称",
+  "Last Resume Failure": "上次恢复失败",
+  "Resolved Endpoint": "已解析端点",
+  "Instance Generation": "实例代次",
+  "Structure Status": "结构状态",
+  "Presented Window": "呈现窗口",
+  "Reporting Presentation": "报告呈现",
+  "Reporting Generation": "报告代次",
+  "Rex Server app icon": "Rex 服务器应用图标",
+  "Screen & System Audio Recording": "屏幕与系统音频录制",
+  "Rex returned an invalid process identifier": "Rex 返回了无效的进程标识符",
+  "Rex couldn't open your browser. Use Reopen to try again.": "Rex 无法打开浏览器。请使用“重新打开”重试。",
+  "Rex couldn’t open your browser. Use Reopen to try again.": "Rex 无法打开浏览器。请使用“重新打开”重试。",
+  "Couldn’t migrate Ghostty theme": "无法迁移 Ghostty 主题",
+  "Couldn't migrate Ghostty theme": "无法迁移 Ghostty 主题",
+  "Couldn’t open link": "无法打开链接",
+  "Couldn't open link": "无法打开链接",
+  "Migrated your Ghostty themes": "已迁移 Ghostty 主题",
+  "Migrated your Ghostty theme": "已迁移 Ghostty 主题",
+  "Migrated your Ghostty settings": "已迁移 Ghostty 设置",
+  "Migrated your Ghostty font": "已迁移 Ghostty 字体",
+  "Lets command-line tools and agents open files in protected folders, like ~/Downloads and sandboxed apps' containers.": "允许命令行工具和智能体打开受保护文件夹中的文件，例如 ~/Downloads 和沙盒应用容器中的文件。",
+  "This Mac leaves your tailnet. The next time you turn Tailscale on, you’ll need to sign in again.": "此 Mac 将离开你的 Tailnet。下次开启 Tailscale 时，需要重新登录。",
+  "This Mac leaves your tailnet. The next time you turn Tailscale on, you'll need to sign in again.": "此 Mac 将离开你的 Tailnet。下次开启 Tailscale 时，需要重新登录。",
+  "Recorded here. It takes priority over your configuration file and Rex’s defaults.": "此处记录的快捷键优先于配置文件和 Rex 的默认设置。",
+  "Recorded here. It takes priority over your configuration file and Rex's defaults.": "此处记录的快捷键优先于配置文件和 Rex 的默认设置。",
+  "Melt preview failed": "预览合成失败",
   "None": "无",
 ]
 
@@ -1373,6 +1425,54 @@ private func translate(_ value: String) -> String {
   }
   if value.hasPrefix("Copied config file path. ") {
     return "已复制配置文件路径 " + value.dropFirst("Copied config file path. ".count)
+  }
+  if value.hasPrefix("Dismiss notice (") {
+    return "关闭通知 (" + value.dropFirst("Dismiss notice (".count)
+  }
+  if value.hasPrefix("Enter a size from ") {
+    return "输入大小，范围为 " + value.dropFirst("Enter a size from ".count)
+  }
+  if value.hasPrefix("Nothing named ") {
+    return "没有名为 " + value.dropFirst("Nothing named ".count)
+  }
+  if value.hasPrefix("No Ghostty configuration was found. Searched: ") {
+    return "未找到 Ghostty 配置。已搜索：" + value.dropFirst("No Ghostty configuration was found. Searched: ".count)
+  }
+  if value.hasPrefix("Couldn’t find the Ghostty theme ") {
+    return "找不到 Ghostty 主题 " + value.dropFirst("Couldn’t find the Ghostty theme ".count)
+  }
+  if value.hasPrefix("Couldn't find the Ghostty theme ") {
+    return "找不到 Ghostty 主题 " + value.dropFirst("Couldn't find the Ghostty theme ".count)
+  }
+  if value.hasPrefix("Migrate my keybindings and settings from ") {
+    return "从 " + value.dropFirst("Migrate my keybindings and settings from ".count) + " 迁移我的快捷键和设置"
+  }
+  if value.hasPrefix("Resuming (attempt ") {
+    return "正在恢复（尝试 " + value.dropFirst("Resuming (attempt ".count).replacingOccurrences(of: ")", with: "）")
+  }
+  if value.hasPrefix("Reconnecting (attempt ") {
+    return "正在重新连接（尝试 " + value.dropFirst("Reconnecting (attempt ".count).replacingOccurrences(of: ")", with: "）")
+  }
+  if value.hasPrefix("Drag this icon into the list in System Settings to grant ") {
+    return "将此图标拖入系统设置中的列表以授予 " + value.dropFirst("Drag this icon into the list in System Settings to grant ".count)
+  }
+  if value.hasPrefix("Recorded here. It takes priority over your configuration file and Rex") {
+    return "此处记录的快捷键优先于配置文件和 Rex 的默认设置。"
+  }
+  if value.hasPrefix("This Mac leaves your tailnet. The next time you turn Tailscale on, you") {
+    return "此 Mac 将离开你的 Tailnet。下次开启 Tailscale 时，需要重新登录。"
+  }
+  if value.hasPrefix("Press a shortcut") {
+    return "按下快捷键" + value.dropFirst("Press a shortcut".count)
+  }
+  if value.hasPrefix("Working directory ") {
+    return "工作目录 " + value.dropFirst("Working directory ".count)
+  }
+  if value.hasPrefix("Built for channel ") {
+    return "构建频道 " + value.dropFirst("Built for channel ".count)
+  }
+  if value.hasPrefix("Runtime directory: ") {
+    return "运行时目录：" + value.dropFirst("Runtime directory: ".count)
   }
   if value.hasPrefix("Waiting for the next key after ") {
     return "正在等待下一个按键，当前按键：" + value.dropFirst("Waiting for the next key after ".count)

@@ -1382,6 +1382,58 @@ static NSString *RXTranslate(NSString *s) {
             @"Terminal Font": @"终端字体",
             @"Terminal Font Size": @"终端字体大小",
             @"Terminal Padding Color": @"终端内边距颜色",
+            @"Shortcut store": @"快捷键存储",
+            @"Keymap client": @"按键映射客户端",
+            @"Keymap install": @"按键映射安装",
+            @"Client actions": @"客户端操作",
+            @"Key routing": @"按键路由",
+            @"Key resolve": @"按键解析",
+            @"Key translate": @"按键转换",
+            @"Key replay": @"按键重放",
+            @"Fatal error": @"严重错误",
+            @"Monospaced Fonts": @"等宽字体",
+            @"Rex needs you to sign in to Tailscale": @"Rex 需要你登录 Tailscale",
+            @"Rex server is running": @"Rex 服务器正在运行",
+            @"The Rex server is running": @"Rex 服务器正在运行",
+            @"Runtime directory:": @"运行时目录：",
+            @"Just a moment...": @"请稍候…",
+            @"Allows tailnet members": @"允许 Tailnet 成员",
+            @"Needs machine approval": @"需要设备批准",
+            @"Working directory": @"工作目录",
+            @"None (development build)": @"无（开发构建）",
+            @"Built for channel": @"构建频道",
+            @"Last update check": @"上次检查更新",
+            @"GPU Sample": @"GPU 采样",
+            @"None using the GPU": @"没有程序使用 GPU",
+            @"Tailnet Preference": @"Tailnet 偏好设置",
+            @"Tailnet Hostname": @"Tailnet 主机名",
+            @"Tailnet DNS Name": @"Tailnet DNS 名称",
+            @"Last Resume Failure": @"上次恢复失败",
+            @"Resolved Endpoint": @"已解析端点",
+            @"Instance Generation": @"实例代次",
+            @"Structure Status": @"结构状态",
+            @"Presented Window": @"呈现窗口",
+            @"Reporting Presentation": @"报告呈现",
+            @"Reporting Generation": @"报告代次",
+            @"Rex Server app icon": @"Rex 服务器应用图标",
+            @"Screen & System Audio Recording": @"屏幕与系统音频录制",
+            @"Rex returned an invalid process identifier": @"Rex 返回了无效的进程标识符",
+            @"Rex couldn't open your browser. Use Reopen to try again.": @"Rex 无法打开浏览器。请使用“重新打开”重试。",
+            @"Rex couldn’t open your browser. Use Reopen to try again.": @"Rex 无法打开浏览器。请使用“重新打开”重试。",
+            @"Couldn’t migrate Ghostty theme": @"无法迁移 Ghostty 主题",
+            @"Couldn't migrate Ghostty theme": @"无法迁移 Ghostty 主题",
+            @"Couldn’t open link": @"无法打开链接",
+            @"Couldn't open link": @"无法打开链接",
+            @"Migrated your Ghostty themes": @"已迁移 Ghostty 主题",
+            @"Migrated your Ghostty theme": @"已迁移 Ghostty 主题",
+            @"Migrated your Ghostty settings": @"已迁移 Ghostty 设置",
+            @"Migrated your Ghostty font": @"已迁移 Ghostty 字体",
+            @"Lets command-line tools and agents open files in protected folders, like ~/Downloads and sandboxed apps' containers.": @"允许命令行工具和智能体打开受保护文件夹中的文件，例如 ~/Downloads 和沙盒应用容器中的文件。",
+            @"This Mac leaves your tailnet. The next time you turn Tailscale on, you’ll need to sign in again.": @"此 Mac 将离开你的 Tailnet。下次开启 Tailscale 时，需要重新登录。",
+            @"This Mac leaves your tailnet. The next time you turn Tailscale on, you'll need to sign in again.": @"此 Mac 将离开你的 Tailnet。下次开启 Tailscale 时，需要重新登录。",
+            @"Recorded here. It takes priority over your configuration file and Rex’s defaults.": @"此处记录的快捷键优先于配置文件和 Rex 的默认设置。",
+            @"Recorded here. It takes priority over your configuration file and Rex's defaults.": @"此处记录的快捷键优先于配置文件和 Rex 的默认设置。",
+            @"Melt preview failed": @"预览合成失败",
             @"None": @"无",
         };
     });
@@ -1405,6 +1457,58 @@ static NSString *RXTranslate(NSString *s) {
     }
     if ([s hasPrefix:@"Copied config file path. "]) {
         return [NSString stringWithFormat:@"已复制配置文件路径 %@", [s substringFromIndex:25]];
+    }
+    if ([s hasPrefix:@"Dismiss notice ("]) {
+        return [NSString stringWithFormat:@"关闭通知 (%@", [s substringFromIndex:[@"Dismiss notice (" length]]];
+    }
+    if ([s hasPrefix:@"Enter a size from "]) {
+        return [NSString stringWithFormat:@"输入大小，范围为 %@", [s substringFromIndex:[@"Enter a size from " length]]];
+    }
+    if ([s hasPrefix:@"Nothing named "]) {
+        return [NSString stringWithFormat:@"没有名为 %@", [s substringFromIndex:[@"Nothing named " length]]];
+    }
+    if ([s hasPrefix:@"No Ghostty configuration was found. Searched: "]) {
+        return [NSString stringWithFormat:@"未找到 Ghostty 配置。已搜索：%@", [s substringFromIndex:[@"No Ghostty configuration was found. Searched: " length]]];
+    }
+    if ([s hasPrefix:@"Couldn’t find the Ghostty theme "]) {
+        return [NSString stringWithFormat:@"找不到 Ghostty 主题 %@", [s substringFromIndex:[@"Couldn’t find the Ghostty theme " length]]];
+    }
+    if ([s hasPrefix:@"Couldn't find the Ghostty theme "]) {
+        return [NSString stringWithFormat:@"找不到 Ghostty 主题 %@", [s substringFromIndex:[@"Couldn't find the Ghostty theme " length]]];
+    }
+    if ([s hasPrefix:@"Migrate my keybindings and settings from "]) {
+        return [NSString stringWithFormat:@"从 %@ 迁移我的快捷键和设置", [s substringFromIndex:[@"Migrate my keybindings and settings from " length]]];
+    }
+    if ([s hasPrefix:@"Resuming (attempt "]) {
+        NSString *tail = [s substringFromIndex:[@"Resuming (attempt " length]];
+        tail = [tail stringByReplacingOccurrencesOfString:@")" withString:@"）"];
+        return [NSString stringWithFormat:@"正在恢复（尝试 %@", tail];
+    }
+    if ([s hasPrefix:@"Reconnecting (attempt "]) {
+        NSString *tail = [s substringFromIndex:[@"Reconnecting (attempt " length]];
+        tail = [tail stringByReplacingOccurrencesOfString:@")" withString:@"）"];
+        return [NSString stringWithFormat:@"正在重新连接（尝试 %@", tail];
+    }
+    if ([s hasPrefix:@"Drag this icon into the list in System Settings to grant "]) {
+        return [NSString stringWithFormat:@"将此图标拖入系统设置中的列表以授予 %@", [s substringFromIndex:[@"Drag this icon into the list in System Settings to grant " length]]];
+    }
+    if ([s hasPrefix:@"Recorded here. It takes priority over your configuration file and Rex"]) {
+        return @"此处记录的快捷键优先于配置文件和 Rex 的默认设置。";
+    }
+    if ([s hasPrefix:@"This Mac leaves your tailnet. The next time you turn Tailscale on, you"]) {
+        return @"此 Mac 将离开你的 Tailnet。下次开启 Tailscale 时，需要重新登录。";
+    }
+    if ([s hasPrefix:@"Press a shortcut"]) {
+        return [NSString stringWithFormat:@"按下快捷键%@", [s substringFromIndex:[@"Press a shortcut" length]]];
+    }
+    if ([s hasPrefix:@"Working directory "]) {
+        return [NSString stringWithFormat:@"工作目录 %@", [s substringFromIndex:[@"Working directory " length]]];
+    }
+    if ([s hasPrefix:@"Built for channel "]) {
+        return [NSString stringWithFormat:@"构建频道 %@", [s substringFromIndex:[@"Built for channel " length]]];
+    }
+    if ([s hasPrefix:@"Runtime directory: "]) {
+        return [NSString stringWithFormat:@"运行时目录：%@", [s substringFromIndex:[@"Runtime directory: " length]]];
     }
     if ([s hasPrefix:@"Waiting for the next key after "]) {
         return [NSString stringWithFormat:@"正在等待下一个按键，当前按键：%@", [s substringFromIndex:31]];
