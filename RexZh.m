@@ -51,6 +51,7 @@ static NSString *RXTranslate(NSString *s) {
             @"Edit Host": @"编辑主机",
             @"Changes are saved locally on this Mac.": @"更改将保存在此 Mac 本地。",
             @"Save": @"保存",
+            @"https://example.com or https://*.example.com": @"https://example.com 或 https://*.example.com",
             @"Color": @"颜色",
             @"Background color": @"背景色",
             @"Text color": @"文本色",
