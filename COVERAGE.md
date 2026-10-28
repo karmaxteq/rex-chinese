@@ -60,10 +60,25 @@ open "$HOME/Applications/Rex Beta 中文版.app"
 - 远程主机设置页、添加/编辑/移除主机流程新增的按钮、确认框、错误正文和服务器兼容性状态已加入资源、SwiftUI 和 AppKit 三条翻译路径。
 - 重建后使用 `vmmap` 读回进程映像，确认当前运行副本加载 `libRexChinese.dylib` 和 `libRexTextHook.dylib`；不是只检查文件是否存在。
 
+## 继续回归：主题错误和确认弹窗
+
+本轮在最终重建的副本上实际选择 `/tmp/rex-invalid.txt` 作为主题文件，触发了无效主题错误。可见文本和 Accessibility 树均为：
+
+```text
+无法导入主题
+主题缺少有效颜色：背景色、前景色、调色板 0、…、调色板 15。
+好
+```
+
+此前这条正文仍是英文 `The theme is missing valid colors for...`，现在由 SwiftUI 动态前缀规则和 AppKit 动态前缀规则共同覆盖；`OK` 按钮也已覆盖为“好”。同时重新触发了“停止 Rex 服务器？”确认框，标题、风险说明和“取消/停止”均为中文，测试没有确认停止。
+
+最终进程重启后再次通过 `vmmap` 确认两个 universal 动态库均已加载；`swiftc -typecheck`、`clang -fsyntax-only`、`plutil -lint`、`git diff --check` 和应用签名验证均通过。
+
 ## 有意保留原文或未执行的路径
 
 - Rex、Tailscale、Shell、Menlo、Display P3、Option、Ghostty、iTerm、URL、主机名、会话名和终端真实输出属于品牌、技术标识或用户数据，保留原文。
 - 设置窗口工具栏的两个图标在 Accessibility 树中仍返回 `Back` / `Forward`；视觉上只有左右箭头，帮助文本已是中文。
+- macOS 原生文件选择器的系统级 AX 节点仍可能返回 `Search` 等系统提供者标签；选择器的可见按钮“打开/取消/新建文件夹”已显示中文。这些节点属于系统面板，不是 Rex 自绘内容。
 - `Download Update` → `下载更新` 已加入资源和运行时映射；本轮发现有可用更新并核验了“下载”通知，但未执行真实下载/安装。
 - 本轮没有执行真实 Tailscale 登录、服务器重启或远程主机成功连接流程；这些状态不应被当作已验证。
 

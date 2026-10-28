@@ -15,6 +15,10 @@ private let translations: [String: String] = [
   "Edit Host": "编辑主机",
   "Changes are saved locally on this Mac.": "更改将保存在此 Mac 本地。",
   "Save": "保存",
+  "OK": "好",
+  "Open": "打开",
+  "Search": "搜索",
+  "New Folder": "新建文件夹",
   "Running": "运行中",
   "Rex Server": "Rex 服务器",
   "Interface style": "界面样式",
@@ -941,6 +945,17 @@ private func translate(_ value: String) -> String {
   }
   if value.hasPrefix("Copied config file path. ") {
     return "已复制配置文件路径 " + value.dropFirst("Copied config file path. ".count)
+  }
+  if value.hasPrefix("The theme is missing valid colors for: ") {
+    let suffix = value.dropFirst("The theme is missing valid colors for: ".count)
+    let names = suffix.split(separator: ",", omittingEmptySubsequences: true).map { raw -> String in
+      let name = raw.trimmingCharacters(in: .whitespaces)
+      if name == "background" { return "背景色" }
+      if name == "foreground" { return "前景色" }
+      if name.hasPrefix("palette ") { return "调色板 " + name.dropFirst("palette ".count) }
+      return name
+    }
+    return "主题缺少有效颜色：" + names.joined(separator: "、")
   }
   if value.hasPrefix("You don’t have permission to view ") {
     return "你没有权限查看 " + value.dropFirst("You don’t have permission to view ".count)

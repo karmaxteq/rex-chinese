@@ -51,6 +51,10 @@ static NSString *RXTranslate(NSString *s) {
             @"Edit Host": @"编辑主机",
             @"Changes are saved locally on this Mac.": @"更改将保存在此 Mac 本地。",
             @"Save": @"保存",
+            @"OK": @"好",
+            @"Open": @"打开",
+            @"Search": @"搜索",
+            @"New Folder": @"新建文件夹",
             @"Expose settings for development and debugging.": @"显示用于开发和调试的设置。",
             @"Appearance": @"外观",
             @"Color scheme": @"配色方案",
@@ -971,6 +975,19 @@ static NSString *RXTranslate(NSString *s) {
     }
     if ([s hasPrefix:@"Copied config file path. "]) {
         return [NSString stringWithFormat:@"已复制配置文件路径 %@", [s substringFromIndex:25]];
+    }
+    if ([s hasPrefix:@"The theme is missing valid colors for: "]) {
+        NSString *suffix = [s substringFromIndex:39];
+        NSArray *parts = [suffix componentsSeparatedByString:@","];
+        NSMutableArray *translatedParts = [NSMutableArray arrayWithCapacity:parts.count];
+        for (NSString *rawPart in parts) {
+            NSString *part = [rawPart stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            if ([part isEqualToString:@"background"]) part = @"背景色";
+            else if ([part isEqualToString:@"foreground"]) part = @"前景色";
+            else if ([part hasPrefix:@"palette "]) part = [@"调色板 " stringByAppendingString:[part substringFromIndex:8]];
+            [translatedParts addObject:part];
+        }
+        return [NSString stringWithFormat:@"主题缺少有效颜色：%@", [translatedParts componentsJoinedByString:@"、"]];
     }
     if ([s hasPrefix:@"You don’t have permission to view "]) {
         return [NSString stringWithFormat:@"你没有权限查看 %@", [s substringFromIndex:33]];

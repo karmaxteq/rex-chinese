@@ -519,6 +519,7 @@
 "Preview unavailable" = "预览不可用";
 "Couldn’t import theme" = "无法导入主题";
 "Couldn't import theme" = "无法导入主题";
+"The theme is missing valid colors for:" = "主题缺少有效颜色：";
 "The theme file could not be read." = "无法读取主题文件。";
 "The theme file couldn’t be read." = "无法读取主题文件。";
 "This removes the custom theme and any unsaved edits to it. If selected, Rex returns to the default theme." = "这将移除自定义主题及其未保存的编辑。选择后，Rex 将恢复为默认主题。";
@@ -633,6 +634,10 @@
 "Globe" = "地球";
 "Rex does not provide transport authentication. Use a trusted tunnel such as Tailscale." = "Rex 不提供传输身份验证。请使用 Tailscale 等受信任的隧道。";
 "Cancel" = "取消";
+"OK" = "好";
+"Open" = "打开";
+"Search" = "搜索";
+"New Folder" = "新建文件夹";
 "App Version" = "应用版本";
 "Update Channel" = "更新频道";
 "Tagged builds for testers." = "供测试人员使用的标记版本。";
