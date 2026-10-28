@@ -324,6 +324,59 @@ static NSString *RXTranslate(NSString *s) {
             @"App": @"应用",
             @"Command Palette…": @"命令面板…",
             @"Rex Diagnostics": @"Rex 诊断",
+            @"Diagnostics": @"诊断",
+            @"Rex Binary": @"Rex 二进制",
+            @"Installation": @"安装",
+            @"Kind": @"类型",
+            @"Included with Rex.app": @"随 Rex.app 附带",
+            @"Live Logs": @"实时日志",
+            @"Stop Server": @"停止服务器",
+            @"Clear Logs": @"清除日志",
+            @"Show Inspector": @"显示检查器",
+            @"Invoke": @"调用",
+            @"Method": @"方法",
+            @"JSON Payload": @"JSON 负载",
+            @"Send": @"发送",
+            @"Calls": @"调用",
+            @"Clear": @"清除",
+            @"Events": @"事件",
+            @"All Sessions": @"所有会话",
+            @"recorded": @"已记录",
+            @"Terminal Policy": @"终端策略",
+            @"Scheme": @"方案",
+            @"Cursor Blink": @"光标闪烁",
+            @"Option Key": @"Option 键",
+            @"Event": @"事件",
+            @"Sessions": @"会话",
+            @"Hosts": @"主机",
+            @"Migrated": @"已迁移",
+            @"Pending Changes": @"待处理变更",
+            @"Launch to First Drawable Frame": @"启动到首个可绘制帧",
+            @"Launch": @"启动",
+            @"Prewarm": @"预热",
+            @"Last Host": @"上一个主机",
+            @"Reset": @"重置",
+            @"Name": @"名称",
+            @"Icon": @"图标",
+            @"Connection": @"连接",
+            @"Resumes": @"恢复",
+            @"Last Resume Failed": @"上次恢复失败",
+            @"Locators": @"地址",
+            @"Preferred URL": @"首选 URL",
+            @"Instance ID": @"实例 ID",
+            @"Host ID": @"主机 ID",
+            @"Client ID": @"客户端 ID",
+            @"Last Failure": @"上次失败",
+            @"Usage": @"使用情况",
+            @"Now": @"当前",
+            @"Mean": @"平均",
+            @"Peak": @"峰值",
+            @"Last 120 Seconds": @"最近 120 秒",
+            @"Other Processes": @"其他进程",
+            @"Total": @"总计",
+            @"Copy Rex event": @"复制 Rex 事件",
+            @"Copy event": @"复制事件",
+            @"Shares are of one GPU's time over each one-second sample. WindowServer composites Rex's transparent terminals over the window's glass and blur, so terminal output that redraws often shows up there rather than under Rex. Other windows also add to WindowServer's share. Use script/gpu-usage.py to record the same counters from Terminal.": @"每个一秒采样点中的占比是单个 GPU 时间的占比。WindowServer 会将 Rex 的透明终端合成到窗口的玻璃和模糊效果上，因此经常重绘的终端输出通常会显示在 WindowServer 下，而不是 Rex 下。其他窗口也会增加 WindowServer 的占比。使用 script/gpu-usage.py 可从终端记录相同的计数器。",
             @"Open Onboarding Session…": @"打开入门会话…",
             @"Grant System Permissions…": @"授予系统权限…",
             @"Copy Version Info": @"复制版本信息",
@@ -1343,7 +1396,13 @@ static NSString *RXTranslate(NSString *s) {
             @"The Rex WebSocket closed.": @"Rex WebSocket 已关闭。",
             @"The Rex WebSocket is closed.": @"Rex WebSocket 已关闭。",
             @"The Rex block that owned the data stream closed.": @"拥有数据流的 Rex 块已关闭。",
+            @"The Rex API payload is invalid: ": @"Rex API 负载无效：",
+            @"The Rex API request is invalid: ": @"Rex API 请求无效：",
+            @"The Rex control connection was lost.": @"Rex 控制连接已丢失。",
             @"The Rex control connection closed.": @"Rex 控制连接已关闭。",
+            @"The Rex control connection closed: ": @"Rex 控制连接已关闭：",
+            @"The Rex control connection sent an invalid message: ": @"Rex 控制连接发送了无效消息：",
+            @"The Rex control request ": @"Rex 控制请求 ",
             @"The Rex data connection closed.": @"Rex 数据连接已关闭。",
             @"The Rex terminal stream ended inside an authenticated control record.": @"Rex 终端流在经过身份验证的控制记录中结束。",
             @"The client_connection_changed connection_lost_at field is invalid.": @"client_connection_changed 的 connection_lost_at 字段无效。",
@@ -1356,6 +1415,11 @@ static NSString *RXTranslate(NSString *s) {
             @"The selected file does not contain valid SVG markup.": @"所选文件不包含有效的 SVG 标记。",
             @"The session is not attached on the current connection.": @"会话未附加到当前连接。",
             @"The tab to show. Tabs count from 1, and -1 means the last tab.": @"要显示的标签页。标签页从 1 开始计数，-1 表示最后一个标签页。",
+            @"Update Rex on the server to use ": @"更新服务器上的 Rex 以使用 ",
+            @"the server uses revision ": @"服务器使用修订版 ",
+            @"this app needs revisions ": @"此应用需要修订版 ",
+            @"The Rex server supports API revisions ": @"Rex 服务器支持 API 修订版 ",
+            @"The Rex server refused the connection: ": @"Rex 服务器拒绝连接：",
             @"Use theme": @"使用主题",
             @"Surface": @"表面",
             @"Content": @"内容",
@@ -1759,6 +1823,27 @@ static NSString *RXTranslate(NSString *s) {
     if ([s hasPrefix:@"Rex server is running as part of "]) return [NSString stringWithFormat:@"Rex 服务器属于 %@", [s substringFromIndex:33]];
     if ([s hasPrefix:@"The running Rex server and this Rex.app share no version of the control API."]) return [NSString stringWithFormat:@"正在运行的 Rex 服务器与此 Rex.app 没有共同的控制 API 版本。%@", [s substringFromIndex:76]];
     if ([s hasPrefix:@"The running Rex server is older than this Rex.app. "]) return [NSString stringWithFormat:@"正在运行的 Rex 服务器版本低于此 Rex.app。%@", [s substringFromIndex:51]];
+    NSString *controlAPIError = s;
+    controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"The Rex API payload is invalid: " withString:@"Rex API 负载无效："];
+    controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"The Rex API request is invalid: " withString:@"Rex API 请求无效："];
+    controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"The Rex control connection was lost." withString:@"Rex 控制连接已丢失。"];
+    controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"The Rex control connection closed: " withString:@"Rex 控制连接已关闭："];
+    controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"The Rex control connection sent an invalid message: " withString:@"Rex 控制连接发送了无效消息："];
+    controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"The Rex control request " withString:@"Rex 控制请求 "];
+    controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"The Rex server refused the connection because it doesn't support the API " withString:@"Rex 服务器拒绝连接，因为它不支持 API "];
+    controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"The Rex server refused the connection because it doesn’t support the API " withString:@"Rex 服务器拒绝连接，因为它不支持 API "];
+    controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"revisions this app needs (" withString:@"修订版，此应用需要（"];
+    controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"). Update Rex on the server or this app." withString:@"）。请更新服务器上的 Rex 或此应用。"];
+    controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"The Rex server refused the connection: " withString:@"Rex 服务器拒绝连接："];
+    controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"The Rex server supports API revisions " withString:@"Rex 服务器支持 API 修订版 "];
+    controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"This app can't send this " withString:@"此应用无法发送此 "];
+    controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"This app can’t send this " withString:@"此应用无法发送此 "];
+    controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@" request to a server that uses API revision " withString:@" 请求，服务器使用 API 修订版 "];
+    controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@". Update Rex on the server." withString:@"。请更新服务器上的 Rex。"];
+    controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"Update Rex on the server to use " withString:@"更新服务器上的 Rex 以使用 "];
+    controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"the server uses revision " withString:@"服务器使用修订版 "];
+    controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"this app needs revisions " withString:@"此应用需要修订版 "];
+    if (![controlAPIError isEqualToString:s]) return controlAPIError;
     if ([s hasPrefix:@"Signing out of Tailscale timed out. "]) return [NSString stringWithFormat:@"退出 Tailscale 超时。%@", [s substringFromIndex:36]];
     if ([s hasPrefix:@"Changing Tailscale tags timed out. "]) return [NSString stringWithFormat:@"更改 Tailscale 标签超时。%@", [s substringFromIndex:35]];
     if ([s hasPrefix:@"This app is older than Rex on "]) return [NSString stringWithFormat:@"此应用版本低于主机上的 Rex：%@", [s substringFromIndex:30]];
@@ -1824,6 +1909,61 @@ static NSString *RXTranslate(NSString *s) {
     if ([s containsString:@"swift build && swift test"]) s = [s stringByReplacingOccurrencesOfString:@"swift build && swift test" withString:@"Swift 构建 && Swift 测试"];
     if ([s containsString:@"warning:"]) s = [s stringByReplacingOccurrencesOfString:@"warning:" withString:@"警告："];
     if ([s containsString:@"Build complete!"]) s = [s stringByReplacingOccurrencesOfString:@"Build complete!" withString:@"构建完成！"];
+    if ([s containsString:@"Diagnostics"] || [s containsString:@"Rex Binary"] || [s containsString:@"Terminal Policy"] || [s containsString:@"JSON Payload"] || [s containsString:@"Shares are of one GPU"] || [s containsString:@"Scheme"] || [s containsString:@" recorded"] || [s containsString:@"Other Processes"]) {
+        s = [s stringByReplacingOccurrencesOfString:@" – Diagnostics" withString:@" – 诊断"];
+        s = [s stringByReplacingOccurrencesOfString:@" Diagnostics" withString:@" 诊断"];
+        s = [s stringByReplacingOccurrencesOfString:@"Kind" withString:@"类型"];
+        s = [s stringByReplacingOccurrencesOfString:@"Included with Rex.app" withString:@"随 Rex.app 附带"];
+        s = [s stringByReplacingOccurrencesOfString:@"Live Logs" withString:@"实时日志"];
+        s = [s stringByReplacingOccurrencesOfString:@"Stop Server" withString:@"停止服务器"];
+        s = [s stringByReplacingOccurrencesOfString:@"Clear Logs" withString:@"清除日志"];
+        s = [s stringByReplacingOccurrencesOfString:@"Show Inspector" withString:@"显示检查器"];
+        s = [s stringByReplacingOccurrencesOfString:@"Invoke" withString:@"调用"];
+        s = [s stringByReplacingOccurrencesOfString:@"JSON Payload" withString:@"JSON 负载"];
+        s = [s stringByReplacingOccurrencesOfString:@"Method" withString:@"方法"];
+        s = [s stringByReplacingOccurrencesOfString:@"Calls" withString:@"调用"];
+        s = [s stringByReplacingOccurrencesOfString:@"Events" withString:@"事件"];
+        s = [s stringByReplacingOccurrencesOfString:@"All Sessions" withString:@"所有会话"];
+        s = [s stringByReplacingOccurrencesOfString:@" recorded" withString:@" 已记录"];
+        s = [s stringByReplacingOccurrencesOfString:@"Terminal Policy" withString:@"终端策略"];
+        s = [s stringByReplacingOccurrencesOfString:@"Scheme" withString:@"方案"];
+        s = [s stringByReplacingOccurrencesOfString:@"Cursor Style" withString:@"光标样式"];
+        s = [s stringByReplacingOccurrencesOfString:@"Cursor Blink" withString:@"光标闪烁"];
+        s = [s stringByReplacingOccurrencesOfString:@"Option Key" withString:@"Option 键"];
+        s = [s stringByReplacingOccurrencesOfString:@"Pending Changes" withString:@"待处理变更"];
+        s = [s stringByReplacingOccurrencesOfString:@"Pending Pane Commands" withString:@"待处理窗格命令"];
+        s = [s stringByReplacingOccurrencesOfString:@"Launch to First Drawable Frame" withString:@"启动到首个可绘制帧"];
+        s = [s stringByReplacingOccurrencesOfString:@"Launch" withString:@"启动"];
+        s = [s stringByReplacingOccurrencesOfString:@"Prewarm" withString:@"预热"];
+        s = [s stringByReplacingOccurrencesOfString:@"Last Host" withString:@"上一个主机"];
+        s = [s stringByReplacingOccurrencesOfString:@"Last Resume Failed" withString:@"上次恢复失败"];
+        s = [s stringByReplacingOccurrencesOfString:@"Resumes" withString:@"恢复"];
+        s = [s stringByReplacingOccurrencesOfString:@"Locators" withString:@"地址"];
+        s = [s stringByReplacingOccurrencesOfString:@"Preferred URL" withString:@"首选 URL"];
+        s = [s stringByReplacingOccurrencesOfString:@"Resolved Endpoint" withString:@"已解析端点"];
+        s = [s stringByReplacingOccurrencesOfString:@"Instance Generation" withString:@"实例代次"];
+        s = [s stringByReplacingOccurrencesOfString:@"Instance ID" withString:@"实例 ID"];
+        s = [s stringByReplacingOccurrencesOfString:@"Host ID" withString:@"主机 ID"];
+        s = [s stringByReplacingOccurrencesOfString:@"Client ID" withString:@"客户端 ID"];
+        s = [s stringByReplacingOccurrencesOfString:@"Last Failure" withString:@"上次失败"];
+        s = [s stringByReplacingOccurrencesOfString:@"Connection" withString:@"连接"];
+        s = [s stringByReplacingOccurrencesOfString:@"Name" withString:@"名称"];
+        s = [s stringByReplacingOccurrencesOfString:@"Icon" withString:@"图标"];
+        s = [s stringByReplacingOccurrencesOfString:@"Sessions" withString:@"会话"];
+        s = [s stringByReplacingOccurrencesOfString:@"Hosts" withString:@"主机"];
+        s = [s stringByReplacingOccurrencesOfString:@"Migrated" withString:@"已迁移"];
+        s = [s stringByReplacingOccurrencesOfString:@"Reset" withString:@"重置"];
+        s = [s stringByReplacingOccurrencesOfString:@"Usage" withString:@"使用情况"];
+        s = [s stringByReplacingOccurrencesOfString:@"Now" withString:@"当前"];
+        s = [s stringByReplacingOccurrencesOfString:@"Mean" withString:@"平均"];
+        s = [s stringByReplacingOccurrencesOfString:@"Peak" withString:@"峰值"];
+        s = [s stringByReplacingOccurrencesOfString:@"Last 120 Seconds" withString:@"最近 120 秒"];
+        s = [s stringByReplacingOccurrencesOfString:@"Other Processes" withString:@"其他进程"];
+        s = [s stringByReplacingOccurrencesOfString:@"Shares are of one GPU's time over each one-second sample. WindowServer composites Rex's transparent terminals over the window's glass and blur, so terminal output that redraws often shows up there rather than under Rex. Other windows also add to WindowServer's share. Use script/gpu-usage.py to record the same counters from Terminal." withString:@"每个一秒采样点中的占比是单个 GPU 时间的占比。WindowServer 会将 Rex 的透明终端合成到窗口的玻璃和模糊效果上，因此经常重绘的终端输出通常会显示在 WindowServer 下，而不是 Rex 下。其他窗口也会增加 WindowServer 的占比。使用 script/gpu-usage.py 可从终端记录相同的计数器。"];
+    }
+    if ([s hasSuffix:@" recorded"]) {
+        s = [[s substringToIndex:s.length - 9] stringByAppendingString:@" 已记录"];
+    }
     if (![s isEqualToString:original]) return s;
     NSString *remoteHostError = s;
     remoteHostError = [remoteHostError stringByReplacingOccurrencesOfString:@"Couldn’t connect to " withString:@"无法连接到 "];
@@ -2090,6 +2230,8 @@ static NSRect RXNotificationFrame;
 static BOOL RXHasNotificationFrame;
 static NSRect RXRemoteHeaderFrame;
 static BOOL RXHasRemoteHeaderFrame;
+static NSRect RXServerAccessFrame;
+static BOOL RXHasServerAccessFrame;
 static NSRect RXRemoteErrorFrame;
 static BOOL RXHasRemoteErrorFrame;
 static BOOL RXHasRemoteErrorNode;
@@ -3763,7 +3905,16 @@ static void RXUpdateSettingsResidualOverlays(NSWindow *window) {
     BOOL terminal = [title containsString:@"终端"] || [title containsString:@"Terminal"];
     // SwiftUI replaces the detail subtree while navigating. Remove stale overlays
     // before adding only the overlay that belongs to the visible page.
-    if (server) RXSetResidualOverlay(detail, @"rex-server-access", @"从其他设备安全访问 Rex。", NSMakeRect(74.0, 604.0, 430.0, 25.0), NO);
+    if (server) {
+        // This SwiftUI subtitle is rendered outside the normal text hooks on
+        // some Rex builds. Prefer its live AX frame; keep the fixed fallback
+        // for builds that do not expose the node.
+        if (RXHasServerAccessFrame) {
+            RXSetWindowResidualOverlay(window, @"rex-server-access", @"从其他设备安全访问 Rex。", RXServerAccessFrame);
+        } else {
+            RXSetResidualOverlay(detail, @"rex-server-access", @"从其他设备安全访问 Rex。", NSMakeRect(74.0, 604.0, 430.0, 25.0), NO);
+        }
+    }
     if (notifications) {
         if (RXHasNotificationFrame) {
             RXSetWindowResidualOverlay(window, @"rex-notification-position", @"显示在右下角", RXNotificationFrame);
@@ -3794,6 +3945,12 @@ static void RXWalkAX(id element, NSUInteger depth) {
             NSString *rawValue = [rawObject isKindOfClass:[NSString class]] ? rawObject : value;
             NSString *translated = RXTranslate(value);
             NSRect rawFrame = RXAccessibilityFrame(element);
+            if ([rawValue containsString:@"Access Rex securely from your other devices."] ||
+                [value containsString:@"Access Rex securely from your other devices."] ||
+                [translated containsString:@"从其他设备安全访问 Rex。"] ) {
+                RXServerAccessFrame = rawFrame;
+                RXHasServerAccessFrame = !NSIsEmptyRect(rawFrame);
+            }
             if ([rawValue isEqualToString:@"Hue"]) {
                 RXHueFrame = rawFrame;
                 RXHasHueFrame = !NSIsEmptyRect(rawFrame);
@@ -3927,6 +4084,7 @@ static void RXRefreshAccessibility(void) {
         RXHasDefaultShellFrame = NO;
         RXHasNotificationFrame = NO;
         RXHasRemoteHeaderFrame = NO;
+        RXHasServerAccessFrame = NO;
         RXHasRemoteErrorFrame = NO;
         RXHasRemoteErrorNode = NO;
         RXRemoteErrorTitleText = nil;
@@ -3940,6 +4098,7 @@ static void RXRefreshAccessibility(void) {
         RXHueFrame = NSZeroRect;
         RXChromaFrame = NSZeroRect;
         RXLightnessFrame = NSZeroRect;
+        RXServerAccessFrame = NSZeroRect;
         RXAXWalkWindow = window;
         RXRefreshToolbar(window.toolbar);
         RXWalk(window.contentView);

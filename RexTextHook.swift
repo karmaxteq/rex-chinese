@@ -57,6 +57,59 @@ private let translations: [String: String] = [
   "Command Palette…": "命令面板…",
   "Settings…": "设置…",
   "Rex Diagnostics": "Rex 诊断",
+  "Diagnostics": "诊断",
+  "Rex Binary": "Rex 二进制",
+  "Installation": "安装",
+  "Kind": "类型",
+  "Included with Rex.app": "随 Rex.app 附带",
+  "Live Logs": "实时日志",
+  "Stop Server": "停止服务器",
+  "Clear Logs": "清除日志",
+  "Show Inspector": "显示检查器",
+  "Invoke": "调用",
+  "Method": "方法",
+  "JSON Payload": "JSON 负载",
+  "Send": "发送",
+  "Calls": "调用",
+  "Clear": "清除",
+  "Events": "事件",
+  "All Sessions": "所有会话",
+  "recorded": "已记录",
+  "Terminal Policy": "终端策略",
+  "Scheme": "方案",
+  "Cursor Blink": "光标闪烁",
+  "Option Key": "Option 键",
+  "Event": "事件",
+  "Sessions": "会话",
+  "Hosts": "主机",
+  "Migrated": "已迁移",
+  "Pending Changes": "待处理变更",
+  "Launch to First Drawable Frame": "启动到首个可绘制帧",
+  "Launch": "启动",
+  "Prewarm": "预热",
+  "Last Host": "上一个主机",
+  "Reset": "重置",
+  "Name": "名称",
+  "Icon": "图标",
+  "Connection": "连接",
+  "Resumes": "恢复",
+  "Last Resume Failed": "上次恢复失败",
+  "Locators": "地址",
+  "Preferred URL": "首选 URL",
+  "Instance ID": "实例 ID",
+  "Host ID": "主机 ID",
+  "Client ID": "客户端 ID",
+  "Last Failure": "上次失败",
+  "Usage": "使用情况",
+  "Now": "当前",
+  "Mean": "平均",
+  "Peak": "峰值",
+  "Last 120 Seconds": "最近 120 秒",
+  "Other Processes": "其他进程",
+  "Total": "总计",
+  "Copy Rex event": "复制 Rex 事件",
+  "Copy event": "复制事件",
+  "Shares are of one GPU's time over each one-second sample. WindowServer composites Rex's transparent terminals over the window's glass and blur, so terminal output that redraws often shows up there rather than under Rex. Other windows also add to WindowServer's share. Use script/gpu-usage.py to record the same counters from Terminal.": "每个一秒采样点中的占比是单个 GPU 时间的占比。WindowServer 会将 Rex 的透明终端合成到窗口的玻璃和模糊效果上，因此经常重绘的终端输出通常会显示在 WindowServer 下，而不是 Rex 下。其他窗口也会增加 WindowServer 的占比。使用 script/gpu-usage.py 可从终端记录相同的计数器。",
   "Record Shortcut": "录制快捷键",
   "Typography": "字体排印",
   "Terminal font": "终端字体",
@@ -1312,7 +1365,13 @@ private let translations: [String: String] = [
   "The Rex WebSocket closed.": "Rex WebSocket 已关闭。",
   "The Rex WebSocket is closed.": "Rex WebSocket 已关闭。",
   "The Rex block that owned the data stream closed.": "拥有数据流的 Rex 块已关闭。",
+  "The Rex API payload is invalid: ": "Rex API 负载无效：",
+  "The Rex API request is invalid: ": "Rex API 请求无效：",
+  "The Rex control connection was lost.": "Rex 控制连接已丢失。",
   "The Rex control connection closed.": "Rex 控制连接已关闭。",
+  "The Rex control connection closed: ": "Rex 控制连接已关闭：",
+  "The Rex control connection sent an invalid message: ": "Rex 控制连接发送了无效消息：",
+  "The Rex control request ": "Rex 控制请求 ",
   "The Rex data connection closed.": "Rex 数据连接已关闭。",
   "The Rex terminal stream ended inside an authenticated control record.": "Rex 终端流在经过身份验证的控制记录中结束。",
   "The client_connection_changed connection_lost_at field is invalid.": "client_connection_changed 的 connection_lost_at 字段无效。",
@@ -1325,6 +1384,11 @@ private let translations: [String: String] = [
   "The selected file does not contain valid SVG markup.": "所选文件不包含有效的 SVG 标记。",
   "The session is not attached on the current connection.": "会话未附加到当前连接。",
   "The tab to show. Tabs count from 1, and -1 means the last tab.": "要显示的标签页。标签页从 1 开始计数，-1 表示最后一个标签页。",
+  "Update Rex on the server to use ": "更新服务器上的 Rex 以使用 ",
+  "the server uses revision ": "服务器使用修订版 ",
+  "this app needs revisions ": "此应用需要修订版 ",
+  "The Rex server supports API revisions ": "Rex 服务器支持 API 修订版 ",
+  "The Rex server refused the connection: ": "Rex 服务器拒绝连接：",
   "Use theme": "使用主题",
   "Surface": "表面",
   "Content": "内容",
@@ -1383,8 +1447,6 @@ private let translations: [String: String] = [
   "Tailnet Hostname": "Tailnet 主机名",
   "Tailnet DNS Name": "Tailnet DNS 名称",
   "Last Resume Failure": "上次恢复失败",
-  "Resolved Endpoint": "已解析端点",
-  "Instance Generation": "实例代次",
   "Structure Status": "结构状态",
   "Presented Window": "呈现窗口",
   "Reporting Presentation": "报告呈现",
@@ -1760,6 +1822,27 @@ private func translate(_ value: String) -> String {
   if value.hasPrefix("The running Rex server is older than this Rex.app. ") {
     return "正在运行的 Rex 服务器版本低于此 Rex.app。" + value.dropFirst("The running Rex server is older than this Rex.app. ".count)
   }
+  var controlAPIError = value
+  controlAPIError = controlAPIError.replacingOccurrences(of: "The Rex API payload is invalid: ", with: "Rex API 负载无效：")
+  controlAPIError = controlAPIError.replacingOccurrences(of: "The Rex API request is invalid: ", with: "Rex API 请求无效：")
+  controlAPIError = controlAPIError.replacingOccurrences(of: "The Rex control connection was lost.", with: "Rex 控制连接已丢失。")
+  controlAPIError = controlAPIError.replacingOccurrences(of: "The Rex control connection closed: ", with: "Rex 控制连接已关闭：")
+  controlAPIError = controlAPIError.replacingOccurrences(of: "The Rex control connection sent an invalid message: ", with: "Rex 控制连接发送了无效消息：")
+  controlAPIError = controlAPIError.replacingOccurrences(of: "The Rex control request ", with: "Rex 控制请求 ")
+  controlAPIError = controlAPIError.replacingOccurrences(of: "The Rex server refused the connection because it doesn't support the API ", with: "Rex 服务器拒绝连接，因为它不支持 API ")
+  controlAPIError = controlAPIError.replacingOccurrences(of: "The Rex server refused the connection because it doesn’t support the API ", with: "Rex 服务器拒绝连接，因为它不支持 API ")
+  controlAPIError = controlAPIError.replacingOccurrences(of: "revisions this app needs (", with: "修订版，此应用需要（")
+  controlAPIError = controlAPIError.replacingOccurrences(of: "). Update Rex on the server or this app.", with: "）。请更新服务器上的 Rex 或此应用。")
+  controlAPIError = controlAPIError.replacingOccurrences(of: "The Rex server refused the connection: ", with: "Rex 服务器拒绝连接：")
+  controlAPIError = controlAPIError.replacingOccurrences(of: "The Rex server supports API revisions ", with: "Rex 服务器支持 API 修订版 ")
+  controlAPIError = controlAPIError.replacingOccurrences(of: "This app can't send this ", with: "此应用无法发送此 ")
+  controlAPIError = controlAPIError.replacingOccurrences(of: "This app can’t send this ", with: "此应用无法发送此 ")
+  controlAPIError = controlAPIError.replacingOccurrences(of: " request to a server that uses API revision ", with: " 请求，服务器使用 API 修订版 ")
+  controlAPIError = controlAPIError.replacingOccurrences(of: ". Update Rex on the server.", with: "。请更新服务器上的 Rex。")
+  controlAPIError = controlAPIError.replacingOccurrences(of: "Update Rex on the server to use ", with: "更新服务器上的 Rex 以使用 ")
+  controlAPIError = controlAPIError.replacingOccurrences(of: "the server uses revision ", with: "服务器使用修订版 ")
+  controlAPIError = controlAPIError.replacingOccurrences(of: "this app needs revisions ", with: "此应用需要修订版 ")
+  if controlAPIError != value { return controlAPIError }
   if value.hasPrefix("Signing out of Tailscale timed out. ") {
     return "退出 Tailscale 超时。" + value.dropFirst("Signing out of Tailscale timed out. ".count)
   }
@@ -1878,6 +1961,63 @@ private func translate(_ value: String) -> String {
   }
   if value.contains("Build complete!") {
     return value.replacingOccurrences(of: "Build complete!", with: "构建完成！")
+  }
+  if value.contains("Diagnostics") || value.contains("Rex Binary") || value.contains("Terminal Policy") || value.contains("JSON Payload") || value.contains("Shares are of one GPU") || value.contains("Scheme") || value.contains(" recorded") || value.contains("Other Processes") {
+    var diagnosticsText = value
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: " – Diagnostics", with: " – 诊断")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: " Diagnostics", with: " 诊断")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Kind", with: "类型")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Included with Rex.app", with: "随 Rex.app 附带")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Live Logs", with: "实时日志")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Stop Server", with: "停止服务器")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Clear Logs", with: "清除日志")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Show Inspector", with: "显示检查器")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Invoke", with: "调用")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "JSON Payload", with: "JSON 负载")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Method", with: "方法")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Calls", with: "调用")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Events", with: "事件")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "All Sessions", with: "所有会话")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: " recorded", with: " 已记录")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Terminal Policy", with: "终端策略")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Scheme", with: "方案")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Cursor Style", with: "光标样式")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Cursor Blink", with: "光标闪烁")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Option Key", with: "Option 键")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Pending Changes", with: "待处理变更")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Pending Pane Commands", with: "待处理窗格命令")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Launch to First Drawable Frame", with: "启动到首个可绘制帧")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Launch", with: "启动")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Prewarm", with: "预热")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Last Host", with: "上一个主机")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Last Resume Failed", with: "上次恢复失败")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Resumes", with: "恢复")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Locators", with: "地址")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Preferred URL", with: "首选 URL")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Resolved Endpoint", with: "已解析端点")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Instance Generation", with: "实例代次")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Instance ID", with: "实例 ID")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Host ID", with: "主机 ID")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Client ID", with: "客户端 ID")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Last Failure", with: "上次失败")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Connection", with: "连接")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Name", with: "名称")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Icon", with: "图标")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Sessions", with: "会话")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Hosts", with: "主机")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Migrated", with: "已迁移")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Reset", with: "重置")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Usage", with: "使用情况")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Now", with: "当前")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Mean", with: "平均")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Peak", with: "峰值")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Last 120 Seconds", with: "最近 120 秒")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Other Processes", with: "其他进程")
+  diagnosticsText = diagnosticsText.replacingOccurrences(of: "Shares are of one GPU's time over each one-second sample. WindowServer composites Rex's transparent terminals over the window's glass and blur, so terminal output that redraws often shows up there rather than under Rex. Other windows also add to WindowServer's share. Use script/gpu-usage.py to record the same counters from Terminal.", with: "每个一秒采样点中的占比是单个 GPU 时间的占比。WindowServer 会将 Rex 的透明终端合成到窗口的玻璃和模糊效果上，因此经常重绘的终端输出通常会显示在 WindowServer 下，而不是 Rex 下。其他窗口也会增加 WindowServer 的占比。使用 script/gpu-usage.py 可从终端记录相同的计数器。")
+    if diagnosticsText != value { return diagnosticsText }
+  }
+  if value.hasSuffix(" recorded") {
+    return String(value.dropLast(" recorded".count)) + " 已记录"
   }
   if value.contains("Dock Badge") || value.contains("Sound") {
     return value.replacingOccurrences(of: "Dock Badge", with: "程序坞标记")

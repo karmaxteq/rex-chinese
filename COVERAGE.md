@@ -2,6 +2,32 @@
 
 最后回归：2026-10-29（macOS，`Rex Beta 中文版.app`）。验证对象是补丁副本，并用原版 `/Applications/Rex Beta.app` 做路径对照。
 
+## 2026-10-29 06:20–06:22 当前工作树复测
+
+这次从当前工作树重新执行了 `./build.sh`、Swift 类型检查、ObjC 语法检查、资源 `plutil -lint`、
+`git diff --check`，随后运行 `./patch.sh "/Applications/Rex Beta.app"`，完全退出旧实例并冷启动
+`~/Applications/Rex Beta 中文版.app`。正式进程的路径是中文版副本，`vmmap` 读回了
+`Contents/Frameworks/libRexChinese.dylib` 和 `Contents/Frameworks/libRexTextHook.dylib`，
+Bundle ID 为 `com.superlogical.rex.chinese`，深度签名校验通过；两个动态库均为 `arm64`/`x86_64`
+通用二进制。
+
+本轮直接从进程 Accessibility 树读取主窗口、菜单和设置页，而不是只统计源文件：
+
+- 主工作区的`标签页`、`切换会话`、`命令面板`、`活动`、`新建标签页`、`向右分栏`、`向下分栏`、
+  `移动`、`终端`均为中文；文件、编辑、显示、窗口、帮助菜单的可见项均为中文。
+- 服务器、界面、主题、终端、快捷键、集成、通知、远程主机、开发者九个设置页逐页切换，页面标题、
+  控件、说明、状态和工具栏“返回/前进”均为中文。终端页的字体、光标、闪烁、Option、Display P3、
+  内边距、选择、链接和 Shell 设置均读回中文；`Menlo`、`Shell`、`Display P3`、URL 和路径是技术标识。
+- 服务器页的 Tailscale 副说明在 Accessibility 树中已是“登录 Tailscale、从其他设备安全访问 Rex。”；
+  视觉截图初次仍发现一帧英文残留，已改为按实时 AX 坐标覆盖并在重建冷启动后截图确认显示为中文。
+- 本轮没有把终端的 `Last login`、Shell 提示符、命令、路径、主机名和用户会话名算作界面残留；这些是
+  运行数据，按原文保留。
+
+当前三路静态映射规模为：`Localizable.strings` 1,343 条（键去重 1,337），Swift 映射 1,555 条，
+AppKit 映射 1,572 条，三处合并去重 1,701 个键。这个数字是补丁映射规模，不是应用全部文本的百分比。
+本轮新增的 Rex API 控制连接/API 修订版错误前缀已写入三路映射，但尚未通过真实不兼容服务器逐条触发，
+因此仍计为“静态覆盖”，不计作运行时通过。
+
 ## 2026-10-29 04:36–04:41 最新构建复测
 
 本轮先重新执行 `./build.sh`、Swift/ObjC/资源语法检查和 `./patch.sh "/Applications/Rex Beta.app"`，
