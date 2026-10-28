@@ -692,6 +692,7 @@ static NSString *RXTranslate(NSString *s) {
             @"Show QR code to pair a device": @"显示用于配对设备的二维码",
             @"Signed in to Tailscale": @"已登录 Tailscale",
             @"Signing out of Tailscale": @"正在退出 Tailscale",
+            @"Sign Out": @"退出登录",
             @"Removing this Mac’s saved Tailscale login": @"正在移除此 Mac 保存的 Tailscale 登录信息",
             @"Removing this Mac's saved Tailscale login": @"正在移除此 Mac 保存的 Tailscale 登录信息",
             @"Ready to connect...": @"准备连接…",
@@ -790,6 +791,8 @@ static NSString *RXTranslate(NSString *s) {
             @"Show full message": @"显示完整消息",
             @"Collapse message": @"折叠消息",
             @"No custom themes": @"没有自定义主题",
+            @"This tab is open in another window.": @"此标签页已在另一个窗口中打开。",
+            @"A theme with this name already exists.": @"已存在同名主题。",
             @"Couldn’t load folders": @"无法加载文件夹",
             @"Couldn't load folders": @"无法加载文件夹",
             @"Couldn’t load": @"无法加载",
@@ -896,6 +899,63 @@ static NSString *RXTranslate(NSString *s) {
             @"Taking longer than usual. If you've finished in your browser, Rex is still waiting for Tailscale to confirm.": @"所需时间比平时长。如果你已在浏览器中完成操作，Rex 仍在等待 Tailscale 确认。",
             @"Update Channel Tagged builds for testers.": @"更新频道 供测试人员使用的标记版本。",
             @"Local API URL unix:///Users/a1/Library/Application Support/rex/server.sock": @"本地 API URL unix:///Users/a1/Library/Application Support/rex/server.sock",
+            @"Find in Scrollback": @"在回滚中查找",
+            @"Session View Failed": @"会话视图失败",
+            @"Loading the window's blocks": @"正在加载窗口块",
+            @"Loading the window’s blocks": @"正在加载窗口块",
+            @"Keyboard shortcut: ": @"键盘快捷键：",
+            @"Open a new tab to start a terminal.": @"打开新标签页以启动终端。",
+            @"Choose to try again.": @"选择重试。",
+            @"The connection dropped. Sessions stay open while Rex reconnects.": @"连接已断开。Rex 重新连接期间会话保持打开。",
+            @"The remote host couldn't be added.": @"远程主机添加失败。",
+            @"The remote host couldn’t be added.": @"远程主机添加失败。",
+            @"The remote host couldn't be updated.": @"远程主机更新失败。",
+            @"The remote host couldn’t be updated.": @"远程主机更新失败。",
+            @"Enter a host name.": @"输入主机名。",
+            @"Enter an HTTP or HTTPS URL, or a bare hostname and port.": @"输入 HTTP 或 HTTPS URL，或直接输入主机名和端口。",
+            @"That remote host is already saved.": @"该远程主机已保存。",
+            @"Rex connects to the address and saves it on this Mac.": @"Rex 将连接到该地址并将其保存到此 Mac。",
+            @"Preview unavailable": @"预览不可用",
+            @"Couldn’t import theme": @"无法导入主题",
+            @"Couldn't import theme": @"无法导入主题",
+            @"The theme file could not be read.": @"无法读取主题文件。",
+            @"The theme file couldn’t be read.": @"无法读取主题文件。",
+            @"This removes the custom theme and any unsaved edits to it. If selected, Rex returns to the default theme.": @"这将移除自定义主题及其未保存的编辑。选择后，Rex 将恢复为默认主题。",
+            @"The current Theme Customizer draft has changes that haven't been saved.": @"当前主题自定义器草稿有未保存的更改。",
+            @"The current Theme Customizer draft has changes that haven’t been saved.": @"当前主题自定义器草稿有未保存的更改。",
+            @"No trusted links": @"没有受信任的链接",
+            @"Choosing Always Open on a link's notice adds the link's scheme and the app that opens it here.": @"在链接提示中选择“始终打开”后，链接协议和打开它的应用会显示在此处。",
+            @"Choosing Always Open on a link’s notice adds the link’s scheme and the app that opens it here.": @"在链接提示中选择“始终打开”后，链接协议和打开它的应用会显示在此处。",
+            @"These apply only while Links that open apps is set to Ask First.": @"这些设置仅在“打开应用的链接”设为“先询问”时生效。",
+            @"Links with that scheme open without asking until you remove them.": @"使用该协议的链接会直接打开，直到你将其移除。",
+            @"Connection warning": @"连接警告",
+            @"No processes are reporting activity": @"没有进程报告活动",
+            @"Opening terminal": @"正在打开终端",
+            @"Links that open other apps need confirmation.": @"打开其他应用的链接需要确认。",
+            @"No app is set to open ": @"没有设置用于打开的应用：",
+            @"Rex is set to never open links that launch other apps.": @"Rex 已设置为永不打开会启动其他应用的链接。",
+            @"Unsupported Terminal": @"不受支持的终端",
+            @"Rex needs attention": @"Rex 需要注意",
+            @"Tailscale needs attention": @"Tailscale 需要注意",
+            @"Rex server running": @"Rex 服务器正在运行",
+            @"Rex server stopped": @"Rex 服务器已停止",
+            @"Your device must be connected to the same Tailscale network.": @"你的设备必须连接到同一 Tailscale 网络。",
+            @"Tap \"Pair via QR Code\" in Rex on your other device.": @"在另一台设备上的 Rex 中点击“通过二维码配对”。",
+            @"Restart Required": @"需要重新启动",
+            @"Preparing server...": @"正在准备服务器…",
+            @"Preparing server…": @"正在准备服务器…",
+            @"Teaches agents to drive Rex: sessions, panes, and config.": @"教会智能体操作 Rex：会话、窗格和配置。",
+            @"Lets agents open protected folders and record the screen.": @"允许智能体打开受保护文件夹并录制屏幕。",
+            @"Runs rex skill setup for every agent on this Mac.": @"为此 Mac 上的每个智能体运行 rex 技能设置。",
+            @"Paste this prompt into an agent to migrate your config.": @"将此提示粘贴到智能体中以迁移你的配置。",
+            @"Couldn’t load files": @"无法加载文件",
+            @"Couldn't load files": @"无法加载文件",
+            @"Couldn’t load this folder (": @"无法加载此文件夹（",
+            @"Couldn't load this folder (": @"无法加载此文件夹（",
+            @"You don’t have permission to view this folder": @"你没有权限查看此文件夹",
+            @"You don't have permission to view this folder": @"你没有权限查看此文件夹",
+            @"Rex Server is running as part of ": @"Rex 服务器属于 ",
+            @"Rex server is running as part of ": @"Rex 服务器属于 ",
         };
     });
     NSString *exact = map[s];
@@ -920,6 +980,15 @@ static NSString *RXTranslate(NSString *s) {
     }
     if ([s hasPrefix:@"No folders named "]) {
         return [NSString stringWithFormat:@"没有名为 %@ 的文件夹", [s substringFromIndex:16]];
+    }
+    if ([s hasPrefix:@"Couldn’t load this folder ("]) {
+        return [NSString stringWithFormat:@"无法加载此文件夹（%@", [s substringFromIndex:27]];
+    }
+    if ([s hasPrefix:@"Couldn't load this folder ("]) {
+        return [NSString stringWithFormat:@"无法加载此文件夹（%@", [s substringFromIndex:27]];
+    }
+    if ([s hasPrefix:@"No app is set to open "]) {
+        return [NSString stringWithFormat:@"没有设置用于打开的应用：%@", [s substringFromIndex:22]];
     }
     if ([s hasSuffix:@" is not a folder"]) {
         return [NSString stringWithFormat:@"%@ 不是文件夹", [s substringToIndex:s.length - 17]];
@@ -983,6 +1052,8 @@ static NSString *RXTranslate(NSString *s) {
     if ([s hasPrefix:@"status exited with "]) return [NSString stringWithFormat:@"状态退出，结果为 %@", [s substringFromIndex:19]];
     if ([s hasPrefix:@"Rex server status is ambiguous ("]) return [NSString stringWithFormat:@"Rex 服务器状态不明确（%@", [s substringFromIndex:32]];
     if ([s hasPrefix:@"Rex server status could not be verified. "]) return [NSString stringWithFormat:@"无法验证 Rex 服务器状态。%@", [s substringFromIndex:41]];
+    if ([s hasPrefix:@"Rex Server is running as part of "]) return [NSString stringWithFormat:@"Rex 服务器属于 %@", [s substringFromIndex:33]];
+    if ([s hasPrefix:@"Rex server is running as part of "]) return [NSString stringWithFormat:@"Rex 服务器属于 %@", [s substringFromIndex:33]];
     if ([s hasPrefix:@"The running Rex server and this Rex.app share no version of the control API."]) return [NSString stringWithFormat:@"正在运行的 Rex 服务器与此 Rex.app 没有共同的控制 API 版本。%@", [s substringFromIndex:76]];
     if ([s hasPrefix:@"The running Rex server is older than this Rex.app. "]) return [NSString stringWithFormat:@"正在运行的 Rex 服务器版本低于此 Rex.app。%@", [s substringFromIndex:51]];
     if ([s hasPrefix:@"Signing out of Tailscale timed out. "]) return [NSString stringWithFormat:@"退出 Tailscale 超时。%@", [s substringFromIndex:36]];
@@ -1243,6 +1314,10 @@ static void RXDebugTranslation(id self, SEL selector, NSString *value, NSString 
 static IMP origTitle, origButtonTitleGetter, origMenuTitle, origMenuTitleGetter, origMenuAttributedTitle, origMenuAttributedTitleGetter, origMenuAccessibilityValue, origMenuAccessibilityLabel, origMenuAccessibilityTitle, origMenuAccessibilityDescription, origWindowTitle, origStringValue, origPlaceholder, origPlaceholderGetter, origAccessibilityLabel, origAccessibilityTitle, origAccessibilityHelp, origAccessibilityDescription, origToolTip, origAccessibilityValue, origSegmentAccessibilityValue, origSegmentAccessibilityDescription, origSegmentAccessibilityDescriptionAttribute, origToolbarViewerDescriptionAttribute, origToolbarViewerTitleAttribute, origPopupTitleOfSelectedItem, origPopupCellTitle, origViewAccessibilityLabelGetter, origViewAccessibilityTitleGetter, origViewAccessibilityHelpGetter, origViewAccessibilityDescriptionGetter, origViewAccessibilityPlaceholderGetter, origViewAccessibilityValueGetter, origViewAccessibilityValueDescriptionGetter, origViewAccessibilityRoleDescriptionGetter, origButtonAccessibilityLabel, origButtonAccessibilityTitle, origButtonAccessibilityHelp, origButtonAccessibilityDescription, origToolbarItemLabel, origToolbarItemLabelGetter, origToolbarItemPaletteLabel, origToolbarItemPaletteLabelGetter, origToolbarItemToolTip, origToolbarItemToolTipGetter, origBundleLocalized, origSplitChildren, origSplitters, origCellStringValue, origCellSetStringValue, origCellAccessibilityLabel, origCellAccessibilityTitle, origCellAccessibilityHelp, origCellAccessibilityValue, origSwiftLabel, origSwiftHelp, origSwiftDescription, origSwiftAttribute, origSwiftValue, origSwiftValueDescription, origSwiftRoleDescription, origSwiftPlaceholder, origSwiftAttributedLabel;
 static IMP origAXElementAttribute, origAXElementValue, origAXElementPlaceholder, origAXElementLabel, origAXElementTitle, origAXElementHelp, origAXElementDescription, origAXElementRoleDescription;
 static __thread BOOL RXInAXElementHook;
+// AppKit's private toolbar accessibility providers can ask for an attribute
+// while resolving the value of that same attribute. The segment hooks below
+// must not re-enter one another through NSAccessibility's legacy bridge.
+static __thread BOOL RXInSegmentAXHook;
 static NSMutableDictionary *RXPopupOriginals;
 static NSMutableDictionary *RXMenuItemOriginals;
 static NSWindow *RXAXWalkWindow;
@@ -1365,11 +1440,21 @@ static NSString *RXMenuAccessibilityDescription(id self, SEL _cmd) {
     return RXTranslate(value);
 }
 static NSString *RXSegmentAccessibilityDescription(id self, SEL _cmd) {
+    if (RXInSegmentAXHook) {
+        return origSegmentAccessibilityDescription ? ((NSString *(*)(id, SEL))origSegmentAccessibilityDescription)(self, _cmd) : nil;
+    }
+    RXInSegmentAXHook = YES;
     NSString *value = origSegmentAccessibilityDescription ? ((NSString *(*)(id, SEL))origSegmentAccessibilityDescription)(self, _cmd) : nil;
+    RXInSegmentAXHook = NO;
     return RXTranslate(value);
 }
 static NSString *RXSegmentAccessibilityDescriptionAttribute(id self, SEL _cmd) {
+    // Returning nil for a re-entrant lookup breaks the AppKit legacy bridge's
+    // cycle while allowing the outer request to continue normally.
+    if (RXInSegmentAXHook) return nil;
+    RXInSegmentAXHook = YES;
     NSString *value = origSegmentAccessibilityDescriptionAttribute ? ((NSString *(*)(id, SEL))origSegmentAccessibilityDescriptionAttribute)(self, _cmd) : nil;
+    RXInSegmentAXHook = NO;
     return RXTranslate(value);
 }
 static NSString *RXToolbarViewerDescriptionAttribute(id self, SEL _cmd) {
@@ -1382,7 +1467,12 @@ static NSString *RXToolbarViewerTitleAttribute(id self, SEL _cmd) {
 }
 static id RXSegmentAccessibilityAttributeValue(id self, SEL _cmd, NSString *attribute) {
     IMP original = origSegmentAccessibilityValue ? origSegmentAccessibilityValue : (origAXElementAttribute ? origAXElementAttribute : origAccessibilityValue);
+    if (RXInSegmentAXHook) {
+        return original ? ((id (*)(id, SEL, NSString *))original)(self, _cmd, attribute) : nil;
+    }
+    RXInSegmentAXHook = YES;
     id value = original ? ((id (*)(id, SEL, NSString *))original)(self, _cmd, attribute) : nil;
+    RXInSegmentAXHook = NO;
     NSString *translatedValue = [value isKindOfClass:[NSString class]] ? RXTranslate(value) : nil;
     RXDebugTranslation(self, _cmd, value, [NSString stringWithFormat:@"Segment %@", attribute]);
     if ([value isKindOfClass:[NSString class]] &&
@@ -2595,10 +2685,7 @@ static void RXSetThemeEditorNameOverlay(NSWindow *window, BOOL visible) {
 static void RXUpdateRemoteHostSheetOverlay(NSWindow *window) {
     if (!window || !window.contentView) return;
     NSSize size = window.frame.size;
-    FILE *debugFile = fopen("/tmp/rex-overlay.log", "a");
-    if (debugFile) { fprintf(debugFile, "title=%s size=%.1fx%.1f flipped=%d\n", window.title.UTF8String ?: "", size.width, size.height, window.contentView.isFlipped); fclose(debugFile); }
     if (window.title.length) return;
-    NSLog(@"[RexChinese] sheet frame %@ title=%@", NSStringFromRect(window.frame), window.title);
     if (size.width >= 450.0 && size.width <= 600.0 && size.height >= 400.0 && size.height <= 600.0) {
         BOOL flipped = window.contentView.isFlipped;
         NSRect headerFrame = flipped ? NSMakeRect(72.0, 18.0, size.width - 130.0, 78.0) : NSMakeRect(72.0, size.height - 96.0, size.width - 130.0, 78.0);
@@ -2698,8 +2785,6 @@ static void RXTranslateThemeEditorNameInView(NSView *view) {
 
 static void RXUpdateRuntimeTextOverlays(NSWindow *window) {
     if (!window) return;
-    FILE *debugFile = fopen("/tmp/rex-overlay.log", "a");
-    if (debugFile) { fprintf(debugFile, "runtime title=%s size=%.1fx%.1f visible=%d frame=%.1f,%.1f %.1fx%.1f err=%d node=%d\n", window.title.UTF8String ?: "", window.frame.size.width, window.frame.size.height, window.isVisible, RXRemoteErrorFrame.origin.x, RXRemoteErrorFrame.origin.y, RXRemoteErrorFrame.size.width, RXRemoteErrorFrame.size.height, RXHasRemoteErrorFrame, RXHasRemoteErrorNode); fclose(debugFile); }
     RXSetAboutOverlay(window);
     if (!window.title.length && RXHasThemeEditorNameFrame) RXSetThemeEditorNameOverlay(window, YES);
     else if (!window.title.length) RXSetThemeEditorNameOverlay(window, NO);

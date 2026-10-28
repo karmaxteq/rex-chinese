@@ -19,6 +19,15 @@ open "$HOME/Applications/Rex Beta 中文版.app"
 `/Applications/Rex Beta.app` 是原版，不会加载补丁。也可以先退出两个 Rex 进程，
 再用上述 `open` 命令启动副本。
 
+快速确认当前打开的是补丁副本：
+
+```sh
+pgrep -af 'Rex Beta 中文版.app/Contents/MacOS/Rex'
+```
+
+输出中必须包含 `~/Applications/Rex Beta 中文版.app`。如果看到的是
+`/Applications/Rex Beta.app`，请先退出原版，再重新运行上面的 `open` 命令。
+
 卸载补丁副本：
 
 ```sh
@@ -48,6 +57,8 @@ open "$HOME/Applications/Rex Beta 中文版.app"
 ~/Applications/Rex Beta 中文版.app/Contents/Frameworks/libRexTextHook.dylib
 ```
 
+最近一次从源码重建后，已完全退出旧进程并重新启动副本复测；主工作区截图、应用菜单、命令面板和 9 个设置页均为简体中文。终端中的登录提示、路径、主机名和命令属于真实运行数据，仍按原文显示。
+
 本轮回归还确认窗口菜单中的两个原始英文项已显示为“向左移动标签页”和“向右移动标签页”，命令面板的 `tab` 筛选项和字体选择器的“搜索字体 / 等宽字体 / 所有字体”均显示为简体中文；主题编辑器、快捷键“配置”菜单、开发者“更新频道”菜单和 Rex 安装位置菜单也已实际打开并核验为中文。
 
 本轮还重新构建了 `libRexChinese.dylib` 的 `arm64` / `x86_64` 二进制，并验证设置窗口、关于面板和定时辅助功能刷新在重启后仍可用。动态映射 `Download Update` → `下载更新` 已写入资源和运行时；本轮检查更新时看到了中文的“有可用更新 / 下载”通知，但没有执行真实下载。
@@ -55,6 +66,8 @@ open "$HOME/Applications/Rex Beta 中文版.app"
 本轮还测试了“窗口 → 复制版本信息”和“窗口 → 复制调试信息”。通知的可见文本和 Accessibility 描述均为中文，版本号、提交号等技术载荷按原文保留。
 
 仍存在的边界：设置窗口工具栏的两个图标按钮在 Accessibility 树中仍返回 `Back` 和 `Forward`；它们只有左右箭头图标，没有可见英文。Tailscale 真实登录/失败和服务器重启后的动态状态没有在本轮执行。用户创建的会话名、主机名、终端真实输出和运行时生成的 URL/路径属于用户数据或技术标识，按原文保留。
+
+项目中的异常流程映射（例如主题导入失败、服务器兼容性错误、Tailscale 登录生命周期和工作区失败提示）已写入资源、SwiftUI 和 AppKit 三条路径，但没有逐一触发；它们属于静态覆盖，不能当作已经完成的运行时回归。
 
 验证时确认补丁进程实际加载了：
 

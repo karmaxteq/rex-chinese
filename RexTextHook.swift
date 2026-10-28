@@ -665,6 +665,7 @@ private let translations: [String: String] = [
   "Show QR code to pair a device": "显示用于配对设备的二维码",
   "Signed in to Tailscale": "已登录 Tailscale",
   "Signing out of Tailscale": "正在退出 Tailscale",
+  "Sign Out": "退出登录",
   "Removing this Mac’s saved Tailscale login": "正在移除此 Mac 保存的 Tailscale 登录信息",
   "Removing this Mac's saved Tailscale login": "正在移除此 Mac 保存的 Tailscale 登录信息",
   "Ready to connect...": "准备连接…",
@@ -763,6 +764,8 @@ private let translations: [String: String] = [
   "Show full message": "显示完整消息",
   "Collapse message": "折叠消息",
   "No custom themes": "没有自定义主题",
+  "This tab is open in another window.": "此标签页已在另一个窗口中打开。",
+  "A theme with this name already exists.": "已存在同名主题。",
   "Couldn’t load folders": "无法加载文件夹",
   "Couldn't load folders": "无法加载文件夹",
   "Couldn’t load": "无法加载",
@@ -867,6 +870,63 @@ private let translations: [String: String] = [
   "Tailscale is taking longer than usual. You can keep waiting or cancel.": "Tailscale 所需时间比平时长。你可以继续等待或取消。",
   "Taking longer than usual. If you’ve finished in your browser, Rex is still waiting for Tailscale to confirm.": "所需时间比平时长。如果你已在浏览器中完成操作，Rex 仍在等待 Tailscale 确认。",
   "Taking longer than usual. If you've finished in your browser, Rex is still waiting for Tailscale to confirm.": "所需时间比平时长。如果你已在浏览器中完成操作，Rex 仍在等待 Tailscale 确认。",
+  "Find in Scrollback": "在回滚中查找",
+  "Session View Failed": "会话视图失败",
+  "Loading the window's blocks": "正在加载窗口块",
+  "Loading the window’s blocks": "正在加载窗口块",
+  "Keyboard shortcut: ": "键盘快捷键：",
+  "Open a new tab to start a terminal.": "打开新标签页以启动终端。",
+  "Choose to try again.": "选择重试。",
+  "The connection dropped. Sessions stay open while Rex reconnects.": "连接已断开。Rex 重新连接期间会话保持打开。",
+  "The remote host couldn't be added.": "远程主机添加失败。",
+  "The remote host couldn’t be added.": "远程主机添加失败。",
+  "The remote host couldn't be updated.": "远程主机更新失败。",
+  "The remote host couldn’t be updated.": "远程主机更新失败。",
+  "Enter a host name.": "输入主机名。",
+  "Enter an HTTP or HTTPS URL, or a bare hostname and port.": "输入 HTTP 或 HTTPS URL，或直接输入主机名和端口。",
+  "That remote host is already saved.": "该远程主机已保存。",
+  "Rex connects to the address and saves it on this Mac.": "Rex 将连接到该地址并将其保存到此 Mac。",
+  "Preview unavailable": "预览不可用",
+  "Couldn’t import theme": "无法导入主题",
+  "Couldn't import theme": "无法导入主题",
+  "The theme file could not be read.": "无法读取主题文件。",
+  "The theme file couldn’t be read.": "无法读取主题文件。",
+  "This removes the custom theme and any unsaved edits to it. If selected, Rex returns to the default theme.": "这将移除自定义主题及其未保存的编辑。选择后，Rex 将恢复为默认主题。",
+  "The current Theme Customizer draft has changes that haven't been saved.": "当前主题自定义器草稿有未保存的更改。",
+  "The current Theme Customizer draft has changes that haven’t been saved.": "当前主题自定义器草稿有未保存的更改。",
+  "No trusted links": "没有受信任的链接",
+  "Choosing Always Open on a link's notice adds the link's scheme and the app that opens it here.": "在链接提示中选择“始终打开”后，链接协议和打开它的应用会显示在此处。",
+  "Choosing Always Open on a link’s notice adds the link’s scheme and the app that opens it here.": "在链接提示中选择“始终打开”后，链接协议和打开它的应用会显示在此处。",
+  "These apply only while Links that open apps is set to Ask First.": "这些设置仅在“打开应用的链接”设为“先询问”时生效。",
+  "Links with that scheme open without asking until you remove them.": "使用该协议的链接会直接打开，直到你将其移除。",
+  "Connection warning": "连接警告",
+  "No processes are reporting activity": "没有进程报告活动",
+  "Opening terminal": "正在打开终端",
+  "Links that open other apps need confirmation.": "打开其他应用的链接需要确认。",
+  "No app is set to open ": "没有设置用于打开的应用：",
+  "Rex is set to never open links that launch other apps.": "Rex 已设置为永不打开会启动其他应用的链接。",
+  "Unsupported Terminal": "不受支持的终端",
+  "Rex needs attention": "Rex 需要注意",
+  "Tailscale needs attention": "Tailscale 需要注意",
+  "Rex server running": "Rex 服务器正在运行",
+  "Rex server stopped": "Rex 服务器已停止",
+  "Your device must be connected to the same Tailscale network.": "你的设备必须连接到同一 Tailscale 网络。",
+  "Tap \"Pair via QR Code\" in Rex on your other device.": "在另一台设备上的 Rex 中点击“通过二维码配对”。",
+  "Restart Required": "需要重新启动",
+  "Preparing server...": "正在准备服务器…",
+  "Preparing server…": "正在准备服务器…",
+  "Teaches agents to drive Rex: sessions, panes, and config.": "教会智能体操作 Rex：会话、窗格和配置。",
+  "Lets agents open protected folders and record the screen.": "允许智能体打开受保护文件夹并录制屏幕。",
+  "Runs rex skill setup for every agent on this Mac.": "为此 Mac 上的每个智能体运行 rex 技能设置。",
+  "Paste this prompt into an agent to migrate your config.": "将此提示粘贴到智能体中以迁移你的配置。",
+  "Couldn’t load files": "无法加载文件",
+  "Couldn't load files": "无法加载文件",
+  "Couldn’t load this folder (": "无法加载此文件夹（",
+  "Couldn't load this folder (": "无法加载此文件夹（",
+  "You don’t have permission to view this folder": "你没有权限查看此文件夹",
+  "You don't have permission to view this folder": "你没有权限查看此文件夹",
+  "Rex Server is running as part of ": "Rex 服务器属于 ",
+  "Rex server is running as part of ": "Rex 服务器属于 ",
 ]
 
 private func translate(_ value: String) -> String {
@@ -890,6 +950,15 @@ private func translate(_ value: String) -> String {
   }
   if value.hasPrefix("No folders named ") {
     return "没有名为 " + value.dropFirst("No folders named ".count) + " 的文件夹"
+  }
+  if value.hasPrefix("Couldn’t load this folder (") {
+    return "无法加载此文件夹（" + value.dropFirst("Couldn’t load this folder (".count)
+  }
+  if value.hasPrefix("Couldn't load this folder (") {
+    return "无法加载此文件夹（" + value.dropFirst("Couldn't load this folder (".count)
+  }
+  if value.hasPrefix("No app is set to open ") {
+    return "没有设置用于打开的应用：" + value.dropFirst("No app is set to open ".count)
   }
   if value.hasSuffix(" is not a folder") {
     return String(value.dropLast(" is not a folder".count)) + " 不是文件夹"
@@ -1051,6 +1120,7 @@ private func translate(_ value: String) -> String {
   if value.hasPrefix("Tailscale assigned ") { return "Tailscale 已分配 " + value.dropFirst("Tailscale assigned ".count) }
   if value.hasPrefix("Restart required: ") { return "需要重新启动：" + value.dropFirst("Restart required: ".count) }
   if value.hasPrefix("Rex Server is running as part of ") { return "Rex 服务器属于 " + value.dropFirst("Rex Server is running as part of ".count) }
+  if value.hasPrefix("Rex server is running as part of ") { return "Rex 服务器属于 " + value.dropFirst("Rex server is running as part of ".count) }
   if value.hasPrefix("Restarted the Rex server for Rex ") { return "已为 Rex " + value.dropFirst("Restarted the Rex server for Rex ".count) + " 重新启动服务器" }
   if value.hasPrefix("Update Rex on the server to use ") { return "更新服务器上的 Rex 以使用 " + value.dropFirst("Update Rex on the server to use ".count) }
   if value.hasPrefix("Set Cursor Blink Interval to ") { return "将光标闪烁间隔设为 " + value.dropFirst("Set Cursor Blink Interval to ".count) }
