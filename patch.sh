@@ -29,4 +29,11 @@ done
 /usr/libexec/PlistBuddy -c 'Add :CFBundleLocalizations:0 string zh_CN' "$DST/Contents/Info.plist" 2>/dev/null || true
 xattr -dr com.apple.quarantine "$DST" 2>/dev/null || true
 codesign --force --deep --sign - "$DST" >/dev/null
+# Refresh LaunchServices after changing the bundle identity.  Without this,
+# Finder/Dock can keep the source app's stale registration and reopen English
+# Rex even when the user selects the Chinese copy.
+LSREGISTER=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
+if [ -x "$LSREGISTER" ]; then
+  "$LSREGISTER" -f "$DST" >/dev/null 2>&1 || true
+fi
 echo "已生成: $DST"
