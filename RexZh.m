@@ -531,6 +531,8 @@ static NSString *RXTranslate(NSString *s) {
             @"Split Pane Best Fit": @"最佳分栏",
             @"Change Keybinding": @"更改快捷键",
             @"Action": @"操作",
+            @"Undo": @"撤销",
+            @"Redo": @"重做",
             @"Paste": @"粘贴",
             @"Arrange in Front": @"前置排列",
             @"Merino Light": @"Merino 浅色",
@@ -1502,8 +1504,9 @@ static void RXDebugTranslation(id self, SEL selector, NSString *value, NSString 
     (void)source;
 }
 
-static IMP origTitle, origButtonTitleGetter, origMenuTitle, origMenuTitleGetter, origMenuAttributedTitle, origMenuAttributedTitleGetter, origMenuAccessibilityValue, origMenuAccessibilityLabel, origMenuAccessibilityTitle, origMenuAccessibilityDescription, origWindowTitle, origStringValue, origPlaceholder, origPlaceholderGetter, origAccessibilityLabel, origAccessibilityTitle, origAccessibilityHelp, origAccessibilityDescription, origToolTip, origAccessibilityValue, origSegmentAccessibilityValue, origSegmentAccessibilityDescription, origSegmentAccessibilityDescriptionAttribute, origToolbarViewerDescriptionAttribute, origToolbarViewerTitleAttribute, origPopupTitleOfSelectedItem, origPopupCellTitle, origViewAccessibilityLabelGetter, origViewAccessibilityTitleGetter, origViewAccessibilityHelpGetter, origViewAccessibilityDescriptionGetter, origViewAccessibilityPlaceholderGetter, origViewAccessibilityValueGetter, origViewAccessibilityValueDescriptionGetter, origViewAccessibilityRoleDescriptionGetter, origButtonAccessibilityLabel, origButtonAccessibilityTitle, origButtonAccessibilityHelp, origButtonAccessibilityDescription, origToolbarItemLabel, origToolbarItemLabelGetter, origToolbarItemPaletteLabel, origToolbarItemPaletteLabelGetter, origToolbarItemToolTip, origToolbarItemToolTipGetter, origBundleLocalized, origSplitChildren, origSplitters, origCellStringValue, origCellSetStringValue, origCellAccessibilityLabel, origCellAccessibilityTitle, origCellAccessibilityHelp, origCellAccessibilityValue, origSwiftLabel, origSwiftHelp, origSwiftDescription, origSwiftAttribute, origSwiftValue, origSwiftValueDescription, origSwiftRoleDescription, origSwiftPlaceholder, origSwiftAttributedLabel;
+static IMP origTitle, origButtonTitleGetter, origMenuTitle, origMenuTitleGetter, origMenuAttributedTitle, origMenuAttributedTitleGetter, origMenuAccessibilityValue, origMenuAccessibilityLabel, origMenuAccessibilityTitle, origMenuAccessibilityDescription, origWindowTitle, origStringValue, origPlaceholder, origPlaceholderGetter, origAccessibilityLabel, origAccessibilityTitle, origAccessibilityHelp, origAccessibilityDescription, origToolTip, origAccessibilityValue, origSegmentAccessibilityValue, origSegmentAccessibilityDescription, origSegmentAccessibilityDescriptionAttribute, origConcreteSegmentAccessibilityValue, origToolbarViewerAccessibilityValue, origToolbarViewerDescriptionAttribute, origToolbarViewerTitleAttribute, origIndexedAssociatedLabel, origIndexedSetAssociatedLabel, origPopupTitleOfSelectedItem, origPopupCellTitle, origViewAccessibilityLabelGetter, origViewAccessibilityTitleGetter, origViewAccessibilityHelpGetter, origViewAccessibilityDescriptionGetter, origViewAccessibilityPlaceholderGetter, origViewAccessibilityValueGetter, origViewAccessibilityValueDescriptionGetter, origViewAccessibilityRoleDescriptionGetter, origButtonAccessibilityLabel, origButtonAccessibilityTitle, origButtonAccessibilityHelp, origButtonAccessibilityDescription, origToolbarItemLabel, origToolbarItemLabelGetter, origToolbarItemPaletteLabel, origToolbarItemPaletteLabelGetter, origToolbarItemToolTip, origToolbarItemToolTipGetter, origBundleLocalized, origSplitChildren, origSplitters, origCellStringValue, origCellSetStringValue, origCellAccessibilityLabel, origCellAccessibilityTitle, origCellAccessibilityHelp, origCellAccessibilityValue, origSwiftLabel, origSwiftHelp, origSwiftDescription, origSwiftAttribute, origSwiftValue, origSwiftValueDescription, origSwiftRoleDescription, origSwiftPlaceholder, origSwiftAttributedLabel;
 static IMP origAXElementAttribute, origAXElementValue, origAXElementPlaceholder, origAXElementLabel, origAXElementTitle, origAXElementHelp, origAXElementDescription, origAXElementRoleDescription;
+static IMP origMockAccessibilityAttribute;
 static __thread BOOL RXInAXElementHook;
 // AppKit's private toolbar accessibility providers can ask for an attribute
 // while resolving the value of that same attribute. The segment hooks below
@@ -1664,6 +1667,63 @@ static NSString *RXToolbarViewerDescriptionAttribute(id self, SEL _cmd) {
 static NSString *RXToolbarViewerTitleAttribute(id self, SEL _cmd) {
     NSString *value = origToolbarViewerTitleAttribute ? ((NSString *(*)(id, SEL))origToolbarViewerTitleAttribute)(self, _cmd) : nil;
     return RXTranslate(value);
+}
+static id RXConcreteSegmentAccessibilityAttributeValue(id self, SEL _cmd, NSString *attribute) {
+    if (RXInSegmentAXHook) {
+        return origConcreteSegmentAccessibilityValue ? ((id (*)(id, SEL, NSString *))origConcreteSegmentAccessibilityValue)(self, _cmd, attribute) : nil;
+    }
+    RXInSegmentAXHook = YES;
+    id value = origConcreteSegmentAccessibilityValue ? ((id (*)(id, SEL, NSString *))origConcreteSegmentAccessibilityValue)(self, _cmd, attribute) : nil;
+    RXInSegmentAXHook = NO;
+    RXDebugTranslation(self, _cmd, value, [NSString stringWithFormat:@"ConcreteSegment %@", attribute]);
+    if ([value isKindOfClass:[NSString class]] &&
+        ([attribute isEqualToString:NSAccessibilityTitleAttribute] ||
+         [attribute isEqualToString:NSAccessibilityDescriptionAttribute] ||
+         [attribute isEqualToString:NSAccessibilityHelpAttribute] ||
+         [attribute isEqualToString:NSAccessibilityValueAttribute] ||
+         [attribute isEqualToString:NSAccessibilityValueDescriptionAttribute] ||
+         [attribute isEqualToString:NSAccessibilityRoleDescriptionAttribute])) return RXTranslate(value);
+    return value;
+}
+static id RXToolbarViewerAccessibilityAttributeValue(id self, SEL _cmd, NSString *attribute) {
+    if (RXInSegmentAXHook) {
+        return origToolbarViewerAccessibilityValue ? ((id (*)(id, SEL, NSString *))origToolbarViewerAccessibilityValue)(self, _cmd, attribute) : nil;
+    }
+    RXInSegmentAXHook = YES;
+    id value = origToolbarViewerAccessibilityValue ? ((id (*)(id, SEL, NSString *))origToolbarViewerAccessibilityValue)(self, _cmd, attribute) : nil;
+    RXInSegmentAXHook = NO;
+    RXDebugTranslation(self, _cmd, value, [NSString stringWithFormat:@"ToolbarViewer %@", attribute]);
+    if ([value isKindOfClass:[NSString class]] &&
+        ([attribute isEqualToString:NSAccessibilityTitleAttribute] ||
+         [attribute isEqualToString:NSAccessibilityDescriptionAttribute] ||
+         [attribute isEqualToString:NSAccessibilityHelpAttribute] ||
+         [attribute isEqualToString:NSAccessibilityValueAttribute] ||
+         [attribute isEqualToString:NSAccessibilityValueDescriptionAttribute] ||
+         [attribute isEqualToString:NSAccessibilityRoleDescriptionAttribute])) return RXTranslate(value);
+    return value;
+}
+static NSString *RXIndexedAssociatedLabel(id self, SEL _cmd) {
+    NSString *value = origIndexedAssociatedLabel ? ((NSString *(*)(id, SEL))origIndexedAssociatedLabel)(self, _cmd) : nil;
+    RXDebugTranslation(self, _cmd, value, @"Indexed associated label");
+    return RXTranslate(value);
+}
+static void RXIndexedSetAssociatedLabel(id self, SEL _cmd, NSString *value) {
+    if (origIndexedSetAssociatedLabel) ((void (*)(id, SEL, NSString *))origIndexedSetAssociatedLabel)(self, _cmd, RXTranslate(value));
+}
+static id RXMockAccessibilityAttributeValue(id self, SEL _cmd, NSString *attribute) {
+    if (RXInSegmentAXHook) return origMockAccessibilityAttribute ? ((id (*)(id, SEL, NSString *))origMockAccessibilityAttribute)(self, _cmd, attribute) : nil;
+    RXInSegmentAXHook = YES;
+    id value = origMockAccessibilityAttribute ? ((id (*)(id, SEL, NSString *))origMockAccessibilityAttribute)(self, _cmd, attribute) : nil;
+    RXInSegmentAXHook = NO;
+    RXDebugTranslation(self, _cmd, value, [NSString stringWithFormat:@"Mock %@", attribute]);
+    if ([value isKindOfClass:[NSString class]] &&
+        ([attribute isEqualToString:NSAccessibilityTitleAttribute] ||
+         [attribute isEqualToString:NSAccessibilityDescriptionAttribute] ||
+         [attribute isEqualToString:NSAccessibilityHelpAttribute] ||
+         [attribute isEqualToString:NSAccessibilityValueAttribute] ||
+         [attribute isEqualToString:NSAccessibilityValueDescriptionAttribute] ||
+         [attribute isEqualToString:NSAccessibilityRoleDescriptionAttribute])) return RXTranslate(value);
+    return value;
 }
 static id RXSegmentAccessibilityAttributeValue(id self, SEL _cmd, NSString *attribute) {
     IMP original = origSegmentAccessibilityValue ? origSegmentAccessibilityValue : (origAXElementAttribute ? origAXElementAttribute : origAccessibilityValue);
@@ -3267,14 +3327,23 @@ static void RXInstallSegmentHooks(void) {
     Class segmentClass = objc_getClass("NSAccessibilityIndexedMockUIElement");
     if (!segmentClass) segmentClass = objc_getClass("NSAccessibilitySegment");
     if (!segmentClass) return;
+    Class mockClass = objc_getClass("NSAccessibilityMockUIElement");
+    if (mockClass) origMockAccessibilityAttribute = RXHook(mockClass, @selector(accessibilityAttributeValue:), (IMP)RXMockAccessibilityAttributeValue);
     origSegmentAccessibilityValue = RXHook(segmentClass, @selector(accessibilityAttributeValue:), (IMP)RXSegmentAccessibilityAttributeValue);
     origSegmentAccessibilityDescription = RXHook(segmentClass, @selector(accessibilityDescription), (IMP)RXSegmentAccessibilityDescription);
     Class concreteSegmentClass = objc_getClass("NSAccessibilitySegment");
     if (concreteSegmentClass) {
+        origConcreteSegmentAccessibilityValue = RXHook(concreteSegmentClass, @selector(accessibilityAttributeValue:), (IMP)RXConcreteSegmentAccessibilityAttributeValue);
         origSegmentAccessibilityDescriptionAttribute = RXHook(concreteSegmentClass, @selector(accessibilityDescriptionAttribute), (IMP)RXSegmentAccessibilityDescriptionAttribute);
+    }
+    Class indexedClass = objc_getClass("NSAccessibilityIndexedMockUIElement");
+    if (indexedClass) {
+        origIndexedAssociatedLabel = RXHook(indexedClass, @selector(associatedAccessibilityLabel), (IMP)RXIndexedAssociatedLabel);
+        origIndexedSetAssociatedLabel = RXHook(indexedClass, @selector(setAssociatedAccessibilityLabel:), (IMP)RXIndexedSetAssociatedLabel);
     }
     Class toolbarViewerClass = objc_getClass("NSToolbarItemViewer");
     if (toolbarViewerClass) {
+        origToolbarViewerAccessibilityValue = RXHook(toolbarViewerClass, @selector(accessibilityAttributeValue:), (IMP)RXToolbarViewerAccessibilityAttributeValue);
         origToolbarViewerDescriptionAttribute = RXHook(toolbarViewerClass, @selector(accessibilityDescriptionAttribute), (IMP)RXToolbarViewerDescriptionAttribute);
         origToolbarViewerTitleAttribute = RXHook(toolbarViewerClass, @selector(accessibilityTitleAttribute), (IMP)RXToolbarViewerTitleAttribute);
     }

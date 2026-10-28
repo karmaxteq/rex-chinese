@@ -271,6 +271,8 @@
 "Dismiss notice" = "关闭通知";
 "Dismiss Notice" = "关闭通知";
 "Change Keybinding" = "更改快捷键";
+"Undo" = "撤销";
+"Redo" = "重做";
 "Migrate theme from Ghostty config" = "从 Ghostty 配置迁移主题";
 "Filter custom themes" = "筛选自定义主题";
 "Enable Terminal Font Smoothing" = "启用终端字体平滑";

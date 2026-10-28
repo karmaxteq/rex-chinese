@@ -616,6 +616,8 @@ private let translations: [String: String] = [
   "Waiting for a key.": "正在等待按键。",
   "Exit Full Screen": "退出全屏",
   "Change Keybinding": "更改快捷键",
+  "Undo": "撤销",
+  "Redo": "重做",
   "Migrate theme from Ghostty config": "从 Ghostty 配置迁移主题",
   "Filter custom themes": "筛选自定义主题",
   "Choose a Ghostty theme or an iTerm color file.": "选择 Ghostty 主题或 iTerm 颜色文件。",
