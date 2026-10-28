@@ -13,6 +13,13 @@ open "$HOME/Applications/Rex Beta 中文版.app"
 
 本次完全退出后重建启动的进程为 `Rex Beta 中文版.app`；`vmmap` 已读回两个动态库路径，CUA 截图和 Accessibility 树均读到中文。
 
+## 当前冷启动结论
+
+- 2026-10-28 冷启动验证的进程路径为 `~/Applications/Rex Beta 中文版.app`，实际加载 `libRexChinese.dylib` 和 `libRexTextHook.dylib`；直接打开 `/Applications/Rex Beta.app` 仍是英文原版。
+- 当前源码中有 692 条资源翻译、929 条 Swift 文本映射、944 条 AppKit 文本映射，合并去重后为 1,059 个字面量键。这是补丁的映射规模，不等于应用全部文本的百分比。
+- 主工作区、菜单和 9 个设置页面已在冷启动后重新读回；终端的 `Last login`、Shell 提示符、命令输出、主机名和路径属于运行数据，按原文保留。
+- 运行时仍需单独触发的路径见文末；静态映射存在不代表对应异常流程已经完成运行时回归。
+
 ## 已实测覆盖
 
 | 区域 | 结果 | 实测内容 |
