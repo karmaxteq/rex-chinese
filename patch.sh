@@ -5,11 +5,11 @@ DST="$HOME/Applications/Rex Beta 中文版.app"
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 [ -d "$SRC" ] || { echo "找不到应用: $SRC" >&2; exit 1; }
 [ ! -e "$SRC/Contents/MacOS/RexCore" ] || { echo "请提供未打补丁的 Rex Beta 原版。" >&2; exit 1; }
-command -v python3 >/dev/null || { echo "需要 Python 3（仅使用标准库）以校验预览补丁。" >&2; exit 1; }
+command -v python3 >/dev/null || { echo "需要 Python 3（仅使用标准库）以校验界面常量补丁。" >&2; exit 1; }
 VERSION=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$SRC/Contents/Info.plist")
 BUILD=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$SRC/Contents/Info.plist")
 [ "$VERSION" = 0.1.0 ] && [ "$BUILD" = 1408 ] || { echo "仅支持 Rex Beta 0.1.0 (1408)，当前为 $VERSION ($BUILD)。" >&2; exit 1; }
-# Validate the exact GPU demo constant before touching the installed copy.
+# Validate the exact GPU demos and remote-warning title constants before touching the installed copy.
 python3 "$ROOT/tools/patch-preview.py" "$SRC/Contents/MacOS/Rex" --dry-run
 mkdir -p "$HOME/Applications"
 ditto "$SRC" "$DST"

@@ -28,7 +28,7 @@ for arch in arm64 x86_64; do
     -framework Foundation -framework SwiftUI
 
   clang -arch "$arch" -isysroot "$SDKROOT" -mmacosx-version-min=13.0 \
-    -fobjc-arc -fblocks -dynamiclib "$ROOT/RexZh.m" \
+    -O2 -fobjc-arc -fblocks -dynamiclib "$ROOT/RexZh.m" \
     -o "$BUILD_DIR/libRexChinese-${arch}.dylib" \
     -framework AppKit -framework CoreFoundation -framework CoreText -framework QuartzCore
 done

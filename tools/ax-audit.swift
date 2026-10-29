@@ -12,7 +12,7 @@ func attribute(_ element: AXUIElement, _ name: String) -> Any? {
     return AXUIElementCopyAttributeValue(element, name as CFString, &result) == .success ? result : nil
 }
 let args = CommandLine.arguments
-if args.count < 3 { fail("usage: ax-audit <pid> dump|activate|press|increment|decrement|set|screenshot [label-or-path] [value-or-path]") }
+if args.count < 3 { fail("usage: ax-audit <pid> dump|activate|press|cancel|increment|decrement|set|screenshot [label-or-path] [value-or-path]") }
 guard let pid = Int32(args[1]), NSRunningApplication(processIdentifier: pid) != nil else { fail("No running process: \(args[1])") }
 let app = AXUIElementCreateApplication(pid)
 AXUIElementSetMessagingTimeout(app, 5)
@@ -53,7 +53,7 @@ case "dump": emit(records)
 case "activate":
     guard NSRunningApplication(processIdentifier: pid)?.activate(options: []) == true else { fail("Could not activate app") }
     emit(["result": "activated", "pid": pid])
-case "press", "increment", "decrement", "set":
+case "press", "cancel", "increment", "decrement", "set":
     guard args.count >= 4 else { fail("Missing exact label or node path") }
     let query = args[3]
     let matches = records.enumerated().filter { _, record in
@@ -64,6 +64,12 @@ case "press", "increment", "decrement", "set":
     let target = elements[match.offset].1
     let error: AXError
     if args[2] == "press" { error = AXUIElementPerformAction(target, kAXPressAction as CFString) }
+    else if args[2] == "cancel" {
+        var actions: CFArray?
+        guard AXUIElementCopyActionNames(target, &actions) == .success,
+              (actions as? [String] ?? []).contains(kAXCancelAction) else { fail("Node does not support AXCancel") }
+        error = AXUIElementPerformAction(target, kAXCancelAction as CFString)
+    }
     else if args[2] == "increment" || args[2] == "decrement" {
         guard match.element["role"] as? String == "AXIncrementor" else { fail("Increment/decrement require an AXIncrementor") }
         error = AXUIElementPerformAction(target, (args[2] == "increment" ? kAXIncrementAction : kAXDecrementAction) as CFString)

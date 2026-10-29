@@ -111,6 +111,12 @@
 "Policy" = "策略";
 "Theme" = "主题";
 "Dynamic" = "动态";
+" — Dynamic" = " — 动态";
+" result" = " 项结果";
+" results" = " 项结果";
+"See the keys bound to " = "查看绑定到 ";
+" and where each came from." = " 的按键及其来源。";
+"Record, remove, or reset the keys bound to " = "录制、移除或重置以下操作的按键：";
 "Choose…" = "选择…";
 "Choose..." = "选择…";
 "Dock Badge and Sound" = "程序坞标记和声音";
@@ -630,6 +636,11 @@
 "Full Disk Access" = "完全磁盘访问权限";
 "No Rex installation is available." = "没有可用的 Rex 安装。";
 "Waiting for permission" = "正在等待权限";
+"On" = "开启";
+"Hide Activity" = "隐藏活动";
+"Hide Activity (⌘.)" = "隐藏活动 (⌘.)";
+"Unsupported block" = "不支持的内容块";
+"The content environment does not provide the capabilities required by this block." = "当前内容环境不具备此内容块所需的功能。";
 "Waiting for server" = "正在等待服务器";
 "Ready to Check for Updates" = "可以检查更新";
 "Not available until the server is ready" = "服务器就绪前不可用";
@@ -682,7 +693,7 @@
 "App Version" = "应用版本";
 "Update Channel" = "更新频道";
 "Tagged builds for testers." = "供测试人员使用的标记版本。";
-"Preview" = "预览版";
+"Preview" = "预览";
 "Bleeding Edge" = "前沿版";
 "Source Checkout" = "源代码检出";
 "Allow Automatic Update Checks" = "允许自动检查更新";

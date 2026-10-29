@@ -10,10 +10,13 @@
 static NSString *RXTranslate(NSString *s) {
     if (![s isKindOfClass:[NSString class]] || s.length == 0) return s;
     static NSDictionary *map;
+    static NSSet *translatedValues;
     static dispatch_once_t once;
     dispatch_once(&once, ^{
         map = @{
             @"Waiting for permission": @"正在等待权限",
+            @"Unsupported block": @"不支持的内容块",
+            @"The content environment does not provide the capabilities required by this block.": @"当前内容环境不具备此内容块所需的功能。",
             @"Change Session": @"切换会话",
             @"Change Session...": @"切换会话…",
             @"Command Palette": @"命令面板",
@@ -153,8 +156,8 @@ static NSString *RXTranslate(NSString *s) {
             @"Interface Style": @"界面样式",
             @"Tab Buttons": @"标签页按钮",
             @"Pane Buttons": @"窗格按钮",
-            @"About Rex Beta": @"关于Rex Beta",
-            @"About Rex Beta…": @"关于Rex Beta…",
+            @"About Rex Beta": @"关于 Rex Beta",
+            @"About Rex Beta…": @"关于 Rex Beta…",
             @"Check for Updates...": @"检查更新…",
             @"Check for Updates…": @"检查更新…",
             @"An update is available": @"有可用更新",
@@ -169,10 +172,10 @@ static NSString *RXTranslate(NSString *s) {
             @"Services Settings…": @"服务设置…",
             @"Services Settings\\U2026": @"服务设置…",
             @"No Services Apply": @"没有可用服务",
-            @"Hide Rex Beta": @"隐藏Rex Beta",
+            @"Hide Rex Beta": @"隐藏 Rex Beta",
             @"Hide Others": @"隐藏其他",
             @"Show All": @"显示全部",
-            @"Quit Rex Beta": @"退出Rex Beta",
+            @"Quit Rex Beta": @"退出 Rex Beta",
             @"Quit and Keep Windows": @"退出并保留窗口",
             @"Back": @"返回",
             @"Forward": @"前进",
@@ -296,6 +299,12 @@ static NSString *RXTranslate(NSString *s) {
             @"Show the running program and its directory instead of titles that shells set. Titles that programs set for themselves, and names you give tabs, still appear.": @"显示正在运行的程序及其目录，而不是 Shell 设置的标题。程序自行设置的标题以及你为标签页指定的名称仍会显示。",
             @"Shell": @"Shell",
             @"Dynamic": @"动态",
+            @" — Dynamic": @" — 动态",
+            @" result": @" 项结果",
+            @" results": @" 项结果",
+            @"See the keys bound to ": @"查看绑定到 ",
+            @" and where each came from.": @" 的按键及其来源。",
+            @"Record, remove, or reset the keys bound to ": @"录制、移除或重置以下操作的按键：",
             @"Choose…": @"选择…",
             @"Choose...": @"选择…",
             @"Startup command": @"启动命令",
@@ -334,7 +343,7 @@ static NSString *RXTranslate(NSString *s) {
             @"Rex Binary": @"Rex 二进制",
             @"Installation": @"安装",
             @"Kind": @"类型",
-            @"Included with Rex.app": @"随 Rex.app 附带",
+            @"Included with Rex.app": @"Rex.app 随附",
             @"Live Logs": @"实时日志",
             @"Stop Server": @"停止服务器",
             @"Clear Logs": @"清除日志",
@@ -448,7 +457,7 @@ static NSString *RXTranslate(NSString *s) {
             @"Determined by the theme's background color.": @"由主题背景颜色决定。",
             @"Update the sheet’s appearance as you edit. Turn off to restore the Settings appearance.": @"编辑时更新面板外观。关闭后恢复设置外观。",
             @"Update the sheet's appearance as you edit. Turn off to restore the Settings appearance.": @"编辑时更新面板外观。关闭后恢复设置外观。",
-            @"Click to choose a color. Drag onto another swatch to swap.": @"点击选择颜色。拖动到另一个色板上以交换。",
+            @"Click to choose a color. Drag onto another swatch to swap.": @"点击选择颜色。拖到另一个色板上即可交换。",
             @"Text": @"文本",
             @"Cursor Text": @"光标文本",
             @"Selected Text": @"选中文本",
@@ -669,7 +678,7 @@ static NSString *RXTranslate(NSString *s) {
             @"Host icon": @"主机图标",
             @"Globe": @"地球",
             @"Tagged builds for testers.": @"供测试人员使用的标记版本。",
-            @"Preview": @"预览版",
+            @"Preview": @"预览",
             @"Bleeding Edge": @"前沿版",
             @"Source Checkout": @"源代码检出",
             @"Allow Automatic Update Checks": @"允许自动检查更新",
@@ -1013,7 +1022,7 @@ static NSString *RXTranslate(NSString *s) {
             @"Enter a host name.": @"输入主机名。",
             @"Enter an HTTP or HTTPS URL, or a bare hostname and port.": @"输入 HTTP 或 HTTPS URL，或直接输入主机名和端口。",
             @"That remote host is already saved.": @"该远程主机已保存。",
-            @"Rex connects to the address and saves it on this Mac.": @"Rex 将连接到该地址并将其保存到此 Mac。",
+            @"Rex connects to the address and saves it on this Mac.": @"Rex 会连接到该地址，并将其保存在此 Mac 上。",
             @"Preview unavailable": @"预览不可用",
             @"Couldn’t import theme": @"无法导入主题",
             @"Couldn't import theme": @"无法导入主题",
@@ -1597,11 +1606,168 @@ static NSString *RXTranslate(NSString *s) {
             @"signing out of tailscale": @"正在退出 Tailscale",
             @"remove saved login": @"移除保存的登录信息",
             @"sign out progress": @"退出登录进度",
+            @"Hide Activity": @"隐藏活动",
+            @"Enable or disable all activity for working programs, or configure their tab indicators, notifications, Dock badges, and sounds individually.": @"启用或停用运行中程序的所有活动，或分别配置其标签页指示器、通知、程序坞标记和声音。",
+            @"The Rex server refused the connection because it doesn't support the API revisions this app needs (": @"Rex 服务器拒绝连接，因为它不支持此应用需要的 API 修订版（",
+            @"On": @"开启",
+            @"Connected to Rex": @"已连接到 Rex",
+            @"Update Rex.app, or restart the server to use the included one.": @"更新 Rex.app，或重新启动服务器以使用随附的服务器。",
+            @"Hide Activity (⌘.)": @"隐藏活动 (⌘.)",
+            @"Shown when a program finishes a task": @"程序完成任务时显示",
+            @"Preserve width when resizing sidebar": @"调整侧边栏大小时保持宽度",
+            @"Check for Updates": @"检查更新",
+            @"Approve this Mac in Tailscale": @"在 Tailscale 中批准此 Mac",
+            @"Location": @"位置",
+            @"Restart is required before starting another server.": @"启动另一个服务器前需要重启。",
+            @"No Rex installation is available.": @"没有可用的 Rex 安装。",
+            @"New Session ": @"新建会话 ",
+            @"Let agents label the session after the task they're working on.": @"允许智能体根据正在处理的任务为会话命名。",
+            @"Drag this icon into the list in System Settings to grant ": @"将此图标拖入系统设置中的列表以授予 ",
+            @"Font": @"字体",
+            @"Cancel": @"取消",
+            @"Rex does not provide transport authentication. Use a trusted tunnel such as Tailscale.": @"Rex 不提供传输身份验证。请使用 Tailscale 等受信任的隧道。",
+            @"Connecting to Rex": @"正在连接 Rex",
+            @"Adjust pane spacing, headers, active and inactive appearance, and split balancing.": @"调整窗格间距、标题、活动和非活动外观以及分栏平衡。",
+            @". Update Rex on the server or this app.": @"。请更新服务器上的 Rex 或此应用。",
+            @"Choose fonts, in order, for characters the terminal font doesn't have.": @"按顺序选择用于显示终端字体不包含字符的字体。",
+            @"Couldn’t find the Ghostty theme ": @"找不到 Ghostty 主题 ",
+            @"This app can't send this ": @"此应用无法发送此 ",
+            @"Show on Rex's Dock icon how many tabs have a program that's blocked, failed, or finished that you haven't seen.": @"在 Rex 的程序坞图标上显示你尚未查看的阻塞、失败或已完成程序的标签页数量。",
+            @"Adjust the stroke weight of a variable terminal font.": @"调整可变终端字体的字重。",
+            @"Edit": @"编辑",
+            @"Open Onboarding Session": @"打开入门会话",
+            @"Go to Directory": @"前往目录",
+            @"The theme is missing valid colors for:": @"主题缺少有效颜色：",
+            @"Check serving progress and certificate readiness, retry, copy the address, or pair a device using its QR code.": @"查看服务进度和证书状态、重试、复制地址，或使用二维码配对设备。",
+            @"The Rex server refused the connection because it doesn’t support the API revisions this app needs (": @"Rex 服务器拒绝连接，因为它不支持此应用需要的 API 修订版（",
+            @"Smooth the edges of terminal text.": @"平滑终端文字边缘。",
+            @"Enable or disable all activity for finished programs, or configure their tab indicators, notifications, Dock badges, and sounds individually.": @"启用或停用已完成程序的所有活动，或分别配置其标签页指示器、通知、程序坞标记和声音。",
+            @"Connect to your local Rex server over your Tailnet.": @"通过 Tailnet 连接到本地 Rex 服务器。",
+            @". Update Rex on the server.": @"。请更新服务器上的 Rex。",
+            @"Ended": @"已结束",
+            @" request to a server that uses API revision ": @" 请求，服务器使用 API 修订版 ",
+            @"Web Client Origins": @"Web 客户端来源",
+            @"Browser origins allowed to open Rex WebSocket streams. The hosted Rex client is always allowed. Wildcards match subdomains, e.g. https://*.vercel.app. Changes apply after Rex restarts.": @"允许打开 Rex WebSocket 流的浏览器来源。托管的 Rex 客户端始终允许。通配符匹配子域名，例如 https://*.vercel.app。更改将在 Rex 重启后生效。",
+            @"Host": @"主机",
+            @"Choose Comfortable or Compact pane surfaces and spacing.": @"选择舒适或紧凑的窗格表面和间距。",
+            @"Choose a custom, default, or built-in palette used in light mode.": @"选择浅色模式使用的自定义、默认或内置调色板。",
+            @"Enter a size from ": @"输入大小，范围为 ",
+            @"Migrate my keybindings and settings from ": @"从以下来源迁移我的快捷键和设置：",
+            @"Resuming (attempt ": @"正在恢复（尝试 ",
+            @"File": @"文件",
+            @"Fade inactive panes": @"淡化非活动窗格",
+            @"Manage browser origins allowed to open Rex WebSocket streams.": @"管理允许打开 Rex WebSocket 流的浏览器来源。",
+            @"New Session on Host": @"在主机上新建会话",
+            @"Update": @"更新",
+            @"App Version": @"应用版本",
+            @"Choose Off, Slow, Normal, Fast, or Custom to edit the blink interval.": @"选择关闭、慢速、正常、快速或自定义来编辑闪烁间隔。",
+            @"Independently configure tab indicators, system notifications, Dock badges, and sounds for program activity.": @"分别配置程序活动的标签页指示器、系统通知、程序坞标记和声音。",
+            @"No Remote Hosts": @"没有远程主机",
+            @"Drag around the center to change hue and outward to increase chroma.": @"绕中心拖动可更改色相，向外拖动可提高色度。",
+            @"Shown when a program is busy or reports progress": @"程序忙碌或报告进度时显示",
+            @"API Version": @"API 版本",
+            @"Show update-channel, installation, local API, and web-client origin settings.": @"显示更新频道、安装、本地 API 和 Web 客户端来源设置。",
+            @"Filter Shortcuts...": @"筛选快捷键…",
+            @"Choose Default artwork, Use theme for background and foreground colors, or Use theme accent for accents.": @"选择默认图案、使用主题的背景和前景色，或使用主题强调色。",
+            @"Enable or disable all activity for programs waiting for you, or configure their tab indicators, notifications, Dock badges, and sounds individually.": @"启用或停用等待你操作的程序的所有活动，或分别配置其标签页指示器、通知、程序坞标记和声音。",
+            @"Adjust terminal text size in points.": @"以磅为单位调整终端文字大小。",
+            @"Click to choose a color.": @"点击选择颜色。",
+            @"Add a Rex HTTP or HTTPS address to use its sessions in every window.": @"添加 Rex HTTP 或 HTTPS 地址，以便在每个窗口中使用其会话。",
+            @"Help": @"帮助",
+            @"Set the time between cursor blinks in milliseconds when Blink speed is Custom.": @"将闪烁速度设为自定义时，设置光标闪烁间隔（毫秒）。",
+            @"Show the running program and its directory instead of titles that shells set.": @"显示正在运行的程序及其目录，而不是 Shell 设置的标题。",
+            @"Changes apply to new agent sessions.": @"更改将应用于新的智能体会话。",
+            @"Downloading update": @"正在下载更新",
+            @"Reconnecting to Rex": @"正在重新连接 Rex",
+            @"Browse monospaced or all installed fonts to choose the terminal typeface.": @"浏览等宽字体或所有已安装字体，以选择终端字体。",
+            @"Restarted the Rex server": @"已重新启动 Rex 服务器",
+            @"No Ghostty configuration was found. Searched: ": @"未找到 Ghostty 配置。已搜索：",
+            @"Choose a custom, default, or built-in palette used in dark mode.": @"选择深色模式使用的自定义、默认或内置调色板。",
+            @"Use the pane background or extend edge-cell backgrounds into the padding.": @"使用窗格背景，或将边缘单元格背景延伸到内边距。",
+            @"Manage the local server, compatibility, and diagnostics.": @"管理本地服务器、兼容性和诊断。",
+            @"Enable or disable all activity for programs reporting errors, or configure their tab indicators, notifications, Dock badges, and sounds individually.": @"启用或停用报告错误的程序的所有活动，或分别配置其标签页指示器、通知、程序坞标记和声音。",
+            @"Play a sound when a program in a tab is blocked, reports an error, or finishes.": @"标签页中的程序被阻塞、报告错误或完成时播放声音。",
+            @"Round the corners of terminal text selections.": @"将终端文本选择区域的边角设为圆角。",
+            @"Policy": @"策略",
+            @"Rex Installation": @"Rex 安装",
+            @"Show the title and controls above each pane.": @"在每个窗格上方显示标题和控件。",
+            @"Add and manage remote Rex hosts, view connection status, and retry connection failures.": @"添加和管理远程 Rex 主机，查看连接状态，并重试连接失败的主机。",
+            @"This app can’t send this ": @"此应用无法发送此 ",
+            @"Shown when a program needs you to respond": @"程序需要你响应时显示",
+            @"Server Version": @"服务器版本",
+            @"Closed": @"已关闭",
+            @"Available with horizontal tabs: expand tabs equally to fill the bar, showing backgrounds only for two or more tabs.": @"使用横向标签页时可用：让标签页等宽填满栏，仅在有两个或更多标签页时显示背景。",
+            @"Couldn't find the Ghostty theme ": @"找不到 Ghostty 主题 ",
+            @"Installs the Rex skill and hooks for Claude Code, Codex, and other agents.": @"为 Claude Code、Codex 和其他智能体安装 Rex 技能和钩子。",
+            @"Dismiss notice (": @"关闭通知 (",
+            @"Copy local Rex endpoint": @"复制本地 Rex 端点",
+            @"Shown when a program reports that something went wrong": @"程序报告发生问题时显示",
+            @"Restrict callers to your account or allow tailnet members.": @"仅允许你的账户访问，或允许 Tailnet 成员访问。",
+            @"Available with sidebar tab styles: choose whether the sidebar resizes the window.": @"使用侧边栏标签页样式时可用：选择侧边栏是否调整窗口大小。",
+            @"Check serving progress, copy the address, or pair another device.": @"查看服务进度、复制地址，或配对其他设备。",
+            @"Nothing named ": @"没有名为 ",
+            @"Connect Rex to your tailnet and control who can access it.": @"将 Rex 连接到你的 Tailnet，并控制谁可以访问它。",
+            @"Agents can control Rex: open sessions, arrange panes, run commands, and change your settings.": @"智能体可以控制 Rex：打开会话、排列窗格、运行命令和更改设置。",
+            @"revisions this app needs (": @"修订版，此应用需要（",
+            @"Copy the configuration file": @"复制配置文件",
+            @"Pair Device with QR Code": @"使用二维码配对设备",
+            @"Reconnecting (attempt ": @"正在重新连接（尝试 ",
+            @"Choose an installed face of the terminal font, such as Light or Book.": @"选择终端字体的已安装字形，例如 Light 或 Book。",
+            @"Available with vertical tabs: resize panes when showing or hiding the sidebar, keeping the window width unchanged.": @"使用纵向标签页时可用：显示或隐藏侧边栏时调整窗格大小，同时保持窗口宽度不变。",
+            @"Update Channel": @"更新频道",
+            @"Host Details": @"主机详情",
+            @"Show colored icons Always, For active panes, For active tabs, or Never.": @"选择始终、活动窗格、活动标签页或从不显示彩色图标。",
+            @"Add a Ghostty or iTerm palette to your custom themes.": @"将 Ghostty 或 iTerm 调色板添加到自定义主题。",
+            @"Failed": @"失败",
             @"None": @"无",
         };
+        translatedValues = [NSSet setWithArray:map.allValues];
     });
     NSString *exact = map[s];
     if (exact) return exact;
+    // Getter hooks and polling see the same translated labels repeatedly.
+    // Known complete translations need no dynamic-pattern parsing.
+    if ([translatedValues containsObject:s]) return s;
+    if ([s hasPrefix:@"快捷键 › "]) {
+        for (NSString *prefix in @[@"See the keys bound to ", @"Record, remove, or reset the keys bound to ", @"录制、移除或重置绑定到 ", @"查看绑定到 "]) {
+            NSRange range = [s rangeOfString:prefix];
+            if (range.location != NSNotFound) return [[s substringToIndex:range.location] stringByAppendingString:RXTranslate([s substringFromIndex:range.location])];
+        }
+    }
+    for (NSString *suffix in @[@" result", @" results"]) {
+        if ([s hasSuffix:suffix]) {
+            NSString *count = [s substringToIndex:s.length - suffix.length];
+            NSCharacterSet *notDigit = [[NSCharacterSet characterSetWithCharactersInString:@"0123456789"] invertedSet];
+            if (count.length && [count rangeOfCharacterFromSet:notDigit].location == NSNotFound) return [count stringByAppendingString:@" 项结果"];
+        }
+    }
+    NSString *shortcutPrefix = @"See the keys bound to ";
+    NSString *shortcutSuffix = @" and where each came from.";
+    if ([s hasPrefix:shortcutPrefix] && [s hasSuffix:shortcutSuffix] && s.length >= shortcutPrefix.length + shortcutSuffix.length) {
+        NSString *action = [s substringWithRange:NSMakeRange(shortcutPrefix.length, s.length - shortcutPrefix.length - shortcutSuffix.length)];
+        return [NSString stringWithFormat:@"查看绑定到 %@ 的按键及其来源。", RXTranslate(action)];
+    }
+    for (NSString *suffix in @[@" 的按键", @" 的按键。"]) {
+        NSString *prefix = @"录制、移除或重置绑定到 ";
+        if ([s hasPrefix:prefix] && [s hasSuffix:suffix] && s.length >= prefix.length + suffix.length) {
+            NSString *action = [s substringWithRange:NSMakeRange(prefix.length, s.length - prefix.length - suffix.length)];
+            if ([action hasSuffix:@"."]) return [NSString stringWithFormat:@"%@%@ 的按键。", prefix, RXTranslate([action substringToIndex:action.length - 1])];
+            return [NSString stringWithFormat:@"%@%@%@", prefix, RXTranslate(action), suffix];
+        }
+    }
+    NSString *translatedPrefix = @"查看绑定到 ";
+    NSString *translatedSuffix = @" 的按键及其来源。";
+    if ([s hasPrefix:translatedPrefix] && [s hasSuffix:translatedSuffix] && s.length >= translatedPrefix.length + translatedSuffix.length) {
+        NSString *action = [s substringWithRange:NSMakeRange(translatedPrefix.length, s.length - translatedPrefix.length - translatedSuffix.length)];
+        return [NSString stringWithFormat:@"%@%@%@", translatedPrefix, RXTranslate(action), translatedSuffix];
+    }
+    NSString *actionPrefix = @"录制、移除或重置以下操作的按键：";
+    if ([s hasPrefix:actionPrefix]) {
+        NSString *tail = [s substringFromIndex:actionPrefix.length];
+        NSString *action = [tail hasSuffix:@"."] ? [tail substringToIndex:tail.length - 1] : tail;
+        NSString *translated = map[action];
+        if (translated) return [NSString stringWithFormat:@"%@%@%@", actionPrefix, translated, [tail hasSuffix:@"."] ? @"。" : @""];
+    }
     // Translate shortcut wrappers before general substitutions can return a
     // partially translated sentence (for example a Diagnostics action name).
     if ([s hasPrefix:@"Press a shortcut for "]) {
@@ -1617,17 +1783,19 @@ static NSString *RXTranslate(NSString *s) {
         return [NSString stringWithFormat:@"为 %@ 添加快捷键", RXTranslate([s substringFromIndex:[@"Add a shortcut for " length]])];
     }
     if ([s hasPrefix:@"Record, remove, or reset the keys bound to "]) {
-        return [NSString stringWithFormat:@"录制、移除或重置绑定到 %@ 的按键", RXTranslate([s substringFromIndex:[@"Record, remove, or reset the keys bound to " length]])];
+        NSString *action = [s substringFromIndex:[@"Record, remove, or reset the keys bound to " length]];
+        if ([action hasSuffix:@"."]) return [NSString stringWithFormat:@"录制、移除或重置绑定到 %@ 的按键。", RXTranslate([action substringToIndex:action.length - 1])];
+        return [NSString stringWithFormat:@"录制、移除或重置绑定到 %@ 的按键", RXTranslate(action)];
     }
     // App menus use the installed bundle's display name. Match known Rex names
     // exactly so similarly prefixed session titles and user text stay untouched.
     for (NSString *appName in @[@"Rex", @"Rex Beta", @"Rex 中文版", @"Rex Beta 中文版"]) {
-        if ([s isEqualToString:[@"Quit " stringByAppendingString:appName]]) return [@"退出" stringByAppendingString:appName];
-        if ([s isEqualToString:[@"Hide " stringByAppendingString:appName]]) return [@"隐藏" stringByAppendingString:appName];
-        if ([s isEqualToString:[@"About " stringByAppendingString:appName]]) return [@"关于" stringByAppendingString:appName];
+        if ([s isEqualToString:[@"Quit " stringByAppendingString:appName]]) return [@"退出 " stringByAppendingString:appName];
+        if ([s isEqualToString:[@"Hide " stringByAppendingString:appName]]) return [@"隐藏 " stringByAppendingString:appName];
+        if ([s isEqualToString:[@"About " stringByAppendingString:appName]]) return [@"关于 " stringByAppendingString:appName];
         NSString *about = [@"About " stringByAppendingString:appName];
         if ([s isEqualToString:[about stringByAppendingString:@"…"]] || [s isEqualToString:[about stringByAppendingString:@"..."]]) {
-            return [[@"关于" stringByAppendingString:appName] stringByAppendingString:@"…"];
+            return [[@"关于 " stringByAppendingString:appName] stringByAppendingString:@"…"];
         }
     }
     if ([s containsString:@"Hue "] || [s containsString:@"chroma "] || [s containsString:@"Lightness "]) {
@@ -2237,6 +2405,15 @@ static void RXDebugTranslation(id self, SEL selector, NSString *value, NSString 
 static IMP origTitle, origButtonTitleGetter, origMenuTitle, origMenuTitleGetter, origMenuAttributedTitle, origMenuAttributedTitleGetter, origMenuAccessibilityValue, origMenuAccessibilityLabel, origMenuAccessibilityTitle, origMenuAccessibilityDescription, origWindowTitle, origStringValue, origPlaceholder, origPlaceholderGetter, origAccessibilityLabel, origAccessibilityTitle, origAccessibilityHelp, origAccessibilityDescription, origToolTip, origAccessibilityValue, origSegmentAccessibilityValue, origSegmentAccessibilityDescription, origSegmentAccessibilityDescriptionAttribute, origConcreteSegmentAccessibilityValue, origToolbarViewerAccessibilityValue, origToolbarViewerDescriptionAttribute, origToolbarViewerTitleAttribute, origIndexedAssociatedLabel, origIndexedSetAssociatedLabel, origPopupTitleOfSelectedItem, origPopupCellTitle, origViewAccessibilityLabelGetter, origViewAccessibilityTitleGetter, origViewAccessibilityHelpGetter, origViewAccessibilityDescriptionGetter, origViewAccessibilityPlaceholderGetter, origViewAccessibilityValueGetter, origViewAccessibilityValueDescriptionGetter, origViewAccessibilityRoleDescriptionGetter, origButtonAccessibilityLabel, origButtonAccessibilityTitle, origButtonAccessibilityHelp, origButtonAccessibilityDescription, origToolbarItemLabel, origToolbarItemLabelGetter, origToolbarItemPaletteLabel, origToolbarItemPaletteLabelGetter, origToolbarItemToolTip, origToolbarItemToolTipGetter, origBundleLocalized, origSplitChildren, origSplitters, origCellStringValue, origCellSetStringValue, origCellAccessibilityLabel, origCellAccessibilityTitle, origCellAccessibilityHelp, origCellAccessibilityValue, origSwiftLabel, origSwiftHelp, origSwiftDescription, origSwiftAttribute, origSwiftValue, origSwiftValueDescription, origSwiftRoleDescription, origSwiftPlaceholder, origSwiftAttributedLabel;
 static IMP origAXElementAttribute, origAXElementValue, origAXElementPlaceholder, origAXElementLabel, origAXElementTitle, origAXElementHelp, origAXElementDescription, origAXElementRoleDescription;
 static IMP origMockAccessibilityAttribute;
+static IMP origAttributedPlaceholder, origCellPlaceholder, origCellAttributedPlaceholder;
+// Editable values are user input. Placeholder/label translation must never
+// turn a query or command such as "Filter" into the matching UI translation.
+static BOOL RXIsEditableTextObject(id object) {
+    if ([object isKindOfClass:[NSTextField class]]) return [(NSTextField *)object isEditable];
+    if ([object isKindOfClass:[NSTextView class]]) return [(NSTextView *)object isEditable];
+    if ([object isKindOfClass:[NSTextFieldCell class]]) return [(NSTextFieldCell *)object isEditable];
+    return NO;
+}
 static __thread BOOL RXInAXElementHook;
 // AppKit's private toolbar accessibility providers can ask for an attribute
 // while resolving the value of that same attribute. The segment hooks below
@@ -2254,11 +2431,6 @@ static NSRect RXRemoteHeaderFrame;
 static BOOL RXHasRemoteHeaderFrame;
 static NSRect RXServerAccessFrame;
 static BOOL RXHasServerAccessFrame;
-static NSRect RXRemoteErrorFrame;
-static BOOL RXHasRemoteErrorFrame;
-static BOOL RXHasRemoteErrorNode;
-static NSString *RXRemoteErrorTitleText;
-static NSString *RXRemoteErrorBodyText;
 static NSRect RXRemoteSaveFrame;
 static BOOL RXHasRemoteSaveFrame;
 static NSRect RXThemeEditorNameFrame;
@@ -2481,10 +2653,10 @@ static id RXSegmentAccessibilityAttributeValue(id self, SEL _cmd, NSString *attr
 }
 static NSString *RXCellStringValue(id self, SEL _cmd) {
     NSString *value = origCellStringValue ? ((NSString *(*)(id, SEL))origCellStringValue)(self, _cmd) : nil;
-    return RXTranslate(value);
+    return RXIsEditableTextObject(self) ? value : RXTranslate(value);
 }
 static void RXCellSetStringValue(id self, SEL _cmd, NSString *value) {
-    if (origCellSetStringValue) ((void (*)(id, SEL, NSString *))origCellSetStringValue)(self, _cmd, RXTranslate(value));
+    if (origCellSetStringValue) ((void (*)(id, SEL, NSString *))origCellSetStringValue)(self, _cmd, RXIsEditableTextObject(self) ? value : RXTranslate(value));
 }
 static NSString *RXPopupTitleOfSelectedItem(id self, SEL _cmd) {
     IMP original = RXPopupOriginal(self, _cmd);
@@ -2524,7 +2696,7 @@ static void RXSetWindowTitle(id self, SEL _cmd, NSString *value) {
     }
 }
 static void RXSetStringValue(id self, SEL _cmd, NSString *value) {
-    ((void (*)(id, SEL, NSString *))origStringValue)(self, _cmd, RXTranslate(value));
+    ((void (*)(id, SEL, NSString *))origStringValue)(self, _cmd, RXIsEditableTextObject(self) ? value : RXTranslate(value));
 }
 static void RXSetPlaceholder(id self, SEL _cmd, NSString *value) {
     ((void (*)(id, SEL, NSString *))origPlaceholder)(self, _cmd, RXTranslate(value));
@@ -2532,6 +2704,15 @@ static void RXSetPlaceholder(id self, SEL _cmd, NSString *value) {
 static NSString *RXPlaceholder(id self, SEL _cmd) {
     NSString *value = origPlaceholderGetter ? ((NSString *(*)(id, SEL))origPlaceholderGetter)(self, _cmd) : nil;
     return RXTranslate(value);
+}
+static void RXSetAttributedPlaceholder(id self, SEL _cmd, NSAttributedString *value) {
+    ((void (*)(id, SEL, NSAttributedString *))origAttributedPlaceholder)(self, _cmd, RXTranslatedAttributedString(value));
+}
+static void RXSetCellPlaceholder(id self, SEL _cmd, NSString *value) {
+    ((void (*)(id, SEL, NSString *))origCellPlaceholder)(self, _cmd, RXTranslate(value));
+}
+static void RXSetCellAttributedPlaceholder(id self, SEL _cmd, NSAttributedString *value) {
+    ((void (*)(id, SEL, NSAttributedString *))origCellAttributedPlaceholder)(self, _cmd, RXTranslatedAttributedString(value));
 }
 static void RXSetAccessibilityLabel(id self, SEL _cmd, NSString *value) {
     ((void (*)(id, SEL, NSString *))origAccessibilityLabel)(self, _cmd, RXTranslate(value));
@@ -2570,6 +2751,7 @@ static NSString *RXViewAccessibilityPlaceholder(id self, SEL _cmd) {
 }
 static id RXViewAccessibilityValue(id self, SEL _cmd) {
     id value = origViewAccessibilityValueGetter ? ((id (*)(id, SEL))origViewAccessibilityValueGetter)(self, _cmd) : nil;
+    if (RXIsEditableTextObject(self)) return value;
     return [value isKindOfClass:[NSString class]] ? RXTranslate(value) : value;
 }
 static NSString *RXViewAccessibilityValueDescription(id self, SEL _cmd) {
@@ -2604,6 +2786,7 @@ static NSString *RXCellHelp(id self, SEL _cmd) {
 }
 static id RXCellAttributeValue(id self, SEL _cmd, NSString *attribute) {
     id value = origCellAccessibilityValue ? ((id (*)(id, SEL, NSString *))origCellAccessibilityValue)(self, _cmd, attribute) : nil;
+    if ([attribute isEqualToString:NSAccessibilityValueAttribute] && RXIsEditableTextObject(self)) return value;
     return [value isKindOfClass:[NSString class]] ? RXTranslate(value) : value;
 }
 static NSMutableDictionary *RXSwiftNodeOriginals;
@@ -2768,6 +2951,7 @@ static NSString *RXBundleLocalized(id self, SEL _cmd, NSString *key, NSString *v
 }
 static id RXAccessibilityAttributeValue(id self, SEL _cmd, NSString *attribute) {
     id value = ((id (*)(id, SEL, NSString *))origAccessibilityValue)(self, _cmd, attribute);
+    if ([attribute isEqualToString:NSAccessibilityValueAttribute] && RXIsEditableTextObject(self)) return value;
     RXDebugTranslation(self, _cmd, value, [NSString stringWithFormat:@"View %@", attribute]);
     if ([value isKindOfClass:[NSString class]] && ([attribute isEqualToString:NSAccessibilityTitleAttribute] || [attribute isEqualToString:NSAccessibilityDescriptionAttribute] || [attribute isEqualToString:NSAccessibilityHelpAttribute] || [attribute isEqualToString:NSAccessibilityValueAttribute] || [attribute isEqualToString:NSAccessibilityPlaceholderValueAttribute] || [attribute isEqualToString:NSAccessibilityValueDescriptionAttribute] || [attribute isEqualToString:NSAccessibilityRoleDescriptionAttribute])) {
         return RXTranslate(value);
@@ -2787,6 +2971,7 @@ static id RXRawAXValue(id element, NSString *attribute);
 static IMP origTextFieldTextViewDraw, origNSTextViewDraw, origNSTextViewSetString;
 
 static void RXDrawTranslatedTextViewContent(NSTextView *textView) {
+    if (textView.isEditable) return;
     NSString *raw = textView.string ?: @"";
     NSString *translated = RXTranslate(raw);
     if (!translated.length || [translated isEqualToString:raw]) return;
@@ -2805,11 +2990,12 @@ static void RXNSTextViewDraw(id self, SEL _cmd, NSRect rect) {
 }
 
 static void RXNSTextViewSetString(id self, SEL _cmd, NSString *value) {
-    if (origNSTextViewSetString) ((void (*)(id, SEL, NSString *))origNSTextViewSetString)(self, _cmd, RXTranslate(value));
+    if (origNSTextViewSetString) ((void (*)(id, SEL, NSString *))origNSTextViewSetString)(self, _cmd, RXIsEditableTextObject(self) ? value : RXTranslate(value));
 }
 
 static void RXTextFieldTextViewDraw(id self, SEL _cmd, NSRect rect) {
     if (origTextFieldTextViewDraw) ((void (*)(id, SEL, NSRect))origTextFieldTextViewDraw)(self, _cmd, rect);
+    if (RXIsEditableTextObject(self)) return;
     NSString *raw = nil;
     if ([self isKindOfClass:[NSTextView class]]) raw = [(NSTextView *)self string];
     if (!raw.length) {
@@ -3249,6 +3435,7 @@ static void RXTranslatePopupMenu(NSMenu *menu) {
     }
 }
 
+static void RXTranslateAXNode(id element);
 static void RXWalkAX(id element, NSUInteger depth);
 
 // Runtime overlays are implementation views owned by this patch. They are
@@ -3277,6 +3464,23 @@ static void RXWalk(NSView *view) {
     if (RXIsOwnedOverlayObject(view)) return;
     if ([view isKindOfClass:[NSTextField class]]) {
         NSTextField *field = (NSTextField *)view;
+        // Repair existing storage through the control setter so AppKit also
+        // invalidates its private placeholder label, rather than only the cell.
+        NSTextFieldCell *cell = field.cell;
+        if ([cell isKindOfClass:[NSTextFieldCell class]]) {
+            NSString *placeholder = cell.placeholderString;
+            NSString *translated = RXTranslate(placeholder);
+            if (translated.length && ![translated isEqualToString:placeholder]) {
+                field.placeholderString = translated;
+                [field setNeedsDisplay:YES];
+            }
+            NSAttributedString *attributed = cell.placeholderAttributedString;
+            NSAttributedString *translatedAttributed = RXTranslatedAttributedString(attributed);
+            if (translatedAttributed != attributed) {
+                field.placeholderAttributedString = translatedAttributed;
+                [field setNeedsDisplay:YES];
+            }
+        }
         if (!field.isEditable) {
             NSString *value = field.stringValue;
             NSString *translated = RXTranslate(value);
@@ -3333,8 +3537,11 @@ static void RXWalk(NSView *view) {
     NSString *rawDescription = origViewAccessibilityDescriptionGetter ? ((NSString *(*)(id, SEL))origViewAccessibilityDescriptionGetter)(view, @selector(accessibilityDescription)) : nil;
     NSString *translatedDescription = RXTranslate(rawDescription);
     if (translatedDescription.length && ![translatedDescription isEqualToString:rawDescription] && [view respondsToSelector:@selector(setAccessibilityDescription:)]) ((void (*)(id, SEL, NSString *))objc_msgSend)(view, @selector(setAccessibilityDescription:), translatedDescription);
-    if ([view isKindOfClass:[NSControl class]]) { NSCell *cell = [(NSControl *)view cell]; if (cell) RXWalkAX(cell, 0); }
-    RXWalkAX(view, 0);
+    // Native views are already visited through subviews. Inspect only their
+    // own AX attributes here: recursively walking each view's AX subtree
+    // repeats every descendant once per ancestor and starves the main loop.
+    if ([view isKindOfClass:[NSControl class]]) { NSCell *cell = [(NSControl *)view cell]; if (cell) RXTranslateAXNode(cell); }
+    RXTranslateAXNode(view);
     for (NSView *child in view.subviews) RXWalk(child);
 }
 
@@ -3371,26 +3578,6 @@ static void RXWalk(NSView *view) {
 // ordinary Text views, so draw the translated labels over their exact AX
 // frames. The overlay is transparent to mouse hit testing.
 static void RXSetColorPickerLabelOverlay(NSWindow *window, NSString *key, NSString *text, NSRect screenFrame);
-
-@interface RXRemoteHostPlaceholderOverlayView : NSView
-@property(nonatomic, copy) NSString *text;
-@end
-
-@implementation RXRemoteHostPlaceholderOverlayView
-- (BOOL)isFlipped { return YES; }
-- (BOOL)isOpaque { return YES; }
-- (NSView *)hitTest:(NSPoint)point { (void)point; return nil; }
-- (void)drawRect:(NSRect)dirtyRect {
-    (void)dirtyRect;
-    [NSColor.textBackgroundColor setFill];
-    NSRectFill(self.bounds);
-    NSDictionary *attributes = @{
-        NSFontAttributeName: [NSFont systemFontOfSize:14.0],
-        NSForegroundColorAttributeName: NSColor.placeholderTextColor
-    };
-    [self.text drawAtPoint:NSMakePoint(2.0, 4.0) withAttributes:attributes];
-}
-@end
 
 @interface RXThemeEditorNameOverlayView : NSView
 @property(nonatomic, copy) NSString *text;
@@ -3433,34 +3620,6 @@ static void RXSetColorPickerLabelOverlay(NSWindow *window, NSString *key, NSStri
     };
     [@"编辑主机" drawAtPoint:NSMakePoint(0.0, 0.0) withAttributes:titleAttributes];
     [@"更改将保存在此 Mac 本地。" drawAtPoint:NSMakePoint(0.0, 38.0) withAttributes:subtitleAttributes];
-}
-@end
-
-@interface RXRemoteHostErrorOverlayView : NSView
-@property(nonatomic, copy) NSString *titleText;
-@property(nonatomic, copy) NSString *bodyText;
-@end
-
-@implementation RXRemoteHostErrorOverlayView
-- (BOOL)isFlipped { return YES; }
-- (BOOL)isOpaque { return YES; }
-- (NSView *)hitTest:(NSPoint)point { (void)point; return nil; }
-- (void)drawRect:(NSRect)dirtyRect {
-    (void)dirtyRect;
-    [[NSColor.windowBackgroundColor colorWithAlphaComponent:1.0] setFill];
-    NSRectFill(self.bounds);
-    NSDictionary *titleAttributes = @{
-        NSFontAttributeName: [NSFont boldSystemFontOfSize:22.0],
-        NSForegroundColorAttributeName: NSColor.labelColor
-    };
-    NSDictionary *bodyAttributes = @{
-        NSFontAttributeName: [NSFont systemFontOfSize:18.0],
-        NSForegroundColorAttributeName: NSColor.labelColor
-    };
-    NSString *title = self.titleText.length ? self.titleText : @"无法连接";
-    NSString *body = self.bodyText.length ? self.bodyText : @"请检查网络连接和主机地址，并确保 Rex 正在运行，然后重试。";
-    [title drawAtPoint:NSMakePoint(0.0, 0.0) withAttributes:titleAttributes];
-    [body drawWithRect:NSMakeRect(0.0, 39.0, self.bounds.size.width, MAX(0.0, self.bounds.size.height - 39.0)) options:NSStringDrawingUsesLineFragmentOrigin attributes:bodyAttributes context:nil];
 }
 @end
 
@@ -3531,41 +3690,6 @@ static void RXSetAboutOverlay(NSWindow *window) {
     [overlay setNeedsDisplay:YES];
 }
 
-// SwiftUI presents the remote-host failure details in a borderless auxiliary
-// window (426x176 on Rex Beta 0.1.0). Its title is drawn by SwiftUI rather than
-// exposed as an AppKit text field, so the normal string/AX hooks cannot change
-// the pixels. Cover only the title and body region; the native Retry button
-// remains below it and keeps its original action.
-static void RXSetRemoteHostErrorPopoverOverlay(NSWindow *window) {
-    if (!window || !window.contentView) return;
-    NSSize size = window.frame.size;
-    if (size.width < 400.0 || size.width > 450.0 || size.height < 150.0 || size.height > 200.0) return;
-    NSView *host = window.contentView;
-    RXRemoteHostErrorOverlayView *overlay = nil;
-    for (NSView *subview in host.subviews) {
-        if ([subview isKindOfClass:[RXRemoteHostErrorOverlayView class]] && [subview.identifier isEqualToString:@"rex-remote-host-error-popover"]) {
-            overlay = (RXRemoteHostErrorOverlayView *)subview;
-            break;
-        }
-    }
-    if (!overlay) {
-        overlay = [[RXRemoteHostErrorOverlayView alloc] initWithFrame:NSZeroRect];
-        overlay.identifier = @"rex-remote-host-error-popover";
-        [host addSubview:overlay positioned:NSWindowAbove relativeTo:nil];
-    }
-    if (!RXOwnedResidualOverlays) RXOwnedResidualOverlays = [NSHashTable weakObjectsHashTable];
-    [RXOwnedResidualOverlays addObject:overlay];
-    overlay.wantsLayer = YES;
-    overlay.layer.zPosition = 1000.0;
-    // The borderless popover's content view is flipped, but SwiftUI places
-    // the title above the body. Cover both lines so the original English
-    // title cannot remain visible above the translated body.
-    overlay.frame = NSMakeRect(16.0, 8.0, MAX(0.0, size.width - 32.0), MIN(124.0, size.height - 16.0));
-    overlay.titleText = RXRemoteErrorTitleText;
-    overlay.bodyText = RXRemoteErrorBodyText;
-    [overlay setNeedsDisplay:YES];
-}
-
 @interface RXRemoteHostSaveOverlayView : NSView
 @end
 
@@ -3621,7 +3745,7 @@ static void RXRemoveOwnedResidualOverlays(void) {
 static void RXRemoveResidualOverlays(NSView *view) {
     if (![view isKindOfClass:[NSView class]]) return;
     for (NSView *subview in [view.subviews copy]) {
-        if ([subview isKindOfClass:[RXResidualOverlayView class]] || [subview isKindOfClass:[RXRemoteHostPlaceholderOverlayView class]]) {
+        if ([subview isKindOfClass:[RXResidualOverlayView class]]) {
             [subview removeFromSuperview];
             continue;
         }
@@ -3672,24 +3796,6 @@ static void RXUpdateRemoteHostSheetOverlay(NSWindow *window) {
         RXSetLocalRuntimeOverlayView(window, @"rex-remote-host-save-fixed", [RXRemoteHostSaveOverlayView class], saveFrame);
         return;
     }
-    if (size.width < 450.0 || size.width > 520.0 || size.height < 300.0 || size.height > 390.0) return;
-    NSView *content = window.contentView;
-    RXRemoteHostPlaceholderOverlayView *overlay = nil;
-    for (NSView *subview in content.subviews) {
-        if ([subview isKindOfClass:[RXRemoteHostPlaceholderOverlayView class]] && [subview.identifier isEqualToString:@"rex-remote-host-placeholder"]) {
-            overlay = (RXRemoteHostPlaceholderOverlayView *)subview;
-            break;
-        }
-    }
-    if (!overlay) {
-        overlay = [[RXRemoteHostPlaceholderOverlayView alloc] initWithFrame:NSZeroRect];
-        overlay.identifier = @"rex-remote-host-placeholder";
-        [content addSubview:overlay positioned:NSWindowAbove relativeTo:nil];
-    }
-    overlay.text = @"主机名称";
-    overlay.frame = NSMakeRect(101.0, 164.0, size.width - 131.0, 28.0);
-    overlay.hidden = NO;
-    [overlay setNeedsDisplay:YES];
 }
 
 static NSView *RXFindSettingsDetail(NSView *view);
@@ -3813,23 +3919,7 @@ static void RXUpdateRuntimeTextOverlays(NSWindow *window) {
     if (!window.title.length && window.frame.size.width >= 580.0 && window.frame.size.width <= 650.0 && window.frame.size.height >= 560.0 && window.frame.size.height <= 630.0) {
         RXTranslateThemeEditorNameInView(window.contentView);
     }
-    // Rex keeps the borderless remote-error popover as a reusable 426x176
-    // window, and its SwiftUI text is not present in the AppKit view tree.
-    // The dimensions identify this window on Rex Beta 0.1.0; drawing the
-    // translated region here makes the visible title match the translated AX
-    // value even when AX does not provide a frame.
-    if (!window.title.length && window.frame.size.width >= 420.0 && window.frame.size.width <= 432.0 && window.frame.size.height >= 170.0 && window.frame.size.height <= 182.0) {
-        RXSetRemoteHostErrorPopoverOverlay(window);
-    }
     if (RXHasRemoteHeaderFrame) RXSetRuntimeOverlayView(window, @"rex-remote-host-header", [RXRemoteHostHeaderOverlayView class], RXRemoteHeaderFrame);
-    if (RXHasRemoteErrorFrame) {
-        // The AX frame belongs to the title line. Expand it to cover the
-        // translated body while stopping above the Retry button.
-        NSRect errorFrame = RXRemoteErrorFrame;
-        errorFrame.size.width = MAX(errorFrame.size.width, 400.0);
-        errorFrame.size.height = MAX(errorFrame.size.height + 62.0, 78.0);
-        RXSetRuntimeOverlayView(window, @"rex-remote-host-error", [RXRemoteHostErrorOverlayView class], errorFrame);
-    }
     if (RXHasRemoteSaveFrame) RXSetRuntimeOverlayView(window, @"rex-remote-host-save", [RXRemoteHostSaveOverlayView class], RXRemoteSaveFrame);
 }
 
@@ -3858,7 +3948,9 @@ static void RXSetWindowResidualOverlay(NSWindow *window, NSString *key, NSString
 static NSRect RXAccessibilityFrame(id element) {
     SEL selector = @selector(accessibilityFrame);
     if ([element respondsToSelector:selector]) {
-        NSRect frame = ((NSRect (*)(id, SEL))objc_msgSend)(element, selector);
+        // Let Clang select objc_msgSend_stret for the 32-byte NSRect return
+        // on x86_64; casting objc_msgSend directly only works on arm64.
+        NSRect frame = [element accessibilityFrame];
         if (!NSIsEmptyRect(frame)) return frame;
     }
     // SwiftUI accessibility nodes expose position and size separately. The
@@ -3918,6 +4010,60 @@ static BOOL RXCollectNotificationPosition(id element, NSUInteger depth) {
     return NO;
 }
 
+static BOOL RXCollectServerAccessFrame(id element, NSUInteger depth) {
+    if (!element || depth > 20 || RXIsOwnedOverlayObject(element)) return NO;
+    // This SwiftUI card is present in the modern AX tree but can be omitted
+    // from a window's legacy AXChildren. Find its real frame through the same
+    // modern tree used by external accessibility clients.
+    SEL selectors[] = { @selector(accessibilityLabel), @selector(accessibilityHelp),
+                        @selector(accessibilityDescription), @selector(accessibilityValue) };
+    for (NSUInteger i = 0; i < sizeof(selectors) / sizeof(selectors[0]); i++) {
+        if (![element respondsToSelector:selectors[i]]) continue;
+        id value = ((id (*)(id, SEL))objc_msgSend)(element, selectors[i]);
+        if (![value isKindOfClass:[NSString class]]) continue;
+        NSString *translated = RXTranslate(value);
+        if (![translated containsString:@"从其他设备安全访问 Rex。"]) continue;
+        NSRect frame = RXAccessibilityFrame(element);
+        if (NSIsEmptyRect(frame)) continue;
+        // The combined title/subtitle frame has a bottom-left origin.
+        if (frame.size.height > 22.0) frame.size.height = 14.0;
+        RXServerAccessFrame = frame;
+        RXHasServerAccessFrame = YES;
+        return YES;
+    }
+    id children = [element respondsToSelector:@selector(accessibilityChildren)] ?
+        ((id (*)(id, SEL))objc_msgSend)(element, @selector(accessibilityChildren)) : nil;
+    if ([children isKindOfClass:[NSArray class]]) {
+        for (id child in children) if (RXCollectServerAccessFrame(child, depth + 1)) return YES;
+    }
+    return NO;
+}
+
+static NSString *RXSettingsToolbarPage(id element, NSUInteger depth) {
+    if (!element || depth > 12 || RXIsOwnedOverlayObject(element)) return nil;
+    NSString *label = [element respondsToSelector:@selector(accessibilityLabel)] ? [element accessibilityLabel] : nil;
+    if ([label isEqualToString:@"设置页面"] || [label isEqualToString:@"Settings page"]) {
+        id value = [element respondsToSelector:@selector(accessibilityValue)] ? [element accessibilityValue] : nil;
+        if ([value isKindOfClass:[NSString class]]) return RXTranslate(value);
+    }
+    id children = [element respondsToSelector:@selector(accessibilityChildren)] ? [element accessibilityChildren] : nil;
+    if ([children isKindOfClass:[NSArray class]]) {
+        for (id child in children) {
+            NSString *page = RXSettingsToolbarPage(child, depth + 1);
+            if (page.length) return page;
+        }
+    }
+    return nil;
+}
+
+static NSString *RXSettingsPage(NSWindow *window) {
+    for (NSToolbarItem *item in window.toolbar.items) {
+        NSString *page = RXSettingsToolbarPage(item.view, 0);
+        if (page.length) return page;
+    }
+    return window.title ?: @"";
+}
+
 static void RXUpdateSettingsResidualOverlays(NSWindow *window) {
     NSString *title = window.title ?: @"";
     if (![title hasPrefix:@"设置"] && ![title hasPrefix:@"Settings"]) return;
@@ -3930,12 +4076,19 @@ static void RXUpdateSettingsResidualOverlays(NSWindow *window) {
     // stale text behind after navigation. The registry contains only views we
     // created, so native SwiftUI content is unaffected.
     RXRemoveResidualOverlays(detail);
-    BOOL server = [title containsString:@"服务器"] || [title containsString:@"Server"];
-    BOOL notifications = [title containsString:@"通知"] || [title containsString:@"Notifications"];
-    BOOL terminal = [title containsString:@"终端"] || [title containsString:@"Terminal"];
+    NSString *page = RXSettingsPage(window);
+    BOOL server = [page containsString:@"服务器"] || [page containsString:@"Server"];
+    BOOL notifications = [page containsString:@"通知"] || [page containsString:@"Notifications"];
+    BOOL terminal = [page containsString:@"终端"] || [page containsString:@"Terminal"];
+    // A cold settings window can retain the generic title before SwiftUI
+    // exposes its toolbar breadcrumb. The visible server card is unambiguous.
+    if (!server && ([page isEqualToString:@"设置"] || [page isEqualToString:@"Settings"])) {
+        server = RXCollectServerAccessFrame(window, 0);
+    }
     // SwiftUI replaces the detail subtree while navigating. Remove stale overlays
     // before adding only the overlay that belongs to the visible page.
     if (server) {
+        RXCollectServerAccessFrame(window, 0);
         // This SwiftUI subtitle is rendered outside the normal text hooks on
         // some Rex builds. Prefer its live AX frame; keep the fixed fallback
         // for builds that do not expose the node.
@@ -3958,11 +4111,12 @@ static void RXUpdateSettingsResidualOverlays(NSWindow *window) {
     }
 }
 
-static void RXWalkAX(id element, NSUInteger depth) {
-    if (!element || depth > 20 || ![element respondsToSelector:@selector(accessibilityAttributeValue:)]) return;
+static void RXTranslateAXNode(id element) {
+    if (!element || ![element respondsToSelector:@selector(accessibilityAttributeValue:)]) return;
     if (RXIsOwnedOverlayObject(element)) return;
     NSArray *attrs = @[NSAccessibilityDescriptionAttribute, NSAccessibilityTitleAttribute, NSAccessibilityHelpAttribute, NSAccessibilityPlaceholderValueAttribute, NSAccessibilityValueAttribute, NSAccessibilityValueDescriptionAttribute, NSAccessibilityRoleDescriptionAttribute];
     for (NSString *attribute in attrs) {
+        if ([attribute isEqualToString:NSAccessibilityValueAttribute] && RXIsEditableTextObject(element)) continue;
         id value = [element accessibilityAttributeValue:attribute];
         if ([value isKindOfClass:[NSString class]]) {
             id rawObject = RXRawAXValue(element, attribute);
@@ -3997,23 +4151,6 @@ static void RXWalkAX(id element, NSUInteger depth) {
                 RXRemoteHeaderFrame = rawFrame;
                 RXHasRemoteHeaderFrame = !NSIsEmptyRect(rawFrame);
             }
-            if ([rawValue containsString:@"Couldn’t connect to"] || [rawValue containsString:@"Couldn't connect to"] ||
-                [translated containsString:@"无法连接到"]) {
-                RXHasRemoteErrorNode = YES;
-                RXRemoteErrorFrame = rawFrame;
-                RXHasRemoteErrorFrame = !NSIsEmptyRect(rawFrame);
-                // SwiftUI may expose the full remote-host error as one
-                // attributed string. Keep the translated title/body for the
-                // borderless visual overlay as well as the AX tree.
-                NSRange bodyMarker = [translated rangeOfString:@" 找不到 "];
-                if (bodyMarker.location != NSNotFound) {
-                    RXRemoteErrorTitleText = [translated substringToIndex:bodyMarker.location];
-                    RXRemoteErrorBodyText = [translated substringFromIndex:bodyMarker.location + 1];
-                } else if ([translated hasPrefix:@"无法连接到 "]) {
-                    RXRemoteErrorTitleText = translated;
-                }
-            }
-            if ([translated hasPrefix:@"找不到 "] && !RXRemoteErrorBodyText.length) RXRemoteErrorBodyText = translated;
             if ([rawValue isEqualToString:@"Save"]) {
                 RXRemoteSaveFrame = rawFrame;
                 RXHasRemoteSaveFrame = !NSIsEmptyRect(rawFrame);
@@ -4049,6 +4186,12 @@ static void RXWalkAX(id element, NSUInteger depth) {
             }
         }
     }
+}
+
+static void RXWalkAX(id element, NSUInteger depth) {
+    if (!element || depth > 20 || ![element respondsToSelector:@selector(accessibilityAttributeValue:)]) return;
+    if (RXIsOwnedOverlayObject(element)) return;
+    RXTranslateAXNode(element);
     id children = [element accessibilityAttributeValue:NSAccessibilityChildrenAttribute];
     if ([children isKindOfClass:[NSArray class]]) {
         for (id child in (NSArray *)children) RXWalkAX(child, depth + 1);
@@ -4106,20 +4249,30 @@ static void RXInstallSegmentHooks(void) {
 }
 
 static void RXRefreshAccessibility(void) {
-    RXInstallMenuItemHooks();
-    RXInstallSwiftNodeHooks();
-    RXInstallPopupHooks();
-    RXInstallSegmentHooks();
+    // Setters/interposed constructors translate new text synchronously. The
+    // expensive class discovery and existing native-control repair are a
+    // fallback; AX frames and transient overlays still refresh every tick.
+    static NSTimeInterval lastNativeRefresh = -1.0;
+    static NSHashTable *visitedWindows;
+    NSTimeInterval now = NSProcessInfo.processInfo.systemUptime;
+    BOOL refreshNative = lastNativeRefresh < 0.0 || now - lastNativeRefresh >= 1.0;
+    if (refreshNative) {
+        lastNativeRefresh = now;
+        RXInstallMenuItemHooks();
+        RXInstallSwiftNodeHooks();
+        RXInstallPopupHooks();
+        RXInstallSegmentHooks();
+    }
+    if (!visitedWindows) visitedWindows = [NSHashTable weakObjectsHashTable];
     for (NSWindow *window in NSApp.windows) {
+        // SwiftUI retains closed settings windows and their large view trees.
+        // Setter hooks still cover new content; poll only displayed windows.
+        if (!window.isVisible) continue;
         RXHasDefaultShellFrame = NO;
         RXHasNotificationFrame = NO;
         RXNotificationPositionText = nil;
         RXHasRemoteHeaderFrame = NO;
         RXHasServerAccessFrame = NO;
-        RXHasRemoteErrorFrame = NO;
-        RXHasRemoteErrorNode = NO;
-        RXRemoteErrorTitleText = nil;
-        RXRemoteErrorBodyText = nil;
         RXHasRemoteSaveFrame = NO;
         RXHasThemeEditorNameFrame = NO;
         RXThemeEditorNameFrame = NSZeroRect;
@@ -4132,8 +4285,22 @@ static void RXRefreshAccessibility(void) {
         RXServerAccessFrame = NSZeroRect;
         RXAXWalkWindow = window;
         RXRefreshToolbar(window.toolbar);
-        RXWalk(window.contentView);
-        RXWalkAX(window, 0);
+        BOOL firstVisit = ![visitedWindows containsObject:window];
+        if (refreshNative || firstVisit) {
+            RXWalk(window.contentView);
+            [visitedWindows addObject:window];
+        }
+        NSString *title = window.title ?: @"";
+        BOOL settings = [title hasPrefix:@"设置"] || [title hasPrefix:@"Settings"];
+        NSString *page = settings ? RXSettingsPage(window) : title;
+        BOOL liveFrames = !title.length || (settings &&
+            ([page containsString:@"服务器"] || [page containsString:@"Server"] ||
+             [page containsString:@"通知"] || [page containsString:@"Notifications"] ||
+             [page containsString:@"终端"] || [page containsString:@"Terminal"]));
+        // Other windows have no frame-based overlays. Their existing AX
+        // storage shares the native fallback cadence; getter hooks still
+        // translate every accessibility read synchronously.
+        if (refreshNative || firstVisit || liveFrames) RXWalkAX(window, 0);
         RXUpdateSettingsResidualOverlays(window);
         RXUpdateRemoteHostSheetOverlay(window);
         RXUpdateRuntimeTextOverlays(window);
@@ -4175,6 +4342,9 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
         origNSTextViewDraw = RXHook([NSTextView class], @selector(drawRect:), (IMP)RXNSTextViewDraw);
         origPlaceholder = RXHook([NSTextField class], @selector(setPlaceholderString:), (IMP)RXSetPlaceholder);
         origPlaceholderGetter = RXHook([NSTextField class], @selector(placeholderString), (IMP)RXPlaceholder);
+        origAttributedPlaceholder = RXHook([NSTextField class], @selector(setPlaceholderAttributedString:), (IMP)RXSetAttributedPlaceholder);
+        origCellPlaceholder = RXHook([NSTextFieldCell class], @selector(setPlaceholderString:), (IMP)RXSetCellPlaceholder);
+        origCellAttributedPlaceholder = RXHook([NSTextFieldCell class], @selector(setPlaceholderAttributedString:), (IMP)RXSetCellAttributedPlaceholder);
         origAccessibilityLabel = RXHook([NSView class], @selector(setAccessibilityLabel:), (IMP)RXSetAccessibilityLabel);
         origAccessibilityTitle = RXHook([NSView class], @selector(setAccessibilityTitle:), (IMP)RXSetAccessibilityTitle);
         origAccessibilityHelp = RXHook([NSView class], @selector(setAccessibilityHelp:), (IMP)RXSetAccessibilityHelp);

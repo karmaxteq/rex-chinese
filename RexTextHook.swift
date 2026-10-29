@@ -3,6 +3,8 @@ import SwiftUI
 
 private let translations: [String: String] = [
   "Waiting for permission": "正在等待权限",
+  "Unsupported block": "不支持的内容块",
+  "The content environment does not provide the capabilities required by this block.": "当前内容环境不具备此内容块所需的功能。",
   "Settings": "设置",
   "Server": "服务器",
   "Interface": "界面",
@@ -62,7 +64,7 @@ private let translations: [String: String] = [
   "Rex Binary": "Rex 二进制",
   "Installation": "安装",
   "Kind": "类型",
-  "Included with Rex.app": "随 Rex.app 附带",
+  "Included with Rex.app": "Rex.app 随附",
   "Live Logs": "实时日志",
   "Stop Server": "停止服务器",
   "Clear Logs": "清除日志",
@@ -134,6 +136,12 @@ private let translations: [String: String] = [
   "Titles": "标题",
   "Shell": "Shell",
   "Dynamic": "动态",
+  " — Dynamic": " — 动态",
+  " result": " 项结果",
+  " results": " 项结果",
+  "See the keys bound to ": "查看绑定到 ",
+  " and where each came from.": " 的按键及其来源。",
+  "Record, remove, or reset the keys bound to ": "录制、移除或重置以下操作的按键：",
   "Choose…": "选择…",
   "Choose...": "选择…",
   "Coding Agents": "编码智能体",
@@ -198,7 +206,7 @@ private let translations: [String: String] = [
   "Determined by the theme's background color.": "由主题背景颜色决定。",
   "Update the sheet’s appearance as you edit. Turn off to restore the Settings appearance.": "编辑时更新面板外观。关闭后恢复设置外观。",
   "Update the sheet's appearance as you edit. Turn off to restore the Settings appearance.": "编辑时更新面板外观。关闭后恢复设置外观。",
-  "Click to choose a color. Drag onto another swatch to swap.": "点击选择颜色。拖动到另一个色板上以交换。",
+  "Click to choose a color. Drag onto another swatch to swap.": "点击选择颜色。拖到另一个色板上即可交换。",
   "Text": "文本",
   "Cursor Text": "光标文本",
   "Selected Text": "选中文本",
@@ -443,15 +451,15 @@ private let translations: [String: String] = [
   "Interface Style": "界面样式",
   "Tab Buttons": "标签页按钮",
   "Pane Buttons": "窗格按钮",
-  "About Rex Beta": "关于Rex Beta",
-  "About Rex Beta…": "关于Rex Beta…",
+  "About Rex Beta": "关于 Rex Beta",
+  "About Rex Beta…": "关于 Rex Beta…",
   "Services": "服务",
   "Services Settings…": "服务设置…",
   "No Services Apply": "没有可用服务",
-  "Hide Rex Beta": "隐藏Rex Beta",
+  "Hide Rex Beta": "隐藏 Rex Beta",
   "Hide Others": "隐藏其他",
   "Show All": "显示全部",
-  "Quit Rex Beta": "退出Rex Beta",
+  "Quit Rex Beta": "退出 Rex Beta",
   "Quit and Keep Windows": "退出并保留窗口",
   "Go to the previous Settings page": "转到上一个设置页面",
   "Go to the next Settings page": "转到下一个设置页面",
@@ -639,7 +647,7 @@ private let translations: [String: String] = [
   "Host icon": "主机图标",
   "Globe": "地球",
   "Tagged builds for testers.": "供测试人员使用的标记版本。",
-  "Preview": "预览版",
+  "Preview": "预览",
   "Bleeding Edge": "前沿版",
   "Source Checkout": "源代码检出",
   "Allow Automatic Update Checks": "允许自动检查更新",
@@ -984,7 +992,7 @@ private let translations: [String: String] = [
   "Enter a host name.": "输入主机名。",
   "Enter an HTTP or HTTPS URL, or a bare hostname and port.": "输入 HTTP 或 HTTPS URL，或直接输入主机名和端口。",
   "That remote host is already saved.": "该远程主机已保存。",
-  "Rex connects to the address and saves it on this Mac.": "Rex 将连接到该地址并将其保存到此 Mac。",
+  "Rex connects to the address and saves it on this Mac.": "Rex 会连接到该地址，并将其保存在此 Mac 上。",
   "Preview unavailable": "预览不可用",
   "Couldn’t import theme": "无法导入主题",
   "Couldn't import theme": "无法导入主题",
@@ -1564,11 +1572,183 @@ private let translations: [String: String] = [
   "signing out of tailscale": "正在退出 Tailscale",
   "remove saved login": "移除保存的登录信息",
   "sign out progress": "退出登录进度",
+  "Hide Activity": "隐藏活动",
+  "Enable or disable all activity for working programs, or configure their tab indicators, notifications, Dock badges, and sounds individually.": "启用或停用运行中程序的所有活动，或分别配置其标签页指示器、通知、程序坞标记和声音。",
+  "The Rex server refused the connection because it doesn't support the API revisions this app needs (": "Rex 服务器拒绝连接，因为它不支持此应用需要的 API 修订版（",
+  "Bright": "明亮",
+  "Highlight active pane": "突出显示活动窗格",
+  "Download Update": "下载更新",
+  "On": "开启",
+  "Connected to Rex": "已连接到 Rex",
+  "Update Rex.app, or restart the server to use the included one.": "更新 Rex.app，或重新启动服务器以使用随附的服务器。",
+  "Hide Activity (⌘.)": "隐藏活动 (⌘.)",
+  "Shown when a program finishes a task": "程序完成任务时显示",
+  "Preserve width when resizing sidebar": "调整侧边栏大小时保持宽度",
+  "Check for Updates": "检查更新",
+  "Approve this Mac in Tailscale": "在 Tailscale 中批准此 Mac",
+  "Location": "位置",
+  "Restart is required before starting another server.": "启动另一个服务器前需要重启。",
+  "No Rex installation is available.": "没有可用的 Rex 安装。",
+  "New Session ": "新建会话 ",
+  "Let agents label the session after the task they're working on.": "允许智能体根据正在处理的任务为会话命名。",
+  "Drag this icon into the list in System Settings to grant ": "将此图标拖入系统设置中的列表以授予 ",
+  "Font": "字体",
+  "Show tab icons": "显示标签页图标",
+  "Cancel": "取消",
+  "Rex does not provide transport authentication. Use a trusted tunnel such as Tailscale.": "Rex 不提供传输身份验证。请使用 Tailscale 等受信任的隧道。",
+  "Connecting to Rex": "正在连接 Rex",
+  "Fill available space": "填充可用空间",
+  "Autobalance splits": "自动平衡分栏",
+  "Adjust pane spacing, headers, active and inactive appearance, and split balancing.": "调整窗格间距、标题、活动和非活动外观以及分栏平衡。",
+  ". Update Rex on the server or this app.": "。请更新服务器上的 Rex 或此应用。",
+  "Choose fonts, in order, for characters the terminal font doesn't have.": "按顺序选择用于显示终端字体不包含字符的字体。",
+  "Couldn’t find the Ghostty theme ": "找不到 Ghostty 主题 ",
+  "This app can't send this ": "此应用无法发送此 ",
+  "Show on Rex's Dock icon how many tabs have a program that's blocked, failed, or finished that you haven't seen.": "在 Rex 的程序坞图标上显示你尚未查看的阻塞、失败或已完成程序的标签页数量。",
+  "Adjust the stroke weight of a variable terminal font.": "调整可变终端字体的字重。",
+  "Edit": "编辑",
+  "Open Onboarding Session": "打开入门会话",
+  "Go to Directory": "前往目录",
+  "The theme is missing valid colors for:": "主题缺少有效颜色：",
+  "Check serving progress and certificate readiness, retry, copy the address, or pair a device using its QR code.": "查看服务进度和证书状态、重试、复制地址，或使用二维码配对设备。",
+  "The Rex server refused the connection because it doesn’t support the API revisions this app needs (": "Rex 服务器拒绝连接，因为它不支持此应用需要的 API 修订版（",
+  "Smooth the edges of terminal text.": "平滑终端文字边缘。",
+  "Enable or disable all activity for finished programs, or configure their tab indicators, notifications, Dock badges, and sounds individually.": "启用或停用已完成程序的所有活动，或分别配置其标签页指示器、通知、程序坞标记和声音。",
+  "Show window on launch": "启动时显示窗口",
+  "Connect to your local Rex server over your Tailnet.": "通过 Tailnet 连接到本地 Rex 服务器。",
+  ". Update Rex on the server.": "。请更新服务器上的 Rex。",
+  "Ended": "已结束",
+  " request to a server that uses API revision ": " 请求，服务器使用 API 修订版 ",
+  "Web Client Origins": "Web 客户端来源",
+  "Browser origins allowed to open Rex WebSocket streams. The hosted Rex client is always allowed. Wildcards match subdomains, e.g. https://*.vercel.app. Changes apply after Rex restarts.": "允许打开 Rex WebSocket 流的浏览器来源。托管的 Rex 客户端始终允许。通配符匹配子域名，例如 https://*.vercel.app。更改将在 Rex 重启后生效。",
+  "Choose Comfortable or Compact pane surfaces and spacing.": "选择舒适或紧凑的窗格表面和间距。",
+  "Choose a custom, default, or built-in palette used in light mode.": "选择浅色模式使用的自定义、默认或内置调色板。",
+  "Enter a size from ": "输入大小，范围为 ",
+  "Migrate my keybindings and settings from ": "从以下来源迁移我的快捷键和设置：",
+  "Show pane headers": "显示窗格标题",
+  "Tabs": "标签页",
+  "Resuming (attempt ": "正在恢复（尝试 ",
+  "File": "文件",
+  "Fade inactive panes": "淡化非活动窗格",
+  "Manage browser origins allowed to open Rex WebSocket streams.": "管理允许打开 Rex WebSocket 流的浏览器来源。",
+  "New Session on Host": "在主机上新建会话",
+  "Update": "更新",
+  "App Version": "应用版本",
+  "Choose Off, Slow, Normal, Fast, or Custom to edit the blink interval.": "选择关闭、慢速、正常、快速或自定义来编辑闪烁间隔。",
+  "Copy Shortcuts as Lua": "将快捷键复制为 Lua",
+  "Independently configure tab indicators, system notifications, Dock badges, and sounds for program activity.": "分别配置程序活动的标签页指示器、系统通知、程序坞标记和声音。",
+  "Drag around the center to change hue and outward to increase chroma.": "绕中心拖动可更改色相，向外拖动可提高色度。",
+  "Shown when a program is busy or reports progress": "程序忙碌或报告进度时显示",
+  "API Version": "API 版本",
+  "Show update-channel, installation, local API, and web-client origin settings.": "显示更新频道、安装、本地 API 和 Web 客户端来源设置。",
+  "Reset All…": "全部重置…",
+  "Choose Default artwork, Use theme for background and foreground colors, or Use theme accent for accents.": "选择默认图案、使用主题的背景和前景色，或使用主题强调色。",
+  "Enable or disable all activity for programs waiting for you, or configure their tab indicators, notifications, Dock badges, and sounds individually.": "启用或停用等待你操作的程序的所有活动，或分别配置其标签页指示器、通知、程序坞标记和声音。",
+  "Adjust terminal text size in points.": "以磅为单位调整终端文字大小。",
+  "Click to choose a color.": "点击选择颜色。",
+  "Rex Beta Version": "Rex Beta 版本",
+  "Fade panes for inactive windows": "淡化非活动窗口的窗格",
+  "Help": "帮助",
+  "Set the time between cursor blinks in milliseconds when Blink speed is Custom.": "将闪烁速度设为自定义时，设置光标闪烁间隔（毫秒）。",
+  "Instance Generation": "实例代次",
+  "Show the running program and its directory instead of titles that shells set.": "显示正在运行的程序及其目录，而不是 Shell 设置的标题。",
+  "Changes apply to new agent sessions.": "更改将应用于新的智能体会话。",
+  "Downloading update": "正在下载更新",
+  "Reconnecting to Rex": "正在重新连接 Rex",
+  "Browse monospaced or all installed fonts to choose the terminal typeface.": "浏览等宽字体或所有已安装字体，以选择终端字体。",
+  "Restarted the Rex server": "已重新启动 Rex 服务器",
+  "No Ghostty configuration was found. Searched: ": "未找到 Ghostty 配置。已搜索：",
+  "Choose a custom, default, or built-in palette used in dark mode.": "选择深色模式使用的自定义、默认或内置调色板。",
+  "Use the pane background or extend edge-cell backgrounds into the padding.": "使用窗格背景，或将边缘单元格背景延伸到内边距。",
+  "Manage the local server, compatibility, and diagnostics.": "管理本地服务器、兼容性和诊断。",
+  "Enable or disable all activity for programs reporting errors, or configure their tab indicators, notifications, Dock badges, and sounds individually.": "启用或停用报告错误的程序的所有活动，或分别配置其标签页指示器、通知、程序坞标记和声音。",
+  "Play a sound when a program in a tab is blocked, reports an error, or finishes.": "标签页中的程序被阻塞、报告错误或完成时播放声音。",
+  "Round the corners of terminal text selections.": "将终端文本选择区域的边角设为圆角。",
+  "Policy": "策略",
+  "Rex Installation": "Rex 安装",
+  "Show the title and controls above each pane.": "在每个窗格上方显示标题和控件。",
+  "Add and manage remote Rex hosts, view connection status, and retry connection failures.": "添加和管理远程 Rex 主机，查看连接状态，并重试连接失败的主机。",
+  "This app can’t send this ": "此应用无法发送此 ",
+  "Shown when a program needs you to respond": "程序需要你响应时显示",
+  "Server Version": "服务器版本",
+  "Closed": "已关闭",
+  "Available with horizontal tabs: expand tabs equally to fill the bar, showing backgrounds only for two or more tabs.": "使用横向标签页时可用：让标签页等宽填满栏，仅在有两个或更多标签页时显示背景。",
+  "Resolved Endpoint": "已解析端点",
+  "Couldn't find the Ghostty theme ": "找不到 Ghostty 主题 ",
+  "Installs the Rex skill and hooks for Claude Code, Codex, and other agents.": "为 Claude Code、Codex 和其他智能体安装 Rex 技能和钩子。",
+  "Focus follows mouse": "焦点跟随鼠标",
+  "Dismiss notice (": "关闭通知 (",
+  "Copy local Rex endpoint": "复制本地 Rex 端点",
+  "Shown when a program reports that something went wrong": "程序报告发生问题时显示",
+  "Restrict callers to your account or allow tailnet members.": "仅允许你的账户访问，或允许 Tailnet 成员访问。",
+  "Available with sidebar tab styles: choose whether the sidebar resizes the window.": "使用侧边栏标签页样式时可用：选择侧边栏是否调整窗口大小。",
+  "Check serving progress, copy the address, or pair another device.": "查看服务进度、复制地址，或配对其他设备。",
+  "Nothing named ": "没有名为 ",
+  "Connect Rex to your tailnet and control who can access it.": "将 Rex 连接到你的 Tailnet，并控制谁可以访问它。",
+  "Agents can control Rex: open sessions, arrange panes, run commands, and change your settings.": "智能体可以控制 Rex：打开会话、排列窗格、运行命令和更改设置。",
+  "revisions this app needs (": "修订版，此应用需要（",
+  "Match program backgrounds": "匹配程序背景",
+  "Copy the configuration file": "复制配置文件",
+  "Pair Device with QR Code": "使用二维码配对设备",
+  "App Icon": "应用图标",
+  "Reconnecting (attempt ": "正在重新连接（尝试 ",
+  "Twilight": "暮色",
+  "Panes": "窗格",
+  "Choose an installed face of the terminal font, such as Light or Book.": "选择终端字体的已安装字形，例如 Light 或 Book。",
+  "Available with vertical tabs: resize panes when showing or hiding the sidebar, keeping the window width unchanged.": "使用纵向标签页时可用：显示或隐藏侧边栏时调整窗格大小，同时保持窗口宽度不变。",
+  "Update Channel": "更新频道",
+  "Host Details": "主机详情",
+  "Show colored icons Always, For active panes, For active tabs, or Never.": "选择始终、活动窗格、活动标签页或从不显示彩色图标。",
+  "Add a Ghostty or iTerm palette to your custom themes.": "将 Ghostty 或 iTerm 调色板添加到自定义主题。",
+  "Failed": "失败",
   "None": "无",
 ]
 
 private func translate(_ value: String) -> String {
   if let translated = translations[value] { return translated }
+  if value.hasPrefix("快捷键 › ") {
+    for prefix in ["See the keys bound to ", "Record, remove, or reset the keys bound to ", "录制、移除或重置绑定到 ", "查看绑定到 "] {
+      if let range = value.range(of: prefix) {
+        return String(value[..<range.lowerBound]) + translate(String(value[range.lowerBound...]))
+      }
+    }
+  }
+  for suffix in [" result", " results"] where value.hasSuffix(suffix) {
+    let count = value.dropLast(suffix.count)
+    if !count.isEmpty && count.utf8.allSatisfy({ (48...57).contains($0) }) {
+      return count + " 项结果"
+    }
+  }
+  let shortcutPrefix = "See the keys bound to "
+  let shortcutSuffix = " and where each came from."
+  if value.hasPrefix(shortcutPrefix) && value.hasSuffix(shortcutSuffix) && value.count >= shortcutPrefix.count + shortcutSuffix.count {
+    let action = value.dropFirst(shortcutPrefix.count).dropLast(shortcutSuffix.count)
+    return "查看绑定到 " + translate(String(action)) + " 的按键及其来源。"
+  }
+  for suffix in [" 的按键", " 的按键。"] {
+    let prefix = "录制、移除或重置绑定到 "
+    if value.hasPrefix(prefix) && value.hasSuffix(suffix) && value.count >= prefix.count + suffix.count {
+      let action = value.dropFirst(prefix.count).dropLast(suffix.count)
+      if action.hasSuffix(".") {
+        return prefix + translate(String(action.dropLast())) + " 的按键。"
+      }
+      return prefix + translate(String(action)) + suffix
+    }
+  }
+  let translatedPrefix = "查看绑定到 "
+  let translatedSuffix = " 的按键及其来源。"
+  if value.hasPrefix(translatedPrefix) && value.hasSuffix(translatedSuffix) && value.count >= translatedPrefix.count + translatedSuffix.count {
+    let action = value.dropFirst(translatedPrefix.count).dropLast(translatedSuffix.count)
+    return translatedPrefix + translate(String(action)) + translatedSuffix
+  }
+  let actionPrefix = "录制、移除或重置以下操作的按键："
+  if value.hasPrefix(actionPrefix) {
+    let tail = String(value.dropFirst(actionPrefix.count))
+    let action = tail.hasSuffix(".") ? String(tail.dropLast()) : tail
+    if let translated = translations[action] {
+      return actionPrefix + translated + (tail.hasSuffix(".") ? "。" : "")
+    }
+  }
   // Translate shortcut wrappers before general substitutions can return a
   // partially translated sentence (for example a Diagnostics action name).
   if value.hasPrefix("Press a shortcut for ") {
@@ -1584,16 +1764,20 @@ private func translate(_ value: String) -> String {
     return "为 " + translate(String(value.dropFirst("Add a shortcut for ".count))) + " 添加快捷键"
   }
   if value.hasPrefix("Record, remove, or reset the keys bound to ") {
-    return "录制、移除或重置绑定到 " + translate(String(value.dropFirst("Record, remove, or reset the keys bound to ".count))) + " 的按键"
+    let action = value.dropFirst("Record, remove, or reset the keys bound to ".count)
+    if action.hasSuffix(".") {
+      return "录制、移除或重置绑定到 " + translate(String(action.dropLast())) + " 的按键。"
+    }
+    return "录制、移除或重置绑定到 " + translate(String(action)) + " 的按键"
   }
   // App menus use the installed bundle's display name. Match known Rex names
   // exactly so similarly prefixed session titles and user text stay untouched.
   for appName in ["Rex", "Rex Beta", "Rex 中文版", "Rex Beta 中文版"] {
-    if value == "Quit " + appName { return "退出" + appName }
-    if value == "Hide " + appName { return "隐藏" + appName }
-    if value == "About " + appName { return "关于" + appName }
+    if value == "Quit " + appName { return "退出 " + appName }
+    if value == "Hide " + appName { return "隐藏 " + appName }
+    if value == "About " + appName { return "关于 " + appName }
     if value == "About " + appName + "…" || value == "About " + appName + "..." {
-      return "关于" + appName + "…"
+      return "关于 " + appName + "…"
     }
   }
   if value.contains("Hue ") || value.contains("chroma ") || value.contains("Lightness ") {
@@ -2074,21 +2258,39 @@ private func translate(_ value: String) -> String {
   return value
 }
 
-private typealias LocalizedStringKeyInit = @convention(thin) (String, LocalizedStringKey.Type) -> LocalizedStringKey
+// Match SwiftUI initializer ownership when calling their raw addresses.
+// The original initializers consume these values; borrowing them here would
+// make the caller destroy already-consumed storage during SwiftUI updates.
+private typealias LocalizedStringKeyInit = @convention(thin) (consuming String, LocalizedStringKey.Type) -> LocalizedStringKey
 @_silgen_name("rxOrigLKLiteralAddress") private func rxOrigLKLiteralAddress() -> UnsafeRawPointer
 @_silgen_name("rxOrigLKInitAddress") private func rxOrigLKInitAddress() -> UnsafeRawPointer
 private var originalLiteral: LocalizedStringKeyInit?
 private var originalInit: LocalizedStringKeyInit?
 
-private typealias TextVerbatimInit = @convention(thin) (String, Text.Type) -> Text
+extension LocalizedStringKey.StringInterpolation {
+  // This mutating method borrows String and passes self using swiftself. A
+  // thin function pointer with an inout parameter has a different ABI. Keep
+  // the native method declaration so Swift emits both conventions correctly.
+  // References from this interposing dylib continue to resolve to the native
+  // method; they are deliberately not routed through the replacement again.
+  @_silgen_name("$s7SwiftUI18LocalizedStringKeyV0D13InterpolationV13appendLiteralyySSF")
+  private mutating func rxNativeAppendLiteral(_ value: borrowing String)
+
+  @_silgen_name("rxHookLKAppendLiteral")
+  public mutating func rxHookAppendLiteral(_ value: borrowing String) {
+    rxNativeAppendLiteral(translate(value))
+  }
+}
+
+private typealias TextVerbatimInit = @convention(thin) (consuming String, Text.Type) -> Text
 @_silgen_name("rxOrigTextVerbatimAddress") private func rxOrigTextVerbatimAddress() -> UnsafeRawPointer
 private var originalTextVerbatim: TextVerbatimInit?
 
-private typealias TextLocalizedResourceInit = @convention(thin) (LocalizedStringResource, Text.Type) -> Text
+private typealias TextLocalizedResourceInit = @convention(thin) (consuming LocalizedStringResource, Text.Type) -> Text
 @_silgen_name("rxOrigTextLocalizedResourceAddress") private func rxOrigTextLocalizedResourceAddress() -> UnsafeRawPointer
 private var originalTextLocalizedResource: TextLocalizedResourceInit?
 
-private typealias TextAttributedStringInit = @convention(thin) (AttributedString, Text.Type) -> Text
+private typealias TextAttributedStringInit = @convention(thin) (consuming AttributedString, Text.Type) -> Text
 @_silgen_name("rxOrigTextAttributedStringAddress") private func rxOrigTextAttributedStringAddress() -> UnsafeRawPointer
 private var originalTextAttributedString: TextAttributedStringInit?
 
@@ -2125,10 +2327,10 @@ public func rxHookTextVerbatim(_ value: consuming String, _ type: Text.Type) -> 
 }
 
 @_silgen_name("rxHookTextLocalizedResource")
-public func rxHookTextLocalizedResource(_ value: LocalizedStringResource, _ type: Text.Type) -> Text {
+public func rxHookTextLocalizedResource(_ value: consuming LocalizedStringResource, _ type: Text.Type) -> Text {
   let original = originalTextLocalizedResource ?? unsafeBitCast(rxOrigTextLocalizedResourceAddress(), to: TextLocalizedResourceInit.self)
   originalTextLocalizedResource = original
-  let rendered = String(localized: value)
+  let rendered = String(localized: copy value)
   let translated = translate(rendered)
   guard translated != rendered else { return original(value, type) }
   let replacement = LocalizedStringResource(String.LocalizationValue(translated), table: nil, locale: Locale.current, bundle: .main, comment: nil)
@@ -2136,7 +2338,7 @@ public func rxHookTextLocalizedResource(_ value: LocalizedStringResource, _ type
 }
 
 @_silgen_name("rxHookTextAttributedString")
-public func rxHookTextAttributedString(_ value: AttributedString, _ type: Text.Type) -> Text {
+public func rxHookTextAttributedString(_ value: consuming AttributedString, _ type: Text.Type) -> Text {
   let original = originalTextAttributedString ?? unsafeBitCast(rxOrigTextAttributedStringAddress(), to: TextAttributedStringInit.self)
   originalTextAttributedString = original
   let rendered = String(value.characters)
@@ -2146,7 +2348,7 @@ public func rxHookTextAttributedString(_ value: AttributedString, _ type: Text.T
 }
 
 @_silgen_name("rxHookTextGeneric")
-public func rxHookTextGeneric<S: StringProtocol>(_ value: inout S, _ type: Text.Type) -> Text {
+public func rxHookTextGeneric<S: StringProtocol>(_ value: consuming S, _ type: Text.Type) -> Text {
   let translated = translate(String(value))
   return Text(verbatim: translated)
 }

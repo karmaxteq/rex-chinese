@@ -13,6 +13,28 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 CASES = [
+    ('Preview', '预览'),
+    (' — Dynamic', ' — 动态'),
+    ('0 results', '0 项结果'),
+    ('1 result', '1 项结果'),
+    ('91 results', '91 项结果'),
+    ('999999 results', '999999 项结果'),
+    ('user results', 'user results'),
+    ('-1 results', '-1 results'),
+    ('1.5 results', '1.5 results'),
+    ('See the keys bound to Switch Appearance Mode and where each came from.', '查看绑定到 切换外观模式 的按键及其来源。'),
+    ('See the keys bound to Toggle Activity and where each came from.', '查看绑定到 切换活动 的按键及其来源。'),
+    ('See the keys bound to and where each came from.', 'See the keys bound to and where each came from.'),
+    ('录制、移除或重置绑定到 Toggle Activity 的按键。', '录制、移除或重置绑定到 切换活动 的按键。'),
+    ('录制、移除或重置绑定到 Toggle Activity 的按键', '录制、移除或重置绑定到 切换活动 的按键'),
+    ('查看绑定到 Switch Appearance Mode 的按键及其来源。', '查看绑定到 切换外观模式 的按键及其来源。'),
+    ('Record, remove, or reset the keys bound to Toggle Activity.', '录制、移除或重置绑定到 切换活动 的按键。'),
+    ('录制、移除或重置绑定到 Toggle Activity. 的按键', '录制、移除或重置绑定到 切换活动 的按键。'),
+    ('快捷键 › 快捷键、切换外观模式、See the keys bound to Switch Appearance Mode and where each came from.', '快捷键 › 快捷键、切换外观模式、查看绑定到 切换外观模式 的按键及其来源。'),
+    ('快捷键 › 快捷键、复制配置文件路径、Record, remove, or reset the keys bound to Copy Config File Path.', '快捷键 › 快捷键、复制配置文件路径、录制、移除或重置绑定到 复制配置文件路径 的按键。'),
+    ('快捷键 › 快捷键、切换活动、录制、移除或重置绑定到 Toggle Activity. 的按键', '快捷键 › 快捷键、切换活动、录制、移除或重置绑定到 切换活动 的按键。'),
+    ('录制、移除或重置以下操作的按键：Toggle Activity.', '录制、移除或重置以下操作的按键：切换活动。'),
+    ('录制、移除或重置以下操作的按键：my-task', '录制、移除或重置以下操作的按键：my-task'),
     ('Displayed top left', '显示在左上角'),
     ('Displayed top center', '显示在顶部居中'),
     ('Displayed top right', '显示在右上角'),
@@ -81,6 +103,8 @@ CASES = [
     ('The theme is missing valid colors for: background, foreground, palette 15', '主题缺少有效颜色：背景色、前景色、调色板 15'),
     ('Drag into the list in System Settings to grant access.', '将其拖入系统设置中的列表以授予访问权限。'),
     ('Waiting for permission', '正在等待权限'),
+    ('Unsupported block', '不支持的内容块'),
+    ('The content environment does not provide the capabilities required by this block.', '当前内容环境不具备此内容块所需的功能。'),
     ('Type Shortcut...', '输入快捷键…'),
     ('Type Shortcut…', '输入快捷键…'),
 ]
@@ -98,9 +122,9 @@ for action_name in ['Rex Diagnostics', 'Rex 诊断']:
 # Installed display names are a closed allowlist, not a generic Quit/Hide/About rule.
 for app_name in ['Rex', 'Rex Beta', 'Rex 中文版', 'Rex Beta 中文版']:
     for action, translated in [('Quit', '退出'), ('Hide', '隐藏'), ('About', '关于')]:
-        CASES.append((f'{action} {app_name}', f'{translated}{app_name}'))
+        CASES.append((f'{action} {app_name}', f'{translated} {app_name}'))
     for ellipsis in ['…', '...']:
-        CASES.append((f'About {app_name}{ellipsis}', f'关于{app_name}…'))
+        CASES.append((f'About {app_name}{ellipsis}', f'关于 {app_name}…'))
 
 # Values without Rex UI sentence prefixes are user content and must survive intact.
 for value in ['', '中文界面', '/tmp/中文 😀/rex', '80x24', 'ssh://demo-host', 'Tailscale', 'test-123', 'Already translated 已翻译', 'Quit Terminal', 'Quit Rex Beta task', 'Hide Rex Beta logs', 'About Rexology', 'Quit Rex Beta 中文版 session', 'About Rex Beta 中文版 notes']:
@@ -125,6 +149,13 @@ int main(void) { @autoreleasepool {
 '''
 
 def run():
+    resources = json.loads(subprocess.check_output([
+        'plutil', '-convert', 'json', '-o', '-',
+        str(ROOT / 'Resources/zh_CN.lproj/Localizable.strings'),
+    ]))
+    # Resource translations are the published vocabulary. Exercise both the
+    # source keys and already translated values through the production code.
+    cases = list(resources.items()) + [(value, value) for value in resources.values()] + CASES
     swift = (ROOT / 'RexTextHook.swift').read_text()
     swift = swift[:swift.index('private typealias LocalizedStringKeyInit')]
     swift = swift.replace('import SwiftUI\n', '')
@@ -138,12 +169,12 @@ def run():
         (tmp / 'main.m').write_text(objc + OBJC_RUNNER)
         subprocess.run(['swiftc', str(tmp / 'main.swift'), '-o', str(tmp / 'swift')], check=True)
         subprocess.run(['clang', '-fobjc-arc', '-fblocks', str(tmp / 'main.m'), '-framework', 'Foundation', '-o', str(tmp / 'objc')], check=True)
-        payload = json.dumps([value for value, _ in CASES], ensure_ascii=False).encode()
+        payload = json.dumps([value for value, _ in cases], ensure_ascii=False).encode()
         outputs = {}
         for backend in ['swift', 'objc']:
             outputs[backend] = json.loads(subprocess.check_output([str(tmp / backend)], input=payload))
         failures = []
-        for index, (value, expected) in enumerate(CASES):
+        for index, (value, expected) in enumerate(cases):
             for backend, rows in outputs.items():
                 actual, repeated = rows[index]
                 if actual != expected:
@@ -152,7 +183,8 @@ def run():
                     failures.append(f'{backend}: not idempotent {value!r}: {actual!r} -> {repeated!r}')
             if outputs['swift'][index][0] != outputs['objc'][index][0]:
                 failures.append(f'backend mismatch: {value!r}')
-        print(f'{len(CASES)} cases x 2 production translators; expected output, parity and repeat stability checked.')
+        print(f'{len(resources)} resource keys + {len(resources)} translated values + {len(CASES)} dynamic/boundary cases.')
+        print(f'{len(cases)} cases x 2 production translators; expected output, parity and repeat stability checked.')
         if failures:
             print('\n'.join(failures))
             return 1

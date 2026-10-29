@@ -19,7 +19,7 @@ spec.loader.exec_module(patch)
 
 def thin(payload=None, endian='<', cpu=0x100000c, section_name=b'__cstring', segment_name=b'__TEXT', flags=2):
     if payload is None:
-        payload = b'other\0' + patch.SOURCE + b'\0' + patch.SELECTION_SOURCE + b'\0untouched\0'
+        payload = b'other\0' + patch.SOURCE + b'\0' + patch.SELECTION_SOURCE + b'\0' + patch.REMOTE_TITLE_SOURCE + b'\0untouched\0'
     offset = 256
     header = struct.pack(endian + '8I', 0xfeedfacf, cpu, 0, 2, 1, 152, 0, 0)
     segment = struct.pack(endian + 'II16sQQQQiiII', 0x19, 152, segment_name, 0, 4096, 0, offset + len(payload), 7, 5, 1, 0)
@@ -49,12 +49,14 @@ class PreviewPatchTests(unittest.TestCase):
 
     def assert_patch(self, data, architectures):
         result, report = patch.plan_patch(data)
-        self.assertEqual(report['replacements'], architectures * 2)
+        self.assertEqual(report['replacements'], architectures * 3)
         self.assertEqual(len(result), len(data))
         self.assertEqual(result.count(patch.TARGET + b'\0'), architectures)
         self.assertEqual(result.count(patch.SOURCE + b'\0'), 0)
         self.assertEqual(result.count(patch.SELECTION_TARGET + b'\0'), architectures)
         self.assertEqual(result.count(patch.SELECTION_SOURCE + b'\0'), 0)
+        self.assertEqual(result.count(patch.REMOTE_TITLE_TARGET + b'\0'), architectures)
+        self.assertEqual(result.count(patch.REMOTE_TITLE_SOURCE + b'\0'), 0)
         again, second = patch.plan_patch(result)
         self.assertEqual(again, result)
         self.assertEqual(second['state'], 'patched')
@@ -62,6 +64,7 @@ class PreviewPatchTests(unittest.TestCase):
         # Prove exact changed ranges independently of the production verifier.
         expected = data.replace(patch.SOURCE + b'\0', patch.TARGET + b'\0')
         expected = expected.replace(patch.SELECTION_SOURCE + b'\0', patch.SELECTION_TARGET + b'\0')
+        expected = expected.replace(patch.REMOTE_TITLE_SOURCE + b'\0', patch.REMOTE_TITLE_TARGET + b'\0')
         self.assertEqual(result, expected)
 
     def test_thin_endianness(self):
@@ -109,28 +112,53 @@ class PreviewPatchTests(unittest.TestCase):
                    patch.SOURCE.replace(b'warning', '警告'.encode()) + b'\0']
         for sample in samples:
             with self.subTest(sample=repr(sample[:20])):
-                with self.assertRaises(patch.PatchError):
-                    patch.plan_patch(thin(sample + patch.SELECTION_SOURCE + b'\0'))
+                with self.assertRaisesRegex(patch.PatchError, 'font UI constant'):
+                    patch.plan_patch(thin(sample + patch.SELECTION_SOURCE + b'\0' + patch.REMOTE_TITLE_SOURCE + b'\0'))
 
     def test_reject_missing_either_preview(self):
         for sample in [patch.SOURCE, patch.SELECTION_SOURCE]:
             with self.subTest(sample=sample):
                 with self.assertRaises(patch.PatchError):
-                    patch.plan_patch(thin(sample + b'\0'))
+                    patch.plan_patch(thin(sample + b'\0' + patch.REMOTE_TITLE_SOURCE + b'\0'))
 
     def test_reject_partial_translation_within_architecture(self):
         for font, selection in [(patch.SOURCE, patch.SELECTION_TARGET), (patch.TARGET, patch.SELECTION_SOURCE)]:
             with self.subTest(font=font):
-                with self.assertRaises(patch.PatchError):
-                    patch.plan_patch(thin(font + b'\0' + selection + b'\0'))
+                with self.assertRaisesRegex(patch.PatchError, 'Mixed original and patched'):
+                    patch.plan_patch(thin(font + b'\0' + selection + b'\0' + patch.REMOTE_TITLE_SOURCE + b'\0'))
 
     def test_reject_bad_selection_preview(self):
         for selection in [patch.SELECTION_SOURCE, b'prefix' + patch.SELECTION_SOURCE + b'\0',
                           patch.SELECTION_SOURCE + b'\0' + patch.SELECTION_SOURCE + b'\0',
                           patch.SELECTION_SOURCE + b'\0' + patch.SELECTION_TARGET + b'\0']:
             with self.subTest(selection=selection):
-                with self.assertRaises(patch.PatchError):
-                    patch.plan_patch(thin(patch.SOURCE + b'\0' + selection))
+                with self.assertRaisesRegex(patch.PatchError, 'selection UI constant'):
+                    patch.plan_patch(thin(patch.SOURCE + b'\0' + selection + patch.REMOTE_TITLE_SOURCE + b'\0'))
+
+    def test_remote_title_exact_length_and_text(self):
+        self.assertEqual(patch.REMOTE_TITLE_SOURCE, 'Couldn’t connect to '.encode('utf-8'))
+        self.assertEqual(patch.REMOTE_TITLE_TARGET, '无法连接到主机 '.encode('utf-8'))
+        self.assertEqual(len(patch.REMOTE_TITLE_SOURCE), 22)
+        self.assertEqual(len(patch.REMOTE_TITLE_TARGET), 22)
+        self.assertNotIn(b'\0', patch.REMOTE_TITLE_TARGET)
+
+    def test_reject_missing_duplicate_or_nonstandalone_remote_title(self):
+        prefix = patch.SOURCE + b'\0' + patch.SELECTION_SOURCE + b'\0'
+        title = patch.REMOTE_TITLE_SOURCE
+        for suffix in [b'', title, b'prefix' + title + b'\0', title + b'\0' + title + b'\0',
+                       title + b'\0' + patch.REMOTE_TITLE_TARGET + b'\0']:
+            with self.subTest(suffix=suffix):
+                with self.assertRaisesRegex(patch.PatchError, 'remote-title UI constant'):
+                    patch.plan_patch(thin(prefix + suffix))
+
+    def test_reject_mixed_remote_title_within_architecture(self):
+        for font, selection, title in [
+            (patch.SOURCE, patch.SELECTION_SOURCE, patch.REMOTE_TITLE_TARGET),
+            (patch.TARGET, patch.SELECTION_TARGET, patch.REMOTE_TITLE_SOURCE),
+        ]:
+            with self.subTest(title=title):
+                with self.assertRaisesRegex(patch.PatchError, 'Mixed original and patched'):
+                    patch.plan_patch(thin(font + b'\0' + selection + b'\0' + title + b'\0'))
 
     def test_reject_wrong_sections(self):
         for options in [dict(section_name=b'__const'), dict(segment_name=b'__DATA'), dict(flags=0)]:
@@ -139,8 +167,8 @@ class PreviewPatchTests(unittest.TestCase):
                     patch.plan_patch(thin(**options))
 
     def test_reject_mixed_architectures(self):
-        data = fat([thin(), thin(patch.TARGET + b'\0' + patch.SELECTION_TARGET + b'\0', cpu=0x1000007)])
-        with self.assertRaises(patch.PatchError):
+        data = fat([thin(), thin(patch.TARGET + b'\0' + patch.SELECTION_TARGET + b'\0' + patch.REMOTE_TITLE_TARGET + b'\0', cpu=0x1000007)])
+        with self.assertRaisesRegex(patch.PatchError, 'Mixed original and patched'):
             patch.plan_patch(data)
 
     def test_reject_bad_macho(self):
@@ -179,7 +207,7 @@ class PreviewPatchTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertFalse(json.loads(result.stdout)['written'])
             self.assertEqual(path.read_bytes(), expected)
-            invalid = thin(patch.SOURCE + b'\0' + patch.SOURCE + b'\0')
+            invalid = thin(patch.SOURCE + b'\0' + patch.SOURCE + b'\0' + patch.SELECTION_SOURCE + b'\0' + patch.REMOTE_TITLE_SOURCE + b'\0')
             path.write_bytes(invalid)
             result = invoke('--write')
             self.assertEqual(result.returncode, 1)

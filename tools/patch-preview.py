@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Patch two exact Rex GPU previews in an explicitly supplied local copy.
+"""Patch exact Rex UI constants in an explicitly supplied local copy.
 
 Defaults to a dry run. Never discovers or opens the installed application.
 Only Python's standard library is required.
@@ -26,7 +26,15 @@ _selection_translated = '分支\t  feature/tabs'.encode('utf-8')
 if len(_selection_translated) > len(SELECTION_SOURCE):
     raise RuntimeError('Translated selection preview exceeds the original byte length')
 SELECTION_TARGET = _selection_translated + b' ' * (len(SELECTION_SOURCE) - len(_selection_translated))
-PREVIEWS = [('font', SOURCE, TARGET), ('selection', SELECTION_SOURCE, SELECTION_TARGET)]
+# The remote warning title uses an inlined SwiftUI literal. Replace only its
+# complete, unique prefix; Rex still appends the untouched host name and renders
+# the title with its native font and layout. Both forms occupy exactly 22 bytes.
+REMOTE_TITLE_SOURCE = 'Couldn’t connect to '.encode('utf-8')
+REMOTE_TITLE_TARGET = '无法连接到主机 '.encode('utf-8')
+if len(REMOTE_TITLE_TARGET) != len(REMOTE_TITLE_SOURCE):
+    raise RuntimeError('Translated remote title must retain the original byte length')
+UI_CONSTANTS = [('font', SOURCE, TARGET), ('selection', SELECTION_SOURCE, SELECTION_TARGET),
+                ('remote-title', REMOTE_TITLE_SOURCE, REMOTE_TITLE_TARGET)]
 
 
 class PatchError(ValueError):
@@ -123,20 +131,20 @@ def plan_patch(data):
         cpu, (offset, length) = cstring_section(data, base, size, cpu, subtype)
         section = data[offset:offset + length]
         architectures.append(hex(cpu))
-        for name, source, target in PREVIEWS:
+        for name, source, target in UI_CONSTANTS:
             original, patched = source + b'\0', target + b'\0'
             original_count, patched_count = section.count(original), section.count(patched)
             if (original_count, patched_count) not in [(1, 0), (0, 1)]:
-                raise PatchError(f'Expected exactly one complete original or patched {name} preview in each string section')
+                raise PatchError(f'Expected exactly one complete original or patched {name} UI constant in each string section')
             state = 'original' if original_count else 'patched'
             position = section.index(original if original_count else patched)
             if position and section[position - 1] != 0:
-                raise PatchError(f'{name} preview is not a complete standalone C string')
+                raise PatchError(f'{name} UI constant is not a complete standalone C string')
             states.append(state)
             if state == 'original':
                 changes.append((offset + position, original, patched))
     if len(set(states)) != 1:
-        raise PatchError('Mixed original and patched previews or architectures; refusing partial mutation')
+        raise PatchError('Mixed original and patched UI constants or architectures; refusing partial mutation')
     output = bytearray(data)
     for offset, original, replacement in changes:
         output[offset:offset + len(original)] = replacement
@@ -147,12 +155,13 @@ def plan_patch(data):
     for offset, original, _ in changes:
         allowed.update(range(offset, offset + len(original) - 1))
     if any(a != b and index not in allowed for index, (a, b) in enumerate(zip(data, output))):
-        raise PatchError('Unexpected mutation outside preview bytes')
+        raise PatchError('Unexpected mutation outside UI constant bytes')
     return output, {'state': states[0], 'architectures': architectures,
                     'replacements': len(changes), 'size': len(data),
                     'preview_bytes': len(SOURCE), 'padding_bytes': len(SOURCE) - len(_translated),
                     'selection_preview_bytes': len(SELECTION_SOURCE),
-                    'selection_padding_bytes': len(SELECTION_SOURCE) - len(_selection_translated)}
+                    'selection_padding_bytes': len(SELECTION_SOURCE) - len(_selection_translated),
+                    'remote_title_bytes': len(REMOTE_TITLE_SOURCE)}
 
 
 def main():
@@ -193,7 +202,7 @@ def main():
         print(json.dumps(report, ensure_ascii=False))
         return 0
     except (OSError, PatchError) as error:
-        parser.exit(1, f'Preview patch refused: {error}\n')
+        parser.exit(1, f'UI constant patch refused: {error}\n')
 
 
 if __name__ == '__main__':
