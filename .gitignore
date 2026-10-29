@@ -1,2 +1,4 @@
 # Local compilation products; distributable binaries live in bin/.
 build/
+# Local UI evidence can include host names and user configuration.
+.artifacts/

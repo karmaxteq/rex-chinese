@@ -13,6 +13,7 @@ static NSString *RXTranslate(NSString *s) {
     static dispatch_once_t once;
     dispatch_once(&once, ^{
         map = @{
+            @"Waiting for permission": @"正在等待权限",
             @"Change Session": @"切换会话",
             @"Change Session...": @"切换会话…",
             @"Command Palette": @"命令面板",
@@ -302,6 +303,11 @@ static NSString *RXTranslate(NSString *s) {
             @"Filter Shortcuts": @"筛选快捷键",
             @"Filter Shortcuts…": @"筛选快捷键…",
             @"Displayed bottom right": @"显示在右下角",
+            @"Displayed top left": @"显示在左上角",
+            @"Displayed top center": @"显示在顶部居中",
+            @"Displayed top right": @"显示在右上角",
+            @"Displayed bottom left": @"显示在左下角",
+            @"Displayed bottom center": @"显示在底部居中",
             @"Open Session on Web…": @"在网页上打开会话…",
             @"Open Session on Web...": @"在网页上打开会话…",
             @"Switch Host": @"切换主机",
@@ -748,6 +754,8 @@ static NSString *RXTranslate(NSString *s) {
             @"Keep the shortcut as it was.": @"保留原快捷键。",
             @"Record a shortcut": @"录制快捷键",
             @"Type Shortcut": @"输入快捷键",
+            @"Type Shortcut...": @"输入快捷键…",
+            @"Type Shortcut…": @"输入快捷键…",
             @"This release cannot be installed on this Mac.": @"此版本无法安装在此 Mac 上。",
             @"Rex App Update Failed": @"Rex 应用更新失败",
             @"Retry Rex App Update": @"重试 Rex 应用更新",
@@ -1594,6 +1602,34 @@ static NSString *RXTranslate(NSString *s) {
     });
     NSString *exact = map[s];
     if (exact) return exact;
+    // Translate shortcut wrappers before general substitutions can return a
+    // partially translated sentence (for example a Diagnostics action name).
+    if ([s hasPrefix:@"Press a shortcut for "]) {
+        return [NSString stringWithFormat:@"按下用于%@的快捷键", RXTranslate([s substringFromIndex:[@"Press a shortcut for " length]])];
+    }
+    if ([s hasPrefix:@"Change the shortcut for "]) {
+        return [NSString stringWithFormat:@"修改 %@ 的快捷键", RXTranslate([s substringFromIndex:[@"Change the shortcut for " length]])];
+    }
+    if ([s hasPrefix:@"Record a shortcut for "]) {
+        return [NSString stringWithFormat:@"录制 %@ 的快捷键", RXTranslate([s substringFromIndex:[@"Record a shortcut for " length]])];
+    }
+    if ([s hasPrefix:@"Add a shortcut for "]) {
+        return [NSString stringWithFormat:@"为 %@ 添加快捷键", RXTranslate([s substringFromIndex:[@"Add a shortcut for " length]])];
+    }
+    if ([s hasPrefix:@"Record, remove, or reset the keys bound to "]) {
+        return [NSString stringWithFormat:@"录制、移除或重置绑定到 %@ 的按键", RXTranslate([s substringFromIndex:[@"Record, remove, or reset the keys bound to " length]])];
+    }
+    // App menus use the installed bundle's display name. Match known Rex names
+    // exactly so similarly prefixed session titles and user text stay untouched.
+    for (NSString *appName in @[@"Rex", @"Rex Beta", @"Rex 中文版", @"Rex Beta 中文版"]) {
+        if ([s isEqualToString:[@"Quit " stringByAppendingString:appName]]) return [@"退出" stringByAppendingString:appName];
+        if ([s isEqualToString:[@"Hide " stringByAppendingString:appName]]) return [@"隐藏" stringByAppendingString:appName];
+        if ([s isEqualToString:[@"About " stringByAppendingString:appName]]) return [@"关于" stringByAppendingString:appName];
+        NSString *about = [@"About " stringByAppendingString:appName];
+        if ([s isEqualToString:[about stringByAppendingString:@"…"]] || [s isEqualToString:[about stringByAppendingString:@"..."]]) {
+            return [[@"关于" stringByAppendingString:appName] stringByAppendingString:@"…"];
+        }
+    }
     if ([s containsString:@"Hue "] || [s containsString:@"chroma "] || [s containsString:@"Lightness "]) {
         NSString *translatedDetails = [s stringByReplacingOccurrencesOfString:@"Hue " withString:@"色相 "];
         translatedDetails = [translatedDetails stringByReplacingOccurrencesOfString:@" degrees" withString:@"°"];
@@ -1605,13 +1641,13 @@ static NSString *RXTranslate(NSString *s) {
     // sentence. Keep the payload (version, commit, or path) untouched while
     // translating the sentence prefix used by both visible and AX surfaces.
     if ([s hasPrefix:@"Copied version info. "]) {
-        return [NSString stringWithFormat:@"已复制版本信息 %@", [s substringFromIndex:21]];
+        return [NSString stringWithFormat:@"已复制版本信息 %@", [s substringFromIndex:[@"Copied version info. " length]]];
     }
     if ([s hasPrefix:@"Copied debug info. "]) {
-        return [NSString stringWithFormat:@"已复制调试信息 %@", [s substringFromIndex:19]];
+        return [NSString stringWithFormat:@"已复制调试信息 %@", [s substringFromIndex:[@"Copied debug info. " length]]];
     }
     if ([s hasPrefix:@"Copied config file path. "]) {
-        return [NSString stringWithFormat:@"已复制配置文件路径 %@", [s substringFromIndex:25]];
+        return [NSString stringWithFormat:@"已复制配置文件路径 %@", [s substringFromIndex:[@"Copied config file path. " length]]];
     }
     if ([s hasPrefix:@"Dismiss notice ("]) {
         return [NSString stringWithFormat:@"关闭通知 (%@", [s substringFromIndex:[@"Dismiss notice (" length]]];
@@ -1693,136 +1729,127 @@ static NSString *RXTranslate(NSString *s) {
         return [NSString stringWithFormat:@"已从 Ghostty 迁移%@", [s substringFromIndex:[@"Migrated from Ghostty" length]]];
     }
     if ([s hasPrefix:@"Waiting for the next key after "]) {
-        return [NSString stringWithFormat:@"正在等待下一个按键，当前按键：%@", [s substringFromIndex:31]];
+        return [NSString stringWithFormat:@"正在等待下一个按键，当前按键：%@", [s substringFromIndex:[@"Waiting for the next key after " length]]];
     }
     if ([s hasPrefix:@"The running Rex server is incompatible with this version of Rex.app."]) {
-        return [NSString stringWithFormat:@"正在运行的 Rex 服务器与此版本的 Rex.app 不兼容。%@", [s substringFromIndex:68]];
+        return [NSString stringWithFormat:@"正在运行的 Rex 服务器与此版本的 Rex.app 不兼容。%@", [s substringFromIndex:[@"The running Rex server is incompatible with this version of Rex.app." length]]];
     }
     if ([s hasPrefix:@"The theme is missing valid colors for: "]) {
-        NSString *suffix = [s substringFromIndex:39];
+        NSString *suffix = [s substringFromIndex:[@"The theme is missing valid colors for: " length]];
         NSArray *parts = [suffix componentsSeparatedByString:@","];
         NSMutableArray *translatedParts = [NSMutableArray arrayWithCapacity:parts.count];
         for (NSString *rawPart in parts) {
             NSString *part = [rawPart stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
             if ([part isEqualToString:@"background"]) part = @"背景色";
             else if ([part isEqualToString:@"foreground"]) part = @"前景色";
-            else if ([part hasPrefix:@"palette "]) part = [@"调色板 " stringByAppendingString:[part substringFromIndex:8]];
+            else if ([part hasPrefix:@"palette "]) part = [@"调色板 " stringByAppendingString:[part substringFromIndex:[@"palette " length]]];
             [translatedParts addObject:part];
         }
         return [NSString stringWithFormat:@"主题缺少有效颜色：%@", [translatedParts componentsJoinedByString:@"、"]];
     }
     if ([s hasPrefix:@"You don’t have permission to view "]) {
-        return [NSString stringWithFormat:@"你没有权限查看 %@", [s substringFromIndex:33]];
+        return [NSString stringWithFormat:@"你没有权限查看 %@", [s substringFromIndex:[@"You don’t have permission to view " length]]];
     }
     if ([s hasPrefix:@"You don't have permission to view "]) {
-        return [NSString stringWithFormat:@"你没有权限查看 %@", [s substringFromIndex:33]];
+        return [NSString stringWithFormat:@"你没有权限查看 %@", [s substringFromIndex:[@"You don't have permission to view " length]]];
     }
     if ([s hasPrefix:@"No folders named "]) {
-        return [NSString stringWithFormat:@"没有名为 %@ 的文件夹", [s substringFromIndex:16]];
+        return [NSString stringWithFormat:@"没有名为 %@ 的文件夹", [s substringFromIndex:[@"No folders named " length]]];
     }
     if ([s hasPrefix:@"Couldn’t load this folder ("]) {
-        return [NSString stringWithFormat:@"无法加载此文件夹（%@", [s substringFromIndex:27]];
+        return [NSString stringWithFormat:@"无法加载此文件夹（%@", [s substringFromIndex:[@"Couldn’t load this folder (" length]]];
     }
     if ([s hasPrefix:@"Couldn't load this folder ("]) {
-        return [NSString stringWithFormat:@"无法加载此文件夹（%@", [s substringFromIndex:27]];
+        return [NSString stringWithFormat:@"无法加载此文件夹（%@", [s substringFromIndex:[@"Couldn't load this folder (" length]]];
     }
     if ([s hasPrefix:@"No app is set to open "]) {
-        return [NSString stringWithFormat:@"没有设置用于打开的应用：%@", [s substringFromIndex:22]];
+        return [NSString stringWithFormat:@"没有设置用于打开的应用：%@", [s substringFromIndex:[@"No app is set to open " length]]];
     }
     if ([s hasSuffix:@" is not a folder"]) {
-        return [NSString stringWithFormat:@"%@ 不是文件夹", [s substringToIndex:s.length - 17]];
+        return [NSString stringWithFormat:@"%@ 不是文件夹", [s substringToIndex:s.length - [@" is not a folder" length]]];
     }
-    if ([s hasPrefix:@" is not an HTTP or HTTPS address"]) {
-        return [NSString stringWithFormat:@"不是 HTTP 或 HTTPS 地址%@", [s substringFromIndex:35]];
+    if ([s hasSuffix:@" is not an HTTP or HTTPS address"]) {
+        return [NSString stringWithFormat:@"%@ 不是 HTTP 或 HTTPS 地址", [s substringToIndex:s.length - [@" is not an HTTP or HTTPS address" length]]];
     }
     if ([s hasPrefix:@"Couldn’t Connect to "]) {
-        return [NSString stringWithFormat:@"无法连接到 %@", [s substringFromIndex:20]];
+        return [NSString stringWithFormat:@"无法连接到 %@", [s substringFromIndex:[@"Couldn’t Connect to " length]]];
     }
     if ([s hasPrefix:@"Couldn't Connect to "]) {
-        return [NSString stringWithFormat:@"无法连接到 %@", [s substringFromIndex:20]];
-    }
-    if ([s hasPrefix:@"Press a shortcut for "]) {
-        return [NSString stringWithFormat:@"按下用于%@", [s substringFromIndex:22]];
+        return [NSString stringWithFormat:@"无法连接到 %@", [s substringFromIndex:[@"Couldn't Connect to " length]]];
     }
     if ([s hasPrefix:@"Another client resized this terminal to "]) {
-        return [NSString stringWithFormat:@"另一个客户端已将此终端调整为 %@", [s substringFromIndex:41]];
+        return [NSString stringWithFormat:@"另一个客户端已将此终端调整为 %@", [s substringFromIndex:[@"Another client resized this terminal to " length]]];
     }
     if ([s hasPrefix:@"Rex.app includes version "]) {
-        return [NSString stringWithFormat:@"Rex.app 包含版本 %@", [s substringFromIndex:25]];
+        return [NSString stringWithFormat:@"Rex.app 包含版本 %@", [s substringFromIndex:[@"Rex.app includes version " length]]];
     }
     if ([s hasPrefix:@"Running server version: "]) {
-        return [NSString stringWithFormat:@"运行中服务器版本：%@", [s substringFromIndex:24]];
+        return [NSString stringWithFormat:@"运行中服务器版本：%@", [s substringFromIndex:[@"Running server version: " length]]];
     }
     if ([s hasPrefix:@"Connection attempt "] && [s hasSuffix:@" failed. Choose to try again now."]) {
-        NSString *attempt = [s substringWithRange:NSMakeRange(19, s.length - 19 - 35)];
+        NSString *attempt = [s substringWithRange:NSMakeRange([@"Connection attempt " length], s.length - [@"Connection attempt " length] - [@" failed. Choose to try again now." length])];
         return [NSString stringWithFormat:@"连接尝试 %@ 失败。请选择立即重试。", attempt];
     }
     if ([s hasPrefix:@"Recently used path. Press "] && [s hasSuffix:@" to remove from recents."]) {
-        NSString *path = [s substringWithRange:NSMakeRange(26, s.length - 26 - 24)];
+        NSString *path = [s substringWithRange:NSMakeRange([@"Recently used path. Press " length], s.length - [@"Recently used path. Press " length] - [@" to remove from recents." length])];
         return [NSString stringWithFormat:@"最近使用的路径。按下 %@ 从最近记录中移除。", path];
     }
     if ([s hasPrefix:@"The server supports API revisions "]) {
-        return [NSString stringWithFormat:@"服务器支持 API 修订版 %@", [s substringFromIndex:34]];
+        return [NSString stringWithFormat:@"服务器支持 API 修订版 %@", [s substringFromIndex:[@"The server supports API revisions " length]]];
     }
     if ([s hasSuffix:@" was not found on this server"]) {
-        return [NSString stringWithFormat:@"%@未在此服务器上找到", [s substringToIndex:s.length - 29]];
+        return [NSString stringWithFormat:@"%@未在此服务器上找到", [s substringToIndex:s.length - [@" was not found on this server" length]]];
     }
     if ([s hasPrefix:@"no host has a session "]) {
-        return [NSString stringWithFormat:@"没有主机拥有会话 %@", [s substringFromIndex:22]];
+        return [NSString stringWithFormat:@"没有主机拥有会话 %@", [s substringFromIndex:[@"no host has a session " length]]];
     }
     if ([s hasPrefix:@"rex exited with status "]) {
-        return [NSString stringWithFormat:@"rex 已退出，状态码 %@", [s substringFromIndex:23]];
-    }
-    if ([s hasPrefix:@"Add a shortcut for "]) {
-        return [NSString stringWithFormat:@"为 %@ 添加快捷键", RXTranslate([s substringFromIndex:19])];
-    }
-    if ([s hasPrefix:@"Record, remove, or reset the keys bound to "]) {
-        return [NSString stringWithFormat:@"录制、移除或重置绑定到 %@ 的按键", RXTranslate([s substringFromIndex:43])];
+        return [NSString stringWithFormat:@"rex 已退出，状态码 %@", [s substringFromIndex:[@"rex exited with status " length]]];
     }
     if ([s hasPrefix:@"Reset Overrides ("]) {
-        return [NSString stringWithFormat:@"重置覆盖（%@", [s substringFromIndex:17]];
+        return [NSString stringWithFormat:@"重置覆盖（%@", [s substringFromIndex:[@"Reset Overrides (" length]]];
     }
     if ([s hasPrefix:@"The remote host couldn’t be added"] || [s hasPrefix:@"The remote host couldn't be added"]) return @"无法添加远程主机。";
     if ([s hasPrefix:@"The remote host couldn’t be updated"] || [s hasPrefix:@"The remote host couldn't be updated"]) return @"无法更新远程主机。";
     if ([s hasPrefix:@"The saved hosts couldn’t be read"] || [s hasPrefix:@"The saved hosts couldn't be read"]) return @"无法读取已保存的主机，因此不会保存此列表的更改。";
     if ([s hasPrefix:@"Rex must be updated: "]) {
-        return [NSString stringWithFormat:@"Rex 必须更新：%@", [s substringFromIndex:21]];
+        return [NSString stringWithFormat:@"Rex 必须更新：%@", [s substringFromIndex:[@"Rex must be updated: " length]]];
     }
     if ([s hasPrefix:@"The Rex server command failed: "]) {
-        return [NSString stringWithFormat:@"Rex 服务器命令失败：%@", [s substringFromIndex:31]];
+        return [NSString stringWithFormat:@"Rex 服务器命令失败：%@", [s substringFromIndex:[@"The Rex server command failed: " length]]];
     }
     if ([s hasPrefix:@"The Rex server did not become ready: "]) {
-        return [NSString stringWithFormat:@"Rex 服务器未能就绪：%@", [s substringFromIndex:36]];
+        return [NSString stringWithFormat:@"Rex 服务器未能就绪：%@", [s substringFromIndex:[@"The Rex server did not become ready: " length]]];
     }
     if ([s hasPrefix:@"The Rex server could not be launched: "]) {
-        return [NSString stringWithFormat:@"Rex 服务器无法启动：%@", [s substringFromIndex:38]];
+        return [NSString stringWithFormat:@"Rex 服务器无法启动：%@", [s substringFromIndex:[@"The Rex server could not be launched: " length]]];
     }
     if ([s hasPrefix:@"The Rex server working directory could not be prepared: "]) {
-        return [NSString stringWithFormat:@"Rex 服务器工作目录无法准备：%@", [s substringFromIndex:57]];
+        return [NSString stringWithFormat:@"Rex 服务器工作目录无法准备：%@", [s substringFromIndex:[@"The Rex server working directory could not be prepared: " length]]];
     }
     if ([s hasPrefix:@"The durable host ID is "]) {
-        return [NSString stringWithFormat:@"持久主机 ID 为 %@", [s substringFromIndex:23]];
+        return [NSString stringWithFormat:@"持久主机 ID 为 %@", [s substringFromIndex:[@"The durable host ID is " length]]];
     }
     if ([s hasPrefix:@"Set Cursor Blink Interval to "]) {
-        return [NSString stringWithFormat:@"将光标闪烁间隔设为 %@", [s substringFromIndex:29]];
+        return [NSString stringWithFormat:@"将光标闪烁间隔设为 %@", [s substringFromIndex:[@"Set Cursor Blink Interval to " length]]];
     }
     if ([s hasPrefix:@"Choose a preset or enter a whole number from "]) {
-        return [NSString stringWithFormat:@"选择预设，或输入一个整数，范围为 %@", [s substringFromIndex:45]];
+        return [NSString stringWithFormat:@"选择预设，或输入一个整数，范围为 %@", [s substringFromIndex:[@"Choose a preset or enter a whole number from " length]]];
     }
-    if ([s hasPrefix:@"Server supports "]) return [NSString stringWithFormat:@"服务器支持 %@", [s substringFromIndex:16]];
-    if ([s hasPrefix:@"Rex.app supports "]) return [NSString stringWithFormat:@"Rex.app 支持 %@", [s substringFromIndex:17]];
-    if ([s hasPrefix:@"Rex.app uses Revision "]) return [NSString stringWithFormat:@"Rex.app 使用修订版 %@", [s substringFromIndex:22]];
-    if ([s hasPrefix:@"Couldn’t read Rex Server’s permissions: "]) return [NSString stringWithFormat:@"无法读取 Rex 服务器的权限：%@", [s substringFromIndex:40]];
-    if ([s hasPrefix:@"Couldn't read Rex Server's permissions: "]) return [NSString stringWithFormat:@"无法读取 Rex 服务器的权限：%@", [s substringFromIndex:40]];
-    if ([s hasPrefix:@"Unable to follow Rex server logs: "]) return [NSString stringWithFormat:@"无法跟踪 Rex 服务器日志：%@", [s substringFromIndex:34]];
-    if ([s hasPrefix:@"Unable to observe Rex server status: "]) return [NSString stringWithFormat:@"无法观察 Rex 服务器状态：%@", [s substringFromIndex:37]];
-    if ([s hasPrefix:@"status exited with "]) return [NSString stringWithFormat:@"状态退出，结果为 %@", [s substringFromIndex:19]];
-    if ([s hasPrefix:@"Rex server status is ambiguous ("]) return [NSString stringWithFormat:@"Rex 服务器状态不明确（%@", [s substringFromIndex:32]];
-    if ([s hasPrefix:@"Rex server status could not be verified. "]) return [NSString stringWithFormat:@"无法验证 Rex 服务器状态。%@", [s substringFromIndex:41]];
-    if ([s hasPrefix:@"Rex Server is running as part of "]) return [NSString stringWithFormat:@"Rex 服务器属于 %@", [s substringFromIndex:33]];
-    if ([s hasPrefix:@"Rex server is running as part of "]) return [NSString stringWithFormat:@"Rex 服务器属于 %@", [s substringFromIndex:33]];
-    if ([s hasPrefix:@"The running Rex server and this Rex.app share no version of the control API."]) return [NSString stringWithFormat:@"正在运行的 Rex 服务器与此 Rex.app 没有共同的控制 API 版本。%@", [s substringFromIndex:76]];
-    if ([s hasPrefix:@"The running Rex server is older than this Rex.app. "]) return [NSString stringWithFormat:@"正在运行的 Rex 服务器版本低于此 Rex.app。%@", [s substringFromIndex:51]];
+    if ([s hasPrefix:@"Server supports "]) return [NSString stringWithFormat:@"服务器支持 %@", [s substringFromIndex:[@"Server supports " length]]];
+    if ([s hasPrefix:@"Rex.app supports "]) return [NSString stringWithFormat:@"Rex.app 支持 %@", [s substringFromIndex:[@"Rex.app supports " length]]];
+    if ([s hasPrefix:@"Rex.app uses Revision "]) return [NSString stringWithFormat:@"Rex.app 使用修订版 %@", [s substringFromIndex:[@"Rex.app uses Revision " length]]];
+    if ([s hasPrefix:@"Couldn’t read Rex Server’s permissions: "]) return [NSString stringWithFormat:@"无法读取 Rex 服务器的权限：%@", [s substringFromIndex:[@"Couldn’t read Rex Server’s permissions: " length]]];
+    if ([s hasPrefix:@"Couldn't read Rex Server's permissions: "]) return [NSString stringWithFormat:@"无法读取 Rex 服务器的权限：%@", [s substringFromIndex:[@"Couldn't read Rex Server's permissions: " length]]];
+    if ([s hasPrefix:@"Unable to follow Rex server logs: "]) return [NSString stringWithFormat:@"无法跟踪 Rex 服务器日志：%@", [s substringFromIndex:[@"Unable to follow Rex server logs: " length]]];
+    if ([s hasPrefix:@"Unable to observe Rex server status: "]) return [NSString stringWithFormat:@"无法观察 Rex 服务器状态：%@", [s substringFromIndex:[@"Unable to observe Rex server status: " length]]];
+    if ([s hasPrefix:@"status exited with "]) return [NSString stringWithFormat:@"状态退出，结果为 %@", [s substringFromIndex:[@"status exited with " length]]];
+    if ([s hasPrefix:@"Rex server status is ambiguous ("]) return [NSString stringWithFormat:@"Rex 服务器状态不明确（%@", [s substringFromIndex:[@"Rex server status is ambiguous (" length]]];
+    if ([s hasPrefix:@"Rex server status could not be verified. "]) return [NSString stringWithFormat:@"无法验证 Rex 服务器状态。%@", [s substringFromIndex:[@"Rex server status could not be verified. " length]]];
+    if ([s hasPrefix:@"Rex Server is running as part of "]) return [NSString stringWithFormat:@"Rex 服务器属于 %@", [s substringFromIndex:[@"Rex Server is running as part of " length]]];
+    if ([s hasPrefix:@"Rex server is running as part of "]) return [NSString stringWithFormat:@"Rex 服务器属于 %@", [s substringFromIndex:[@"Rex server is running as part of " length]]];
+    if ([s hasPrefix:@"The running Rex server and this Rex.app share no version of the control API."]) return [NSString stringWithFormat:@"正在运行的 Rex 服务器与此 Rex.app 没有共同的控制 API 版本。%@", [s substringFromIndex:[@"The running Rex server and this Rex.app share no version of the control API." length]]];
+    if ([s hasPrefix:@"The running Rex server is older than this Rex.app. "]) return [NSString stringWithFormat:@"正在运行的 Rex 服务器版本低于此 Rex.app。%@", [s substringFromIndex:[@"The running Rex server is older than this Rex.app. " length]]];
     NSString *controlAPIError = s;
     controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"The Rex API payload is invalid: " withString:@"Rex API 负载无效："];
     controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"The Rex API request is invalid: " withString:@"Rex API 请求无效："];
@@ -1844,51 +1871,51 @@ static NSString *RXTranslate(NSString *s) {
     controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"the server uses revision " withString:@"服务器使用修订版 "];
     controlAPIError = [controlAPIError stringByReplacingOccurrencesOfString:@"this app needs revisions " withString:@"此应用需要修订版 "];
     if (![controlAPIError isEqualToString:s]) return controlAPIError;
-    if ([s hasPrefix:@"Signing out of Tailscale timed out. "]) return [NSString stringWithFormat:@"退出 Tailscale 超时。%@", [s substringFromIndex:36]];
-    if ([s hasPrefix:@"Changing Tailscale tags timed out. "]) return [NSString stringWithFormat:@"更改 Tailscale 标签超时。%@", [s substringFromIndex:35]];
-    if ([s hasPrefix:@"This app is older than Rex on "]) return [NSString stringWithFormat:@"此应用版本低于主机上的 Rex：%@", [s substringFromIndex:30]];
-    if ([s hasPrefix:@"This device is offline. Restore your network connection, then retry connecting to "]) return [NSString stringWithFormat:@"此设备处于离线状态。请恢复网络连接，然后重试连接到 %@", [s substringFromIndex:82]];
-    if ([s hasPrefix:@"Rex couldn’t start Tailscale to remove the saved login. "]) return [NSString stringWithFormat:@"Rex 无法启动 Tailscale 以移除保存的登录信息。%@", [s substringFromIndex:56]];
-    if ([s hasPrefix:@"Rex couldn't start Tailscale to remove the saved login. "]) return [NSString stringWithFormat:@"Rex 无法启动 Tailscale 以移除保存的登录信息。%@", [s substringFromIndex:56]];
+    if ([s hasPrefix:@"Signing out of Tailscale timed out. "]) return [NSString stringWithFormat:@"退出 Tailscale 超时。%@", [s substringFromIndex:[@"Signing out of Tailscale timed out. " length]]];
+    if ([s hasPrefix:@"Changing Tailscale tags timed out. "]) return [NSString stringWithFormat:@"更改 Tailscale 标签超时。%@", [s substringFromIndex:[@"Changing Tailscale tags timed out. " length]]];
+    if ([s hasPrefix:@"This app is older than Rex on "]) return [NSString stringWithFormat:@"此应用版本低于主机上的 Rex：%@", [s substringFromIndex:[@"This app is older than Rex on " length]]];
+    if ([s hasPrefix:@"This device is offline. Restore your network connection, then retry connecting to "]) return [NSString stringWithFormat:@"此设备处于离线状态。请恢复网络连接，然后重试连接到 %@", [s substringFromIndex:[@"This device is offline. Restore your network connection, then retry connecting to " length]]];
+    if ([s hasPrefix:@"Rex couldn’t start Tailscale to remove the saved login. "]) return [NSString stringWithFormat:@"Rex 无法启动 Tailscale 以移除保存的登录信息。%@", [s substringFromIndex:[@"Rex couldn’t start Tailscale to remove the saved login. " length]]];
+    if ([s hasPrefix:@"Rex couldn't start Tailscale to remove the saved login. "]) return [NSString stringWithFormat:@"Rex 无法启动 Tailscale 以移除保存的登录信息。%@", [s substringFromIndex:[@"Rex couldn't start Tailscale to remove the saved login. " length]]];
     if ([s hasPrefix:@"Remove “"] && [s hasSuffix:@"”?"]) {
-        return [NSString stringWithFormat:@"移除%@", [s substringFromIndex:7]];
+        return [NSString stringWithFormat:@"移除%@", [s substringFromIndex:[@"Remove " length]]];
     }
     if ([s hasPrefix:@"Remove '"] && [s hasSuffix:@"'?"]) {
-        return [NSString stringWithFormat:@"移除%@", [s substringFromIndex:7]];
+        return [NSString stringWithFormat:@"移除%@", [s substringFromIndex:[@"Remove " length]]];
     }
     if ([s isEqualToString:@"theme"]) return @"主题";
     if ([s hasPrefix:@"Rex Beta Version "]) {
-        return [NSString stringWithFormat:@"Rex Beta 版本 %@", [s substringFromIndex:17]];
+        return [NSString stringWithFormat:@"Rex Beta 版本 %@", [s substringFromIndex:[@"Rex Beta Version " length]]];
     }
     if ([s hasPrefix:@"Version "]) {
-        return [NSString stringWithFormat:@"版本 %@", [s substringFromIndex:8]];
+        return [NSString stringWithFormat:@"版本 %@", [s substringFromIndex:[@"Version " length]]];
     }
     if ([s hasPrefix:@"Copy "]) {
-        NSString *suffix = [s substringFromIndex:5];
+        NSString *suffix = [s substringFromIndex:[@"Copy " length]];
         return [NSString stringWithFormat:@"复制%@", RXTranslate(suffix)];
     }
     if ([s hasPrefix:@"Hex value for "]) {
-        NSString *label = [s substringFromIndex:14];
+        NSString *label = [s substringFromIndex:[@"Hex value for " length]];
         return [NSString stringWithFormat:@"%@的十六进制值", RXTranslate(label)];
     }
-    if ([s hasPrefix:@"Black #"]) return [NSString stringWithFormat:@"黑色%@", [s substringFromIndex:5]];
-    if ([s hasPrefix:@"Red #"]) return [NSString stringWithFormat:@"红色%@", [s substringFromIndex:4]];
-    if ([s hasPrefix:@"Green #"]) return [NSString stringWithFormat:@"绿色%@", [s substringFromIndex:6]];
-    if ([s hasPrefix:@"Yellow #"]) return [NSString stringWithFormat:@"黄色%@", [s substringFromIndex:7]];
-    if ([s hasPrefix:@"Blue #"]) return [NSString stringWithFormat:@"蓝色%@", [s substringFromIndex:5]];
-    if ([s hasPrefix:@"Magenta #"]) return [NSString stringWithFormat:@"品红色%@", [s substringFromIndex:8]];
-    if ([s hasPrefix:@"Cyan #"]) return [NSString stringWithFormat:@"青色%@", [s substringFromIndex:4]];
-    if ([s hasPrefix:@"White #"]) return [NSString stringWithFormat:@"白色%@", [s substringFromIndex:5]];
-    if ([s hasPrefix:@"Bright Black #"]) return [NSString stringWithFormat:@"亮黑色%@", [s substringFromIndex:12]];
-    if ([s hasPrefix:@"Bright Red #"]) return [NSString stringWithFormat:@"亮红色%@", [s substringFromIndex:10]];
-    if ([s hasPrefix:@"Bright Green #"]) return [NSString stringWithFormat:@"亮绿色%@", [s substringFromIndex:12]];
-    if ([s hasPrefix:@"Bright Yellow #"]) return [NSString stringWithFormat:@"亮黄色%@", [s substringFromIndex:13]];
-    if ([s hasPrefix:@"Bright Blue #"]) return [NSString stringWithFormat:@"亮蓝色%@", [s substringFromIndex:11]];
-    if ([s hasPrefix:@"Bright Magenta #"]) return [NSString stringWithFormat:@"亮品红色%@", [s substringFromIndex:14]];
-    if ([s hasPrefix:@"Bright Cyan #"]) return [NSString stringWithFormat:@"亮青色%@", [s substringFromIndex:11]];
-    if ([s hasPrefix:@"Bright White #"]) return [NSString stringWithFormat:@"亮白色%@", [s substringFromIndex:12]];
+    if ([s hasPrefix:@"Black #"]) return [NSString stringWithFormat:@"黑色%@", [s substringFromIndex:[@"Black" length]]];
+    if ([s hasPrefix:@"Red #"]) return [NSString stringWithFormat:@"红色%@", [s substringFromIndex:[@"Red" length]]];
+    if ([s hasPrefix:@"Green #"]) return [NSString stringWithFormat:@"绿色%@", [s substringFromIndex:[@"Green" length]]];
+    if ([s hasPrefix:@"Yellow #"]) return [NSString stringWithFormat:@"黄色%@", [s substringFromIndex:[@"Yellow" length]]];
+    if ([s hasPrefix:@"Blue #"]) return [NSString stringWithFormat:@"蓝色%@", [s substringFromIndex:[@"Blue" length]]];
+    if ([s hasPrefix:@"Magenta #"]) return [NSString stringWithFormat:@"品红色%@", [s substringFromIndex:[@"Magenta" length]]];
+    if ([s hasPrefix:@"Cyan #"]) return [NSString stringWithFormat:@"青色%@", [s substringFromIndex:[@"Cyan" length]]];
+    if ([s hasPrefix:@"White #"]) return [NSString stringWithFormat:@"白色%@", [s substringFromIndex:[@"White" length]]];
+    if ([s hasPrefix:@"Bright Black #"]) return [NSString stringWithFormat:@"亮黑色%@", [s substringFromIndex:[@"Bright Black" length]]];
+    if ([s hasPrefix:@"Bright Red #"]) return [NSString stringWithFormat:@"亮红色%@", [s substringFromIndex:[@"Bright Red" length]]];
+    if ([s hasPrefix:@"Bright Green #"]) return [NSString stringWithFormat:@"亮绿色%@", [s substringFromIndex:[@"Bright Green" length]]];
+    if ([s hasPrefix:@"Bright Yellow #"]) return [NSString stringWithFormat:@"亮黄色%@", [s substringFromIndex:[@"Bright Yellow" length]]];
+    if ([s hasPrefix:@"Bright Blue #"]) return [NSString stringWithFormat:@"亮蓝色%@", [s substringFromIndex:[@"Bright Blue" length]]];
+    if ([s hasPrefix:@"Bright Magenta #"]) return [NSString stringWithFormat:@"亮品红色%@", [s substringFromIndex:[@"Bright Magenta" length]]];
+    if ([s hasPrefix:@"Bright Cyan #"]) return [NSString stringWithFormat:@"亮青色%@", [s substringFromIndex:[@"Bright Cyan" length]]];
+    if ([s hasPrefix:@"Bright White #"]) return [NSString stringWithFormat:@"亮白色%@", [s substringFromIndex:[@"Bright White" length]]];
     if ([s hasSuffix:@" theme"]) {
-        NSString *base = [s substringToIndex:s.length - 6];
+        NSString *base = [s substringToIndex:s.length - [@" theme" length]];
         NSString *translatedBase = RXTranslate(base);
         if (translatedBase.length && ![translatedBase isEqualToString:base]) return [translatedBase stringByAppendingString:@"主题"];
     }
@@ -1962,7 +1989,7 @@ static NSString *RXTranslate(NSString *s) {
         s = [s stringByReplacingOccurrencesOfString:@"Shares are of one GPU's time over each one-second sample. WindowServer composites Rex's transparent terminals over the window's glass and blur, so terminal output that redraws often shows up there rather than under Rex. Other windows also add to WindowServer's share. Use script/gpu-usage.py to record the same counters from Terminal." withString:@"每个一秒采样点中的占比是单个 GPU 时间的占比。WindowServer 会将 Rex 的透明终端合成到窗口的玻璃和模糊效果上，因此经常重绘的终端输出通常会显示在 WindowServer 下，而不是 Rex 下。其他窗口也会增加 WindowServer 的占比。使用 script/gpu-usage.py 可从终端记录相同的计数器。"];
     }
     if ([s hasSuffix:@" recorded"]) {
-        s = [[s substringToIndex:s.length - 9] stringByAppendingString:@" 已记录"];
+        s = [[s substringToIndex:s.length - [@" recorded" length]] stringByAppendingString:@" 已记录"];
     }
     if (![s isEqualToString:original]) return s;
     NSString *remoteHostError = s;
@@ -1976,10 +2003,10 @@ static NSString *RXTranslate(NSString *s) {
     remoteHostError = [remoteHostError stringByReplacingOccurrencesOfString:@". Check your network connection and the host's address, and make sure Rex is running on the host, then retry." withString:@"。请检查网络连接和主机地址，并确保主机上的 Rex 正在运行，然后重试。"];
     if (![remoteHostError isEqualToString:s]) return remoteHostError;
     if ([s hasPrefix:@"Check for Updates"]) return @"检查更新…";
-    if ([s hasSuffix:@"、Running"]) return [NSString stringWithFormat:@"%@、运行中", [s substringToIndex:s.length - 8]];
-    if ([s hasPrefix:@"Running for "]) return [NSString stringWithFormat:@"已运行%@", [s substringFromIndex:11]];
+    if ([s hasSuffix:@"、Running"]) return [NSString stringWithFormat:@"%@、运行中", [s substringToIndex:s.length - [@"、Running" length]]];
+    if ([s hasPrefix:@"Running for "]) return [NSString stringWithFormat:@"已运行%@", [s substringFromIndex:[@"Running for " length]]];
     if ([s hasPrefix:@"Create a session on "]) {
-        return [NSString stringWithFormat:@"在 %@ 上创建会话", RXTranslate([s substringFromIndex:20])];
+        return [NSString stringWithFormat:@"在 %@ 上创建会话", RXTranslate([s substringFromIndex:[@"Create a session on " length]])];
     }
     if ([s hasPrefix:@"Reconnecting to "]) {
         return [NSString stringWithFormat:@"正在重新连接 %@", [s substringFromIndex:[@"Reconnecting to " length]]];
@@ -1997,7 +2024,7 @@ static NSString *RXTranslate(NSString *s) {
         return [NSString stringWithFormat:@"已退出，状态码 %@", [s substringFromIndex:[@"Exited with status " length]]];
     }
     if ([s hasPrefix:@"Connection warning for "]) {
-        return [NSString stringWithFormat:@"连接警告：%@", RXTranslate([s substringFromIndex:23])];
+        return [NSString stringWithFormat:@"连接警告：%@", RXTranslate([s substringFromIndex:[@"Connection warning for " length]])];
     }
     if ([s hasPrefix:@"Connection errors: "]) {
         return [NSString stringWithFormat:@"连接错误：%@", [s substringFromIndex:[@"Connection errors: " length]]];
@@ -2038,25 +2065,19 @@ static NSString *RXTranslate(NSString *s) {
     }
     if ([s hasPrefix:@"登录 Tailscale、Access Rex securely from your other devices."]) return @"登录 Tailscale、从其他设备安全访问 Rex。";
     if ([s hasPrefix:@"Settings - "]) {
-        return [NSString stringWithFormat:@"设置 - %@", RXTranslate([s substringFromIndex:11])];
+        return [NSString stringWithFormat:@"设置 - %@", RXTranslate([s substringFromIndex:[@"Settings - " length]])];
     }
     if ([s hasPrefix:@"Rex Server Running for "]) {
-        return [NSString stringWithFormat:@"Rex 服务器已运行 %@", [s substringFromIndex:23]];
+        return [NSString stringWithFormat:@"Rex 服务器已运行 %@", [s substringFromIndex:[@"Rex Server Running for " length]]];
     }
     NSRange serverMarker = [s rangeOfString:@"Rex Server Running for"];
     if (serverMarker.location != NSNotFound) {
         NSString *duration = [s substringFromIndex:serverMarker.location + serverMarker.length];
         return [NSString stringWithFormat:@"Rex 服务器已运行%@", duration];
     }
-    if ([s hasPrefix:@"Change the shortcut for "]) {
-        return [NSString stringWithFormat:@"修改 %@ 的快捷键", RXTranslate([s substringFromIndex:24])];
-    }
-    if ([s hasPrefix:@"Record a shortcut for "]) {
-        return [NSString stringWithFormat:@"录制 %@ 的快捷键", RXTranslate([s substringFromIndex:22])];
-    }
     if ([s hasPrefix:@"录制 "] && [s hasSuffix:@" 的快捷键"]) {
         NSString *suffix = @" 的快捷键";
-        NSString *action = [s substringWithRange:NSMakeRange(3, s.length - 3 - suffix.length)];
+        NSString *action = [s substringWithRange:NSMakeRange([@"录制 " length], s.length - [@"录制 " length] - suffix.length)];
         return [NSString stringWithFormat:@"录制 %@ 的快捷键", RXTranslate(action)];
     }
     if ([s hasPrefix:@"Opens "] && [s hasSuffix:@" settings"]) {
@@ -2106,7 +2127,7 @@ static NSString *RXTranslate(NSString *s) {
         return s;
     }
     if ([s hasPrefix:@"Move "] && [s hasSuffix:@" pane"]) {
-        NSString *middle = [s substringWithRange:NSMakeRange(5, s.length - 10)];
+        NSString *middle = [s substringWithRange:NSMakeRange([@"Move " length], s.length - [@"Move " length] - [@" pane" length])];
         return [NSString stringWithFormat:@"移动 %@ 窗格", middle];
     }
     return s;
@@ -2228,6 +2249,7 @@ static NSRect RXDefaultShellFrame;
 static BOOL RXHasDefaultShellFrame;
 static NSRect RXNotificationFrame;
 static BOOL RXHasNotificationFrame;
+static NSString *RXNotificationPositionText;
 static NSRect RXRemoteHeaderFrame;
 static BOOL RXHasRemoteHeaderFrame;
 static NSRect RXServerAccessFrame;
@@ -3318,6 +3340,8 @@ static void RXWalk(NSView *view) {
 
 @interface RXResidualOverlayView : NSView
 @property(nonatomic, copy) NSString *text;
+@property(nonatomic) CGFloat fontSize;
+@property(nonatomic) BOOL settingsSubtitle;
 @end
 
 @implementation RXResidualOverlayView
@@ -3326,10 +3350,16 @@ static void RXWalk(NSView *view) {
 - (NSView *)hitTest:(NSPoint)point { (void)point; return nil; }
 - (void)drawRect:(NSRect)dirtyRect {
     (void)dirtyRect;
-    [[NSColor.controlBackgroundColor colorWithAlphaComponent:1.0] setFill];
+    // The 0.1.0 settings card uses a subtle fill; controlColor is solid white
+    // in Aqua and produced a visible white bar over the translated subtitle.
+    // These fills match 0.1.0's default Merino/Classic cards in both appearances.
+    BOOL dark = [[self.effectiveAppearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameAqua, NSAppearanceNameDarkAqua]] isEqualToString:NSAppearanceNameDarkAqua];
+    NSColor *background = self.settingsSubtitle ? [NSColor colorWithSRGBRed:dark ? 0.101085 : 0.956254
+        green:dark ? 0.113529 : 0.956254 blue:dark ? 0.135443 : 0.956254 alpha:1.0] : NSColor.controlBackgroundColor;
+    [[background colorWithAlphaComponent:1.0] setFill];
     NSRectFill(self.bounds);
     NSDictionary *attributes = @{
-        NSFontAttributeName: [NSFont systemFontOfSize:16.0],
+        NSFontAttributeName: [NSFont systemFontOfSize:self.fontSize > 0.0 ? self.fontSize : 16.0],
         NSForegroundColorAttributeName: NSColor.secondaryLabelColor
     };
     [self.text drawAtPoint:NSMakePoint(0.0, 1.0) withAttributes:attributes];
@@ -3359,35 +3389,6 @@ static void RXSetColorPickerLabelOverlay(NSWindow *window, NSString *key, NSStri
         NSForegroundColorAttributeName: NSColor.placeholderTextColor
     };
     [self.text drawAtPoint:NSMakePoint(2.0, 4.0) withAttributes:attributes];
-}
-@end
-
-@interface RXTerminalPreviewOverlayView : NSView
-@end
-
-@implementation RXTerminalPreviewOverlayView
-- (BOOL)isFlipped { return YES; }
-- (BOOL)isOpaque { return YES; }
-- (NSView *)hitTest:(NSPoint)point { (void)point; return nil; }
-- (void)drawRect:(NSRect)dirtyRect {
-    (void)dirtyRect;
-    NSBezierPath *box = [NSBezierPath bezierPathWithRoundedRect:NSInsetRect(self.bounds, 0.5, 0.5) xRadius:11.0 yRadius:11.0];
-    [NSColor.textBackgroundColor setFill];
-    [box fill];
-    [NSColor.separatorColor setStroke];
-    [box stroke];
-    NSDictionary *attributes = @{
-        NSFontAttributeName: [NSFont fontWithName:@"Menlo" size:15.0] ?: [NSFont monospacedSystemFontOfSize:15.0 weight:NSFontWeightRegular],
-        NSForegroundColorAttributeName: NSColor.labelColor
-    };
-    NSArray *lines = @[
-        @"~/rex | main $ Swift 构建 && Swift 测试",
-        @"main.swift:4: 警告：'run() -> Bool' 已弃用",
-        @"构建完成！ (1.24 秒)"
-    ];
-    for (NSUInteger index = 0; index < lines.count; index++) {
-        [lines[index] drawAtPoint:NSMakePoint(12.0, 5.0 + index * 17.0) withAttributes:attributes];
-    }
 }
 @end
 
@@ -3620,7 +3621,7 @@ static void RXRemoveOwnedResidualOverlays(void) {
 static void RXRemoveResidualOverlays(NSView *view) {
     if (![view isKindOfClass:[NSView class]]) return;
     for (NSView *subview in [view.subviews copy]) {
-        if ([subview isKindOfClass:[RXResidualOverlayView class]] || [subview isKindOfClass:[RXRemoteHostPlaceholderOverlayView class]] || [subview isKindOfClass:[RXTerminalPreviewOverlayView class]]) {
+        if ([subview isKindOfClass:[RXResidualOverlayView class]] || [subview isKindOfClass:[RXRemoteHostPlaceholderOverlayView class]]) {
             [subview removeFromSuperview];
             continue;
         }
@@ -3846,6 +3847,10 @@ static void RXSetWindowResidualOverlay(NSWindow *window, NSString *key, NSString
     overlay.wantsLayer = YES;
     overlay.layer.zPosition = 1000.0;
     overlay.text = text;
+    if ([key isEqualToString:@"rex-server-access"] || [key isEqualToString:@"rex-notification-position"]) {
+        overlay.fontSize = 11.0;
+        overlay.settingsSubtitle = YES;
+    }
     [host addSubview:overlay positioned:NSWindowAbove relativeTo:nil];
     [overlay setNeedsDisplay:YES];
 }
@@ -3888,6 +3893,31 @@ static NSView *RXFindSettingsDetail(NSView *view) {
     return nil;
 }
 
+static BOOL RXCollectNotificationPosition(id element, NSUInteger depth) {
+    if (!element || depth > 20 || RXIsOwnedOverlayObject(element)) return NO;
+    // SwiftUI's subtitle is exposed through the modern AX getters, but not
+    // consistently through accessibilityAttributeValue: during the legacy
+    // walk. Read the same modern tree used by the external AX client.
+    id value = [element respondsToSelector:@selector(accessibilityValue)] ?
+        ((id (*)(id, SEL))objc_msgSend)(element, @selector(accessibilityValue)) : nil;
+    NSString *text = [value isKindOfClass:[NSString class]] ? RXTranslate(value) : nil;
+    if (text && [@[@"显示在左上角", @"显示在顶部居中", @"显示在右上角", @"显示在左下角", @"显示在底部居中", @"显示在右下角"] containsObject:text]) {
+        NSRect frame = RXAccessibilityFrame(element);
+        if (!NSIsEmptyRect(frame)) {
+            RXNotificationFrame = frame;
+            RXNotificationPositionText = text;
+            RXHasNotificationFrame = YES;
+            return YES;
+        }
+    }
+    id children = [element respondsToSelector:@selector(accessibilityChildren)] ?
+        ((id (*)(id, SEL))objc_msgSend)(element, @selector(accessibilityChildren)) : nil;
+    if ([children isKindOfClass:[NSArray class]]) {
+        for (id child in children) if (RXCollectNotificationPosition(child, depth + 1)) return YES;
+    }
+    return NO;
+}
+
 static void RXUpdateSettingsResidualOverlays(NSWindow *window) {
     NSString *title = window.title ?: @"";
     if (![title hasPrefix:@"设置"] && ![title hasPrefix:@"Settings"]) return;
@@ -3916,20 +3946,14 @@ static void RXUpdateSettingsResidualOverlays(NSWindow *window) {
         }
     }
     if (notifications) {
+        RXCollectNotificationPosition(window, 0);
         if (RXHasNotificationFrame) {
-            RXSetWindowResidualOverlay(window, @"rex-notification-position", @"显示在右下角", RXNotificationFrame);
-        } else {
-            RXSetResidualOverlay(detail, @"rex-notification-position", @"显示在右下角", NSMakeRect(30.0, 679.0, 430.0, 25.0), NO);
+            RXSetWindowResidualOverlay(window, @"rex-notification-position", RXNotificationPositionText, RXNotificationFrame);
         }
     }
     if (terminal) {
-        RXTerminalPreviewOverlayView *preview = [[RXTerminalPreviewOverlayView alloc] initWithFrame:NSMakeRect(30.0, 676.0, 625.0, 57.0)];
-        if (!RXOwnedResidualOverlays) RXOwnedResidualOverlays = [NSHashTable weakObjectsHashTable];
-        [RXOwnedResidualOverlays addObject:preview];
-        preview.wantsLayer = YES;
-        preview.layer.zPosition = 1000.0;
-        [detail addSubview:preview positioned:NSWindowAbove relativeTo:nil];
-        [preview setNeedsDisplay:YES];
+        // The GPU preview sample is patched in RexCore's guarded __cstring
+        // constant, preserving its real font, colors, and scrolling behavior.
         if (RXHasDefaultShellFrame) RXSetWindowResidualOverlay(window, @"rex-default-login-shell", @"默认登录 Shell", RXDefaultShellFrame);
     }
 }
@@ -3947,7 +3971,11 @@ static void RXWalkAX(id element, NSUInteger depth) {
             NSRect rawFrame = RXAccessibilityFrame(element);
             if ([rawValue containsString:@"Access Rex securely from your other devices."] ||
                 [value containsString:@"Access Rex securely from your other devices."] ||
-                [translated containsString:@"从其他设备安全访问 Rex。"] ) {
+                [translated containsString:@"从其他设备安全访问 Rex。"]) {
+                // The combined AX label includes the title and subtitle.
+                // AppKit screen frames use a bottom-left origin: keep only
+                // the subtitle line at the bottom of this combined frame.
+                if (rawFrame.size.height > 22.0) rawFrame.size.height = 14.0;
                 RXServerAccessFrame = rawFrame;
                 RXHasServerAccessFrame = !NSIsEmptyRect(rawFrame);
             }
@@ -3995,10 +4023,12 @@ static void RXWalkAX(id element, NSUInteger depth) {
                 RXDefaultShellFrame = frame;
                 RXHasDefaultShellFrame = !NSIsEmptyRect(frame);
             }
-            if ([rawValue containsString:@"Displayed bottom right"] || [value containsString:@"Displayed bottom right"]) {
-                NSRect frame = RXAccessibilityFrame(element);
-                RXNotificationFrame = frame;
-                RXHasNotificationFrame = !NSIsEmptyRect(frame);
+            if ([@[@"显示在左上角", @"显示在顶部居中", @"显示在右上角", @"显示在左下角", @"显示在底部居中", @"显示在右下角"] containsObject:translated]) {
+                // AX getters can already return the translation while SwiftUI
+                // still draws the original subtitle. Track either form.
+                RXNotificationFrame = rawFrame;
+                RXHasNotificationFrame = !NSIsEmptyRect(rawFrame);
+                RXNotificationPositionText = translated;
             }
             if (![translated isEqualToString:value]) {
                 id frame = [element accessibilityAttributeValue:@"AXFrame"];
@@ -4083,6 +4113,7 @@ static void RXRefreshAccessibility(void) {
     for (NSWindow *window in NSApp.windows) {
         RXHasDefaultShellFrame = NO;
         RXHasNotificationFrame = NO;
+        RXNotificationPositionText = nil;
         RXHasRemoteHeaderFrame = NO;
         RXHasServerAccessFrame = NO;
         RXHasRemoteErrorFrame = NO;

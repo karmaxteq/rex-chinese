@@ -2,6 +2,7 @@ import Foundation
 import SwiftUI
 
 private let translations: [String: String] = [
+  "Waiting for permission": "正在等待权限",
   "Settings": "设置",
   "Server": "服务器",
   "Interface": "界面",
@@ -142,6 +143,11 @@ private let translations: [String: String] = [
   "In-App Notifications": "应用内通知",
   "Notification position": "通知位置",
   "Displayed bottom right": "显示在右下角",
+  "Displayed top left": "显示在左上角",
+  "Displayed top center": "显示在顶部居中",
+  "Displayed top right": "显示在右上角",
+  "Displayed bottom left": "显示在左下角",
+  "Displayed bottom center": "显示在底部居中",
   "Program Activity": "程序活动",
   "How status from processes and agents is handled": "进程和智能体状态的处理方式",
   "Show activity in tabs": "在标签页中显示活动",
@@ -721,6 +727,8 @@ private let translations: [String: String] = [
   "Keep the shortcut as it was.": "保留原快捷键。",
   "Record a shortcut": "录制快捷键",
   "Type Shortcut": "输入快捷键",
+  "Type Shortcut...": "输入快捷键…",
+  "Type Shortcut…": "输入快捷键…",
   "This release cannot be installed on this Mac.": "此版本无法安装在此 Mac 上。",
   "Rex App Update Failed": "Rex 应用更新失败",
   "Retry Rex App Update": "重试 Rex 应用更新",
@@ -1561,6 +1569,33 @@ private let translations: [String: String] = [
 
 private func translate(_ value: String) -> String {
   if let translated = translations[value] { return translated }
+  // Translate shortcut wrappers before general substitutions can return a
+  // partially translated sentence (for example a Diagnostics action name).
+  if value.hasPrefix("Press a shortcut for ") {
+    return "按下用于" + translate(String(value.dropFirst("Press a shortcut for ".count))) + "的快捷键"
+  }
+  if value.hasPrefix("Change the shortcut for ") {
+    return "修改 " + translate(String(value.dropFirst("Change the shortcut for ".count))) + " 的快捷键"
+  }
+  if value.hasPrefix("Record a shortcut for ") {
+    return "录制 " + translate(String(value.dropFirst("Record a shortcut for ".count))) + " 的快捷键"
+  }
+  if value.hasPrefix("Add a shortcut for ") {
+    return "为 " + translate(String(value.dropFirst("Add a shortcut for ".count))) + " 添加快捷键"
+  }
+  if value.hasPrefix("Record, remove, or reset the keys bound to ") {
+    return "录制、移除或重置绑定到 " + translate(String(value.dropFirst("Record, remove, or reset the keys bound to ".count))) + " 的按键"
+  }
+  // App menus use the installed bundle's display name. Match known Rex names
+  // exactly so similarly prefixed session titles and user text stay untouched.
+  for appName in ["Rex", "Rex Beta", "Rex 中文版", "Rex Beta 中文版"] {
+    if value == "Quit " + appName { return "退出" + appName }
+    if value == "Hide " + appName { return "隐藏" + appName }
+    if value == "About " + appName { return "关于" + appName }
+    if value == "About " + appName + "…" || value == "About " + appName + "..." {
+      return "关于" + appName + "…"
+    }
+  }
   if value.contains("Hue ") || value.contains("chroma ") || value.contains("Lightness ") {
     return value
       .replacingOccurrences(of: "Hue ", with: "色相 ")
@@ -1627,6 +1662,9 @@ private func translate(_ value: String) -> String {
   if value.hasPrefix("This Mac leaves your tailnet. The next time you turn Tailscale on, you") {
     return "此 Mac 将离开你的 Tailnet。下次开启 Tailscale 时，需要重新登录。"
   }
+  if value.hasPrefix("Move ") && value.hasSuffix(" pane") {
+    return "移动 " + value.dropFirst("Move ".count).dropLast(" pane".count) + " 窗格"
+  }
   if value.hasPrefix("Press a shortcut") {
     return "按下快捷键" + value.dropFirst("Press a shortcut".count)
   }
@@ -1692,17 +1730,14 @@ private func translate(_ value: String) -> String {
   if value.hasSuffix(" is not a folder") {
     return String(value.dropLast(" is not a folder".count)) + " 不是文件夹"
   }
-  if value.hasPrefix(" is not an HTTP or HTTPS address") {
-    return "不是 HTTP 或 HTTPS 地址" + value.dropFirst(" is not an HTTP or HTTPS address".count)
+  if value.hasSuffix(" is not an HTTP or HTTPS address") {
+    return value.dropLast(" is not an HTTP or HTTPS address".count) + " 不是 HTTP 或 HTTPS 地址"
   }
   if value.hasPrefix("Couldn’t Connect to ") {
     return "无法连接到 " + value.dropFirst("Couldn’t Connect to ".count)
   }
   if value.hasPrefix("Couldn't Connect to ") {
     return "无法连接到 " + value.dropFirst("Couldn't Connect to ".count)
-  }
-  if value.hasPrefix("Press a shortcut for ") {
-    return "按下用于" + value.dropFirst("Press a shortcut for ".count)
   }
   if value.hasPrefix("Another client resized this terminal to ") {
     return "另一个客户端已将此终端调整为 " + value.dropFirst("Another client resized this terminal to ".count)
@@ -1732,12 +1767,6 @@ private func translate(_ value: String) -> String {
   }
   if value.hasPrefix("rex exited with status ") {
     return "rex 已退出，状态码 " + value.dropFirst("rex exited with status ".count)
-  }
-  if value.hasPrefix("Add a shortcut for ") {
-    return "为 " + translate(String(value.dropFirst("Add a shortcut for ".count))) + " 添加快捷键"
-  }
-  if value.hasPrefix("Record, remove, or reset the keys bound to ") {
-    return "录制、移除或重置绑定到 " + translate(String(value.dropFirst("Record, remove, or reset the keys bound to ".count))) + " 的按键"
   }
   if value.hasPrefix("Reset Overrides (") {
     return "重置覆盖（" + value.dropFirst("Reset Overrides (".count)
@@ -1929,12 +1958,6 @@ private func translate(_ value: String) -> String {
   }
   if value.contains("API Version Revision ") {
     return value.replacingOccurrences(of: "API Version", with: "API 版本").replacingOccurrences(of: "Revision ", with: "修订版 ")
-  }
-  if value.hasPrefix("Change the shortcut for ") {
-    return "修改 " + translate(String(value.dropFirst("Change the shortcut for ".count))) + " 的快捷键"
-  }
-  if value.hasPrefix("Record a shortcut for ") {
-    return "录制 " + translate(String(value.dropFirst("Record a shortcut for ".count))) + " 的快捷键"
   }
   if value.hasPrefix("Click to record a different shortcut.") { return "点击以录制其他快捷键。" }
   if value.hasPrefix("Click to record a shortcut.") { return "点击以录制快捷键。" }

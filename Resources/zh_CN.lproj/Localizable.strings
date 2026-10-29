@@ -165,6 +165,11 @@
 "Filter Shortcuts…" = "筛选快捷键…";
 "Filter Shortcuts..." = "筛选快捷键…";
 "Displayed bottom right" = "显示在右下角";
+"Displayed top left" = "显示在左上角";
+"Displayed top center" = "显示在顶部居中";
+"Displayed top right" = "显示在右上角";
+"Displayed bottom left" = "显示在左下角";
+"Displayed bottom center" = "显示在底部居中";
 "Access Rex securely from your other devices." = "从其他设备安全访问 Rex。";
 "Working、标签页、通知、Dock Badge和Sound" = "运行中、标签页、通知、程序坞标记和声音";
 "Blocked、标签页、通知、Dock Badge和Sound" = "已阻塞、标签页、通知、程序坞标记和声音";
@@ -315,6 +320,8 @@
 "Keep the shortcut as it was." = "保留原快捷键。";
 "Record a shortcut" = "录制快捷键";
 "Type Shortcut" = "输入快捷键";
+"Type Shortcut..." = "输入快捷键…";
+"Type Shortcut…" = "输入快捷键…";
 "This release cannot be installed on this Mac." = "此版本无法安装在此 Mac 上。";
 "Retry Rex App Update" = "重试 Rex 应用更新";
 "Check Rex App for Updates" = "检查 Rex 应用更新";
