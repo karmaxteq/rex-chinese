@@ -2709,6 +2709,8 @@ static IMP origAXElementAttribute, origAXElementValue, origAXElementPlaceholder,
 static IMP origMockAccessibilityAttribute;
 static IMP origAttributedPlaceholder, origCellPlaceholder, origCellAttributedPlaceholder;
 static NSString *RXTranslateColorAXText(id element, NSString *attribute, NSString *value);
+static BOOL RXIsColorSwatchClass(Class cls);
+static void RXInstallColorWellHooks(void);
 // Editable values are user input. Placeholder/label translation must never
 // turn a query or command such as "Filter" into the matching UI translation.
 static BOOL RXIsEditableTextObject(id object) {
@@ -3167,6 +3169,34 @@ static BOOL RXIsSwiftAccessibilityNode(Class cls, Class nodeClass) {
     return NO;
 }
 
+// SwiftUI frequently leaves accessibility getters on AccessibilityNode and
+// lets its concrete nodes inherit them.  Looking only at each class's own
+// method list therefore misses the live nodes even though the class belongs to
+// the expected hierarchy.  Find the class that owns each selector, install the
+// replacement there once, and key the saved IMP by that owner so inherited
+// calls can still resolve their original implementation safely.
+static void RXInstallSwiftNodeSelector(Class cls, SEL selector, IMP replacement) {
+    for (Class owner = cls; owner; owner = class_getSuperclass(owner)) {
+        unsigned int count = 0;
+        Method *methods = class_copyMethodList(owner, &count);
+        Method found = NULL;
+        for (unsigned int i = 0; i < count; i++) {
+            if (method_getName(methods[i]) == selector) {
+                found = methods[i];
+                break;
+            }
+        }
+        free(methods);
+        if (!found) continue;
+        NSString *key = [NSString stringWithFormat:@"%p:%s", owner, sel_getName(selector)];
+        if (!RXSwiftNodeOriginals[key]) {
+            RXSwiftNodeOriginals[key] = [NSValue valueWithPointer:method_getImplementation(found)];
+            method_setImplementation(found, replacement);
+        }
+        return;
+    }
+}
+
 static void RXInstallSwiftNodeHooks(void) {
     Class nodeClass = objc_getClass("SwiftUI.AccessibilityNode");
     if (!nodeClass) return;
@@ -3188,20 +3218,9 @@ static void RXInstallSwiftNodeHooks(void) {
     for (unsigned int i = 0; i < count; i++) {
         Class cls = classes[i];
         if (!RXIsSwiftAccessibilityNode(cls, nodeClass)) continue;
-        unsigned int methodCount = 0;
-        Method *methods = class_copyMethodList(cls, &methodCount);
         for (NSUInteger j = 0; j < sizeof(selectors) / sizeof(selectors[0]); j++) {
-            for (unsigned int k = 0; k < methodCount; k++) {
-                if (method_getName(methods[k]) != selectors[j]) continue;
-                NSString *key = [NSString stringWithFormat:@"%p:%s", cls, sel_getName(selectors[j])];
-                if (!RXSwiftNodeOriginals[key]) {
-                    RXSwiftNodeOriginals[key] = [NSValue valueWithPointer:method_getImplementation(methods[k])];
-                    method_setImplementation(methods[k], replacements[j]);
-                }
-                break;
-            }
+            RXInstallSwiftNodeSelector(cls, selectors[j], replacements[j]);
         }
-        free(methods);
     }
     Class cellValueClass = [NSPopUpButtonCell class];
     SEL cellValueSelector = @selector(accessibilityValue);
@@ -3670,6 +3689,149 @@ static BOOL RXGeneratedColorIndex(NSString *label, NSUInteger *index) {
 }
 
 static __thread BOOL RXInColorAXHook;
+static BOOL RXIsColorSwatchClass(Class cls) {
+    const char *name = cls ? class_getName(cls) : NULL;
+    if (!name) return NO;
+    // Rex's generated extended-palette cells are private Swift classes. Keep
+    // the dynamic hook limited to that family; never patch AppKit's shared AX
+    // base classes just because a user supplied string happens to match.
+    return strstr(name, "ThemeCustomizerColorWell") != NULL ||
+           strstr(name, "ThemeCustomizer") != NULL && strstr(name, "Swatch") != NULL;
+}
+static void RXInstallColorSwatchHooks(id element) {
+    Class cls = object_getClass(element);
+    if (!RXIsColorSwatchClass(cls)) return;
+    NSMutableString *chain = [NSMutableString string];
+    for (Class probe = cls; probe; probe = class_getSuperclass(probe)) {
+        if (chain.length) [chain appendString:@" <- "];
+        [chain appendString:NSStringFromClass(probe) ?: @"?"];
+    }
+    SEL selectors[] = {
+        @selector(accessibilityLabel), @selector(accessibilityDescription),
+        @selector(accessibilityValue), @selector(accessibilityValueDescription),
+        @selector(accessibilityAttributeValue:)
+    };
+    IMP replacements[] = {
+        (IMP)RXSwiftLabel, (IMP)RXSwiftDescription,
+        (IMP)RXSwiftValue, (IMP)RXSwiftValueDescription,
+        (IMP)RXSwiftAttribute
+    };
+    for (NSUInteger i = 0; i < sizeof(selectors) / sizeof(selectors[0]); i++) {
+        SEL selector = selectors[i];
+        // The generated Swatch class inherits every AX getter from
+        // NSColorWell.  Patching that shared superclass would affect normal
+        // AppKit color wells, so materialize an override on this concrete
+        // private class and retain the inherited IMP in its own table entry.
+        Method inherited = class_getInstanceMethod(cls, selector);
+        if (!inherited) continue;
+        NSString *key = [NSString stringWithFormat:@"%p:%s", cls, sel_getName(selector)];
+        if (RXSwiftNodeOriginals[key]) continue;
+        IMP original = method_getImplementation(inherited);
+        const char *types = method_getTypeEncoding(inherited);
+        if (!class_addMethod(cls, selector, replacements[i], types)) {
+            Method own = class_getInstanceMethod(cls, selector);
+            if (!own) continue;
+            original = method_getImplementation(own);
+            method_setImplementation(own, replacements[i]);
+        }
+        RXSwiftNodeOriginals[key] = [NSValue valueWithPointer:original];
+    }
+}
+
+// The extended palette exposes private Swatch instances through NSColorWell's
+// accessibility provider.  The provider can bypass a subclass method added
+// after the object is created, so give NSColorWell its own filtered methods at
+// startup.  The wrappers call the saved AppKit IMP for every ordinary color
+// well and translate only Rex's generated Swatch class.
+static BOOL RXIsColorSwatchObject(id element) {
+    return RXIsColorSwatchClass(object_getClass(element));
+}
+static BOOL RXHasGeneratedColorStateContext(id element) {
+    // The lazy SwiftUI Swatch nodes do not expose their raw label/help through
+    // the legacy AX bridge, so their private class is the only reliable
+    // context. Fixture/native color wells still expose the standard help and
+    // generated label; require both before translating an otherwise ordinary
+    // user value such as Unedited.
+    if (RXIsColorSwatchObject(element)) return YES;
+    id help = RXRawAXValue(element, NSAccessibilityHelpAttribute);
+    BOOL standardHelp = [help isEqual:@"Click to choose a color."] ||
+        [help isEqual:@"点击选择颜色。"];
+    if (!standardHelp) return NO;
+    for (NSString *attribute in @[NSAccessibilityDescriptionAttribute,
+                                  NSAccessibilityTitleAttribute, @"AXLabel"]) {
+        id rawLabel = RXRawAXValue(element, attribute);
+        if ([rawLabel isKindOfClass:NSString.class] &&
+            RXGeneratedColorIndex(rawLabel, NULL)) return YES;
+    }
+    return NO;
+}
+static NSString *RXColorWellLabel(id self, SEL _cmd) {
+    IMP original = RXSwiftNodeOriginal(self, _cmd);
+    NSString *value = original ? ((NSString *(*)(id, SEL))original)(self, _cmd) : nil;
+    if (!RXIsColorSwatchObject(self)) return value;
+    return RXTranslateColorAXText(self, @"AXLabel", value);
+}
+static NSString *RXColorWellDescription(id self, SEL _cmd) {
+    IMP original = RXSwiftNodeOriginal(self, _cmd);
+    NSString *value = original ? ((NSString *(*)(id, SEL))original)(self, _cmd) : nil;
+    if (!RXIsColorSwatchObject(self)) return value;
+    return RXTranslateColorAXText(self, NSAccessibilityDescriptionAttribute, value);
+}
+static id RXColorWellValue(id self, SEL _cmd) {
+    IMP original = RXSwiftNodeOriginal(self, _cmd);
+    id value = original ? ((id (*)(id, SEL))original)(self, _cmd) : nil;
+    if (!RXIsColorSwatchObject(self) || ![value isKindOfClass:NSString.class]) return value;
+    return RXTranslateColorAXText(self, NSAccessibilityValueAttribute, value);
+}
+static id RXColorWellValueDescription(id self, SEL _cmd) {
+    IMP original = RXSwiftNodeOriginal(self, _cmd);
+    id value = original ? ((id (*)(id, SEL))original)(self, _cmd) : nil;
+    if (!RXIsColorSwatchObject(self) || ![value isKindOfClass:NSString.class]) return value;
+    return RXTranslateColorAXText(self, NSAccessibilityValueDescriptionAttribute, value);
+}
+static id RXColorWellAttribute(id self, SEL _cmd, NSString *attribute) {
+    IMP original = RXSwiftNodeOriginal(self, _cmd);
+    id value = original ? ((id (*)(id, SEL, NSString *))original)(self, _cmd, attribute) : nil;
+    if (!RXIsColorSwatchObject(self) || ![value isKindOfClass:NSString.class]) return value;
+    return RXTranslateColorAXText(self, attribute, value);
+}
+static id RXColorWellPrivateAttribute(id self, SEL _cmd, NSString *attribute, int *clientError) {
+    IMP original = RXSwiftNodeOriginal(self, _cmd);
+    id value = original ? ((id (*)(id, SEL, NSString *, int *))original)(self, _cmd, attribute, clientError) : nil;
+    if (!RXIsColorSwatchObject(self) || ![value isKindOfClass:NSString.class]) return value;
+    return RXTranslateColorAXText(self, attribute, value);
+}
+static void RXInstallColorWellHooks(void) {
+    if (!RXSwiftNodeOriginals) RXSwiftNodeOriginals = [NSMutableDictionary dictionary];
+    Class cls = [NSColorWell class];
+    SEL selectors[] = {
+        @selector(accessibilityLabel), @selector(accessibilityDescription),
+        @selector(accessibilityValue), @selector(accessibilityValueDescription),
+        @selector(accessibilityAttributeValue:),
+        NSSelectorFromString(@"_accessibilityValueForAttribute:clientError:")
+    };
+    IMP replacements[] = {
+        (IMP)RXColorWellLabel, (IMP)RXColorWellDescription,
+        (IMP)RXColorWellValue, (IMP)RXColorWellValueDescription,
+        (IMP)RXColorWellAttribute, (IMP)RXColorWellPrivateAttribute
+    };
+    for (NSUInteger i = 0; i < sizeof(selectors) / sizeof(selectors[0]); i++) {
+        SEL selector = selectors[i];
+        Method method = class_getInstanceMethod(cls, selector);
+        if (!method) continue;
+        NSString *key = [NSString stringWithFormat:@"%p:%s", cls, sel_getName(selector)];
+        if (RXSwiftNodeOriginals[key]) continue;
+        IMP original = method_getImplementation(method);
+        const char *types = method_getTypeEncoding(method);
+        if (!class_addMethod(cls, selector, replacements[i], types)) {
+            method = class_getInstanceMethod(cls, selector);
+            if (!method) continue;
+            original = method_getImplementation(method);
+            method_setImplementation(method, replacements[i]);
+        }
+        RXSwiftNodeOriginals[key] = [NSValue valueWithPointer:original];
+    }
+}
 static NSString *RXTranslateColorAXText(id element, NSString *attribute, NSString *value) {
     if (![value isKindOfClass:NSString.class] || RXInColorAXHook) return value;
     BOOL state = [value isEqualToString:@"Unedited"];
@@ -3697,9 +3859,20 @@ static NSString *RXTranslateColorAXText(id element, NSString *attribute, NSStrin
         label = [value substringToIndex:value.length - [@"的十六进制值" length]];
     }
     NSUInteger index = 0;
+    BOOL generatedColorContext = RXHasGeneratedColorStateContext(element);
     if (!state && !RXGeneratedColorIndex(label, &index)) return value;
+    if (state && !generatedColorContext) return value;
     RXInColorAXHook = YES;
     id role = RXRawAXValue(element, NSAccessibilityRoleAttribute);
+    // SwiftUI accessibility nodes can expose their original getter only after
+    // the private class has been lazily initialized.  During that interval the
+    // raw-IMP table is empty, but the live AX provider still answers the role
+    // directly.  Use that value as a read-only fallback; it keeps the
+    // generated-label check contextual without widening translation to paths
+    // or arbitrary user text.
+    if (![role isKindOfClass:NSString.class] && [element respondsToSelector:@selector(accessibilityAttributeValue:)]) {
+        role = [element accessibilityAttributeValue:NSAccessibilityRoleAttribute];
+    }
     NSString *translated = value;
     if (![role isKindOfClass:NSString.class]) {
         RXInColorAXHook = NO;
@@ -3712,12 +3885,14 @@ static NSString *RXTranslateColorAXText(id element, NSString *attribute, NSStrin
         if ([RXRawAXValue(element, NSAccessibilityPlaceholderValueAttribute) isEqual:@"#RRGGBB"])
             translated = [NSString stringWithFormat:@"颜色 #%lu的十六进制值", (unsigned long)index];
     } else if (!hex && [role isEqualToString:NSAccessibilityColorWellRole]) {
-        id help = RXRawAXValue(element, NSAccessibilityHelpAttribute);
-        BOOL generated = [help isEqual:@"Click to choose a color."] || [help isEqual:@"点击选择颜色。"];
-        if (state && generated) {
-            id rawLabel = RXRawAXValue(element, NSAccessibilityDescriptionAttribute);
-            generated = [rawLabel isKindOfClass:NSString.class] && RXGeneratedColorIndex(rawLabel, NULL);
-        }
+        // SwiftUI's generated swatches expose their AX label as `Color #N`
+        // and their AX value as `Unedited`, but the private node does not
+        // return a raw description/help value when queried through the legacy
+        // bridge.  The role plus the canonical generated label/state is
+        // already a sufficiently narrow context; base theme wells use RGB
+        // values and therefore never enter this branch with these strings.
+        BOOL generated = RXIsColorSwatchObject(element) ||
+            (generatedColorContext && (state || RXGeneratedColorIndex(label, NULL)));
         if (generated) {
             translated = state ? @"未编辑" : [NSString stringWithFormat:@"颜色 #%lu", (unsigned long)index];
             if (combinedColor) translated = [translated stringByAppendingString:@"。点击选择颜色。"];
@@ -4184,9 +4359,11 @@ static void RXUpdateRuntimeTextOverlays(NSWindow *window) {
     RXSetAboutOverlay(window);
     if (!window.title.length && RXHasThemeEditorNameFrame) RXSetThemeEditorNameOverlay(window, YES);
     else if (!window.title.length) RXSetThemeEditorNameOverlay(window, NO);
-    if (!window.title.length && window.frame.size.width >= 580.0 && window.frame.size.width <= 650.0 && window.frame.size.height >= 560.0 && window.frame.size.height <= 630.0) {
-        RXTranslateThemeEditorNameInView(window.contentView);
-    }
+    // SwiftUI can host the theme editor in the main settings window after a
+    // color popover is opened, so its frame is not limited to the small sheet
+    // size used by older Rex builds.  Translate only the two exact generated
+    // default names; arbitrary user-entered theme names remain untouched.
+    if (!window.title.length) RXTranslateThemeEditorNameInView(window.contentView);
     if (RXHasRemoteHeaderFrame) RXSetRuntimeOverlayView(window, @"rex-remote-host-header", [RXRemoteHostHeaderOverlayView class], RXRemoteHeaderFrame);
     if (RXHasRemoteSaveFrame) RXSetRuntimeOverlayView(window, @"rex-remote-host-save", [RXRemoteHostSaveOverlayView class], RXRemoteSaveFrame);
 }
@@ -4389,7 +4566,7 @@ static void RXTranslateAXNode(id element) {
         if ([value isKindOfClass:[NSString class]]) {
             id rawObject = RXRawAXValue(element, attribute);
             NSString *rawValue = [rawObject isKindOfClass:[NSString class]] ? rawObject : value;
-            NSString *translated = RXTranslate(value);
+            NSString *translated = RXTranslateColorAXText(element, attribute, value);
             NSRect rawFrame = RXAccessibilityFrame(element);
             if ([rawValue containsString:@"Access Rex securely from your other devices."] ||
                 [value containsString:@"Access Rex securely from your other devices."] ||
@@ -4444,6 +4621,23 @@ static void RXTranslateAXNode(id element) {
                 if ([attribute isEqualToString:NSAccessibilityDescriptionAttribute] ||
                     [attribute isEqualToString:NSAccessibilityTitleAttribute]) {
                     NSAccessibilityPostNotification(element, NSAccessibilityValueChangedNotification);
+                }
+            }
+            // The generated extended-palette swatches are NSColorWell-backed
+            // private objects whose AX provider ignores the generic setter.
+            // Use the corresponding AppKit metadata setter as a narrow
+            // fallback so the live provider returns the translated label and
+            // state on the next query.  Ordinary color wells and user values
+            // never enter this branch.
+            if (RXIsColorSwatchObject(element) && ![translated isEqualToString:value]) {
+                if ([attribute isEqualToString:NSAccessibilityDescriptionAttribute] && [element respondsToSelector:@selector(setAccessibilityDescription:)]) {
+                    [element setAccessibilityDescription:translated];
+                } else if ([attribute isEqualToString:NSAccessibilityTitleAttribute] && [element respondsToSelector:@selector(setAccessibilityTitle:)]) {
+                    [element setAccessibilityTitle:translated];
+                } else if ([attribute isEqualToString:NSAccessibilityValueAttribute] && [element respondsToSelector:@selector(setAccessibilityValue:)]) {
+                    [element setAccessibilityValue:translated];
+                } else if ([attribute isEqualToString:NSAccessibilityValueDescriptionAttribute] && [element respondsToSelector:@selector(setAccessibilityValueDescription:)]) {
+                    [element setAccessibilityValueDescription:translated];
                 }
             }
             if ([attribute isEqualToString:NSAccessibilityDescriptionAttribute] && ![translated isEqualToString:value] && [element respondsToSelector:@selector(setAccessibilityDescription:)]) {
@@ -4618,6 +4812,7 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
         origAccessibilityHelp = RXHook([NSView class], @selector(setAccessibilityHelp:), (IMP)RXSetAccessibilityHelp);
         origAccessibilityDescription = RXHook([NSView class], @selector(setAccessibilityDescription:), (IMP)RXSetAccessibilityDescription);
         origToolTip = RXHook([NSView class], @selector(setToolTip:), (IMP)RXSetToolTip);
+        RXInstallColorWellHooks();
         origViewAccessibilityLabelGetter = RXHook([NSView class], @selector(accessibilityLabel), (IMP)RXViewAccessibilityLabel);
         origViewAccessibilityTitleGetter = RXHook([NSView class], @selector(accessibilityTitle), (IMP)RXViewAccessibilityTitle);
         origViewAccessibilityHelpGetter = RXHook([NSView class], @selector(accessibilityHelp), (IMP)RXViewAccessibilityHelp);
@@ -4655,6 +4850,13 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
             // text-field hook installed as SwiftUI creates views lazily.
             NSTimer *timer = [NSTimer timerWithTimeInterval:0.2 repeats:YES block:^(NSTimer *timer) {
                 RXInstallTextFieldTextViewHook();
+                // SwiftUI's private AccessibilityNode classes are loaded lazily
+                // when the first settings/editor view is materialized.  The
+                // constructor runs before those classes exist, so retry the
+                // owner-level hooks on the same short-lived refresh cadence.
+                // RXInstallSwiftNodeHooks is idempotent through its original
+                // IMP tables and therefore safe to call after every tick.
+                RXInstallSwiftNodeHooks();
                 RXRefreshAccessibility();
             }];
             [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSRunLoopCommonModes];
