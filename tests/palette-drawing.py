@@ -110,6 +110,12 @@ int main(int argc, const char **argv) { @autoreleasepool {
         @[@"Select Terminal Font…", @"选择终端字体…", @NO],
         @[@"New Tab", @"新建标签页", @NO],
         @[@"New Tab", @"新建标签页", @YES],
+        @[@"Change Theme", @"更改主题", @NO],
+        @[@"Auto Color Scheme", @"自动配色方案", @NO],
+        @[@"Light Color Scheme", @"浅色配色方案", @YES],
+        @[@"Dark Color Scheme", @"深色配色方案", @NO],
+        @[@"Ready to Check for Updates · Preview", @"可以检查更新 · 预览", @NO],
+        @[@"Ready to Check for Updates · Bleeding Edge", @"可以检查更新 · 前沿版", @YES],
         @[@"/tmp/Filter/Settings.txt", @"/tmp/Filter/Settings.txt", @NO],
         @[@"Settings-host.example", @"Settings-host.example", @YES],
         @[@"中文 😀 用户输入", @"中文 😀 用户输入", @NO]
@@ -171,7 +177,7 @@ def main():
         if not result.stdout:
             raise RuntimeError('Native drawing harness did not produce a report')
         report = json.loads(result.stdout)
-        if report.get('checks') != 48 or not isinstance(report.get('failures'), list):
+        if report.get('checks') != 90 or not isinstance(report.get('failures'), list):
             raise RuntimeError('Native drawing harness did not execute every assertion')
         print(json.dumps(report, ensure_ascii=False, indent=2))
         return result.returncode

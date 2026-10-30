@@ -146,6 +146,13 @@
 "Help" = "帮助";
 "About Rex Beta" = "关于 Rex Beta";
 "Check for Updates…" = "检查更新…";
+"Change Theme" = "更改主题";
+"Auto Color Scheme" = "自动配色方案";
+"Light Color Scheme" = "浅色配色方案";
+"Dark Color Scheme" = "深色配色方案";
+"Auto Color 方案" = "自动配色方案";
+"Light Color 方案" = "浅色配色方案";
+"Dark Color 方案" = "深色配色方案";
 "Quit Rex Beta" = "退出 Rex Beta";
 "Font" = "字体";
 "Tabs" = "标签页";
@@ -747,6 +754,10 @@
 "The content environment does not provide the capabilities required by this block." = "当前内容环境不具备此内容块所需的功能。";
 "Waiting for server" = "正在等待服务器";
 "Ready to Check for Updates" = "可以检查更新";
+"Ready to Check for Updates · Preview" = "可以检查更新 · 预览";
+"Ready to Check for Updates · Bleeding Edge" = "可以检查更新 · 前沿版";
+"Ready to Check for Updates · 预览" = "可以检查更新 · 预览";
+"Ready to Check for Updates · 前沿版" = "可以检查更新 · 前沿版";
 "Not available until the server is ready" = "服务器就绪前不可用";
 "Open Onboarding Session" = "打开入门会话";
 "Pair Device with QR Code" = "使用二维码配对设备";

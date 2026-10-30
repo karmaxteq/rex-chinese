@@ -13,6 +13,23 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 CASES = [
+    # Native palette labels observed only after scrolling past the first page.
+    ('Change Theme', '更改主题'),
+    ('Auto Color Scheme', '自动配色方案'),
+    ('Light Color Scheme', '浅色配色方案'),
+    ('Dark Color Scheme', '深色配色方案'),
+    ('Auto Color 方案', '自动配色方案'),
+    ('Light Color 方案', '浅色配色方案'),
+    ('Dark Color 方案', '深色配色方案'),
+    ('/tmp/Change Theme/Settings.txt', '/tmp/Change Theme/Settings.txt'),
+    ('Custom Change Theme', 'Custom Change Theme'),
+    ('Change Theme-host.example', 'Change Theme-host.example'),
+    ('Ready to Check for Updates · Preview', '可以检查更新 · 预览'),
+    ('Ready to Check for Updates · Bleeding Edge', '可以检查更新 · 前沿版'),
+    ('Ready to Check for Updates · 预览', '可以检查更新 · 预览'),
+    ('Ready to Check for Updates · 前沿版', '可以检查更新 · 前沿版'),
+    ('Ready to Check for Updates · Custom', 'Ready to Check for Updates · Custom'),
+    ('/tmp/Ready to Check for Updates · Preview.txt', '/tmp/Ready to Check for Updates · Preview.txt'),
     # The sRGB theme-color help is a distinct literal from the Display P3 help.
     ('Six-digit sRGB hex color, for example #AABBCC', '六位 sRGB 十六进制颜色，例如 #AABBCC'),
     ('sRGB', 'sRGB'),
