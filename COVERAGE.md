@@ -2,6 +2,26 @@
 
 更新日期：2026-10-31。对象是 `~/Applications/Rex Beta 中文版.app`。本记录区分像素截图、Accessibility（AX）读回和静态规则；**不宣称全部界面已汉化，也不宣称没有英文残留**。品牌、技术标识和用户数据保留原文。
 
+## 用户现场复测（2026-10-31，进程 59712）
+
+这次直接从桌面启动并检查了 `Rex Beta 中文版`，不是 `/Applications/Rex Beta.app` 原版。Bundle ID 为 `com.superlogical.rex.chinese`，版本为 `0.1.0 (1408)`；`vmmap` 确认进程实际加载 `libRexChinese.dylib` 和 `libRexTextHook.dylib`。服务器页、主题页和终端页均取得了现场截图，九个设置页通过原生 AX 工具逐页重新读取。下面的数字是当前右侧内容区的**去重可见文本值**，用于说明这次现场到底看到了什么，不是全量翻译百分比。
+
+| 页面 | 去重可见值 | 含汉字 | 现场保留的纯英文/技术标识 |
+| --- | ---: | ---: | --- |
+| 服务器 | 14 | 13 | `Tailscale` |
+| 界面 | 46 | 46 | 无 |
+| 主题 | 95 | 95 | 无；主题卡片中的品牌名已包含中文显示名 |
+| 终端 | 66 | 61 | `Menlo`、`Shell`；`Display P3` 出现在中文说明中 |
+| 快捷键 | 56 | 56 | 无 |
+| 集成 | 4 | 4 | `Claude Code`、`Codex`、`OpenCode`、`Pi` 出现在中文说明中 |
+| 通知 | 31 | 31 | `OSC 9/777`、`Tailscale` 按技术标识保留 |
+| 远程主机 | 3 | 3 | `HTTP/HTTPS` 按协议名保留 |
+| 开发者 | 3 | 3 | 无 |
+
+主窗口现场显示中文标签“切换会话”“命令面板”“活动”“新建标签页”，终端输出仍保留原始 Shell 文本。应用菜单中的“关于”“检查更新…”和“设置…”也为中文。命令面板初始列表为中文；输入英文 `Change Theme` 或中文 `更改主题` 时，结果都显示为“更改主题”。现场证据与逐页截图保存在 Git 忽略目录 `.artifacts/current-user-coverage-1031/` 和 `.artifacts/release-{server,interface,themes,terminal,shortcuts,integrations,notifications,remote,developer}.{json,png}`。
+
+本次没有把 `Tailscale`、Shell/字体/协议/产品名、主机名、路径、终端输出或用户输入计作漏译。仍未由这次现场穷举的范围包括命令面板全部动作及子菜单、所有滚动区和组合状态、真实 Tailscale 授权与跨机器连接、更新安装、生产服务器启停后的完整生命周期，以及所有异常通知。因而当前结论是“已覆盖若干可见页面和已测流程”，不是“完全汉化”。
+
 ## 最新正式副本复测（2026-10-31，进程 59712）
 
 本轮先退出旧中文版和测试候选，再执行 `./build.sh` 与 `./patch.sh /Applications/Rex Beta.app`，最后重新启动正式副本。运行中的 bundle 是 `com.superlogical.rex.chinese`、版本 `0.1.0 (1408)`；`vmmap` 实际读回了正式副本中的 `libRexChinese.dylib` 和 `libRexTextHook.dylib`。因此下面的现场结果对应本次重新安装后的库，而不是工作区里尚未安装的候选。复测中发现主题编辑器默认名称在颜色弹层打开后会重新绘制为英文，已增加只匹配 `Untitled Light Theme`/`Untitled Dark Theme` 的显示层修复并重新安装。
