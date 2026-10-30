@@ -378,6 +378,7 @@ private let translations: [String: String] = [
   "Bright White": "亮白色",
   "Show extended palette": "显示扩展调色板",
   "Collapsed": "已折叠",
+  "Expanded": "已展开",
   "Revert…": "还原…",
   "Revert to the initially loaded palette": "还原到最初加载的调色板",
   "Save & Apply": "保存并应用",
@@ -1729,8 +1730,10 @@ private let translations: [String: String] = [
   "On": "开启",
   "Connected to Rex": "已连接到 Rex",
   "Connected": "已连接",
+  "Reconnecting…": "正在重新连接…",
   "Exited": "已退出",
   "Action failed.": "操作失败。",
+  "Action failed": "操作失败",
   "Update Rex.app, or restart the server to use the included one.": "更新 Rex.app，或重新启动服务器以使用随附的服务器。",
   "Hide Activity (⌘.)": "隐藏活动 (⌘.)",
   "Shown when a program finishes a task": "程序完成任务时显示",
@@ -1857,14 +1860,26 @@ private let translations: [String: String] = [
 
 private func translate(_ value: String) -> String {
   if let translated = translations[value] { return translated }
-  // This complete Rex notice surrounds a host name. Match both literal
-  // boundaries and copy the host verbatim, including any words or paths.
-  let activationPrefix = "Action failed. The tab could not be activated. On "
+  // AX includes the title, while SwiftUI renders the body separately and
+  // may have already translated its first literal. Match both complete
+  // boundaries before the generic error-prefix rule preserves the payload.
   let activationSuffix = ": The server is not ready for this operation."
-  if value.hasPrefix(activationPrefix) && value.hasSuffix(activationSuffix) &&
-      value.count > activationPrefix.count + activationSuffix.count {
-    let host = value.dropFirst(activationPrefix.count).dropLast(activationSuffix.count)
-    return "操作失败。无法激活标签页。主机 " + host + "：服务器尚未准备好执行此操作。"
+  let activationValue = value as NSString
+  let activationSuffixLength = (activationSuffix as NSString).length
+  for (activationPrefix, translatedPrefix) in [
+    ("Action failed. The tab could not be activated. On ", "操作失败。无法激活标签页。主机 "),
+    ("The tab could not be activated. On ", "无法激活标签页。主机 "),
+    ("无法激活标签页。On ", "无法激活标签页。主机 "),
+    ("无法激活标签页。 On ", "无法激活标签页。主机 "),
+  ] {
+    // Match UTF-16 boundaries like the ObjC translator: a host may start
+    // with a combining mark that joins the preceding space's grapheme.
+    let prefixLength = (activationPrefix as NSString).length
+    guard activationValue.hasPrefix(activationPrefix) && activationValue.hasSuffix(activationSuffix) &&
+        activationValue.length > prefixLength + activationSuffixLength else { continue }
+    let host = activationValue.substring(with: NSRange(location: prefixLength,
+      length: activationValue.length - prefixLength - activationSuffixLength))
+    return translatedPrefix + host + "：服务器尚未准备好执行此操作。"
   }
   if value.hasPrefix("操作失败。无法激活标签页。主机 ") &&
       value.hasSuffix("：服务器尚未准备好执行此操作。") { return value }

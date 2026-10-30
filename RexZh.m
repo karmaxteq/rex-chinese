@@ -630,6 +630,7 @@ static NSString *RXTranslateUncached(NSString *s) {
             @"Bright White": @"亮白色",
             @"Show extended palette": @"显示扩展调色板",
             @"Collapsed": @"已折叠",
+            @"Expanded": @"已展开",
             @"Revert…": @"还原…",
             @"Revert to the initially loaded palette": @"还原到最初加载的调色板",
             @"Save & Apply": @"保存并应用",
@@ -1761,8 +1762,10 @@ static NSString *RXTranslateUncached(NSString *s) {
             @"On": @"开启",
             @"Connected to Rex": @"已连接到 Rex",
             @"Connected": @"已连接",
+            @"Reconnecting…": @"正在重新连接…",
             @"Exited": @"已退出",
             @"Action failed.": @"操作失败。",
+            @"Action failed": @"操作失败",
             @"Update Rex.app, or restart the server to use the included one.": @"更新 Rex.app，或重新启动服务器以使用随附的服务器。",
             @"Hide Activity (⌘.)": @"隐藏活动 (⌘.)",
             @"Shown when a program finishes a task": @"程序完成任务时显示",
@@ -1880,14 +1883,22 @@ static NSString *RXTranslateUncached(NSString *s) {
     // Getter hooks and polling see the same translated labels repeatedly.
     // Known complete translations need no dynamic-pattern parsing.
     if ([translatedValues containsObject:s]) return s;
-    // Preserve the host payload inside the complete observed Rex notice.
-    NSString *activationPrefix = @"Action failed. The tab could not be activated. On ";
+    // AX includes the title; the rendered SwiftUI body can arrive separately
+    // or with its first literal already translated. Preserve the host in each.
     NSString *activationSuffix = @": The server is not ready for this operation.";
-    if ([s hasPrefix:activationPrefix] && [s hasSuffix:activationSuffix] &&
-        s.length > activationPrefix.length + activationSuffix.length) {
-        NSString *host = [s substringWithRange:NSMakeRange(activationPrefix.length,
-            s.length - activationPrefix.length - activationSuffix.length)];
-        return [NSString stringWithFormat:@"操作失败。无法激活标签页。主机 %@：服务器尚未准备好执行此操作。", host];
+    for (NSArray<NSString *> *pair in @[
+        @[@"Action failed. The tab could not be activated. On ", @"操作失败。无法激活标签页。主机 "],
+        @[@"The tab could not be activated. On ", @"无法激活标签页。主机 "],
+        @[@"无法激活标签页。On ", @"无法激活标签页。主机 "],
+        @[@"无法激活标签页。 On ", @"无法激活标签页。主机 "]
+    ]) {
+        NSString *prefix = pair[0];
+        if ([s hasPrefix:prefix] && [s hasSuffix:activationSuffix] &&
+            s.length > prefix.length + activationSuffix.length) {
+            NSString *host = [s substringWithRange:NSMakeRange(prefix.length,
+                s.length - prefix.length - activationSuffix.length)];
+            return [NSString stringWithFormat:@"%@%@：服务器尚未准备好执行此操作。", pair[1], host];
+        }
     }
     if ([s hasPrefix:@"操作失败。无法激活标签页。主机 "] &&
         [s hasSuffix:@"：服务器尚未准备好执行此操作。"]) return s;

@@ -2,6 +2,27 @@
 
 更新日期：2026-10-30。对象是 `~/Applications/Rex Beta 中文版.app`。本记录区分像素截图、Accessibility（AX）读回和静态规则；**不宣称全部界面已汉化，也不宣称没有英文残留**。品牌、技术标识和用户数据保留原文。
 
+## 通知详情、断线流程与最新副本（2026-10-30，最终进程 70247）
+
+最终正式副本正常冷启动，两个补丁库已加载，安装与 `bin/` 的双架构 UUID 一致，深度签名通过；原版可执行文件 SHA-256 保持不变。以下截图已实际查看，不以 AX 返回中文代替像素确认。
+
+| 实际测试 | 已查看的证据 | 结论与限制 |
+| --- | --- | --- |
+| 最新九个设置页首屏 | `.artifacts/notice-coverage-final/{server,interface,themes,terminal,shortcuts,integrations,notifications,remote,developer}.png`，进程 70247 | 九张逐一查看，可见文案中文；终端 GPU 字体示例显示“警告”“已弃用”“构建完成！”“秒”；开发者模式关闭，远程列表已恢复为空。未将首屏算作整页覆盖 |
+| 四种活动通知详情 | `.artifacts/notification-children/{0,1,2,3}.{png,json}`，进程 58096 | 实际打开“运行中、已阻塞、错误、已完成”，可见标签与说明为中文；未改动开关 |
+| 通知声音菜单 | `.artifacts/notification-sound-menu.{png,json}` 与 `notification-sound-restored.json`，进程 58096 | 实际查看“提醒、警告、错误、成功、就绪、加载中、点击”七项；关闭后仍为“成功” |
+| 独立 loopback 断线重连 | `.artifacts/rex-notice-fixture/reconnecting-before.png`；修复后的 `release-disconnect-remote-1.png`，进程 70247 | 确实复现 `Reconnecting…` 漏译；补齐精确词条后真实状态显示“正在重新连接…”。主机名与 URL 原样保留 |
+| 断线后切换第二个真实标签页 | `.artifacts/rex-notice-fixture/release-disconnect-main-1.png`、`release-disconnect-expanded.png`、`release-disconnect.json`，进程 70247 | 原生动作实际产生错误通知；折叠/展开画面均显示“操作失败”和完整中文正文，保留测试主机名；重连横幅为“正在重新连接…已保留内容。”，展开按钮 AX 值为“已展开” |
+| 连接失败画面及移除确认 | `.artifacts/rex-notice-fixture/tab-after.png`，进程 58096；`remove-confirmation.png`，进程 69191 | 实际查看中文失败标题、说明、诊断按钮和移除确认；主机名未被翻译。它们分别对应所列中间副本 |
+
+**这轮也再次证实 AX 不是像素证据。** 最初完整通知 AX 已返回中文，但 `retest-disconnect-main-1.png` 的真实标题仍是 `Action failed`，正文只翻译了第一句。原因是绘制时标题没有句点，正文与 AX 的完整消息分别构造；已有完整通知规则没有覆盖正文的原始/半翻译形式。现增加精确标题及带完整首尾边界的正文匹配，没有泛化替换 `On `；最终折叠和展开截图才算修复通过。
+
+复核还发现以组合字符 U+0301 开头的主机名会跨越 Swift 字素边界，使 Swift/ObjC 结果不同。新增四种正文形式先复现失败，再将这一限定规则改为与 ObjC 相同的 NSString 匹配和 UTF-16 截取；主机原文保持，3,310 × 2 回归全部通过。
+
+断线只发生在独立配置/状态目录、仅监听 `127.0.0.1:51941` 的自建服务。CLI 停止操作因要求 Unix 端点而拒绝后，核对 PID 和完整 fixture 参数，才对该测试进程发送 SIGTERM。最终测试服务已退出、监听已关闭，精确核验名称与 URL 后移除唯一测试主机，恢复原本地会话并关闭测试通知；原生产服务 PID 32536 保持运行。最终设置恢复“界面”。这不代表跨机器连接、Tailscale 授权或生产服务启停已测试。
+
+最新翻译回归为 **1,514 资源键 + 1,514 对应译文 + 282 动态/边界用例，共 3,310 × 2 个生产翻译器**；输入存储 80 项、绘制 48 项（原生选择标记 64→64）、搜索桥接与构建/签名/差异检查通过。证据为 `.artifacts/notice-{unicode-after,release-inputs,release-drawing,complete-search-bridge}.log`、`notice-release-installation.json`。构建保留既存 AX 废弃 API 警告；本轮未重跑全部 ownership、颜色弹层、滚动内容或其余命令动作。
+
 ## 最新命令检索与正式副本复测（2026-10-30，进程 58096）
 
 正式中文版经正常退出后重新构建、安装并以普通 `open -n` 冷启动。两补丁库实际加载，安装与构建的两个架构 UUID 一致，深度签名通过；原版 SHA-256 仍为 `0fd11b7d5ca93b26a9df25d8b66995ceb17466372505d24ebf86fc0b01aa50a7`。诊断库已换回正式库，原生产服务器 PID 32536 保持运行。
@@ -162,7 +183,7 @@
 
 | 检查 | 已取得的结果 | 不能证明的事项 |
 | --- | --- | --- |
-| `python3 tests/translation-regressions.py` | 当前 3,286 用例 × 2 个生产翻译器通过；包括 1,511 个发布资源键、对应译文和 264 个动态/用户文本边界用例 | 文本是否成功接入每个真实 UI 绘制路径 |
+| `python3 tests/translation-regressions.py` | 当前 3,310 用例 × 2 个生产翻译器通过；包括 1,514 个发布资源键、对应译文和 282 个动态/用户文本边界用例 | 文本是否成功接入每个真实 UI 绘制路径 |
 | `python3 tests/palette-drawing.py` | 48 项通过，旧清列绘制版原生标记 64→0，当前 64→64 | 全部真实命令的选择与动作绑定 |
 | `python3 tests/raw-ax-receiver.py` | 37 项通过，覆盖已 hook 的 NSObject/继承 provider 与 raw frame | 所有 SwiftUI 私有节点的实际像素 |
 | `python3 tests/translation-cache.py` | 24 项断言、16,000 次并发迭代通过；旧实现原生运行有 10 项预期失败 | 真实应用 CPU、严格内存上限；NSCache 容量限制为建议值 |
@@ -186,6 +207,6 @@
 - 较早冷启动的终端 GPU 预览曾在原版与中文版均为空白；随后字体示例已实际显示中文，空白根因和全部光标预览仍未核验。
 - 深色默认外观中，服务器/通知副说明的覆盖底色仍有轻微差异；其他自定义主题未验证。
 - Rex 内真实跨机器远程服务的效果；本机独立服务已实际连接并核验终端，测试主机随后移除。源码同步到 SSH 工作区仍与 Rex 连接验证分开。
-- 命令面板其余中文查询、所有结果的滚动/动作绑定、断线动态通知修复后的实际像素；本轮四个中文查询与两个原生动作见最新记录。
+- 命令面板其余中文查询、所有结果的滚动/动作绑定及其余动态异常通知；已验证的四个中文查询、两个原生动作和断线通知见对应记录。
 
 Rex、Tailscale、Shell、字体名、Display P3、API、协议、URL、主机名、会话名、路径、命令和真实终端输出可保留原文。macOS 原生面板的 `folder`、`Search` 等系统 AX 标签也应与 Rex 自有文案区分；这类边界不能用于推导 Rex 已全面汉化。
