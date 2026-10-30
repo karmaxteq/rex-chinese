@@ -13,6 +13,37 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 CASES = [
+    # Visible residuals found while sweeping the full shortcuts list.
+    ('Split Pane', '分栏'),
+    ('Split Pane Left', '向左分栏'),
+    ('Split Pane Up', '向上分栏'),
+    ('Split Pane Down', '向下分栏'),
+    ('Focus Pane', '聚焦窗格'),
+    ('Keys', '按键'),
+    ('No GUI Overrides Yet', '尚未在此修改快捷键'),
+    ('Connected', '已连接'),
+    ('/tmp/Connected/Settings.txt', '/tmp/Connected/Settings.txt'),
+    ('Connected-host', 'Connected-host'),
+    ('Exited', '已退出'),
+    ('/tmp/Exited/Connected', '/tmp/Exited/Connected'),
+    ('Action failed.', '操作失败。'),
+    ('Action failed. The tab could not be activated. On 中文本机验证1030: The server is not ready for this operation.',
+     '操作失败。无法激活标签页。主机 中文本机验证1030：服务器尚未准备好执行此操作。'),
+    ('Action failed. The tab could not be activated. On Filter Settings 😀: The server is not ready for this operation.',
+     '操作失败。无法激活标签页。主机 Filter Settings 😀：服务器尚未准备好执行此操作。'),
+    ('Action failed. The tab could not be activated. On /tmp/Filter/Settings.txt: The server is not ready for this operation.',
+     '操作失败。无法激活标签页。主机 /tmp/Filter/Settings.txt：服务器尚未准备好执行此操作。'),
+    ('Notes: Action failed. The tab could not be activated. On demo: The server is not ready for this operation.',
+     'Notes: Action failed. The tab could not be activated. On demo: The server is not ready for this operation.'),
+    ('Action failed. The tab could not be activated. On : The server is not ready for this operation.',
+     'Action failed. The tab could not be activated. On : The server is not ready for this operation.'),
+    ('Action failed. The tab could not be activated. On demo: diagnostics Filter Settings',
+     'Action failed. The tab could not be activated. On demo: diagnostics Filter Settings'),
+    ('Change the shortcut for Split Pane Left', '修改 向左分栏 的快捷键'),
+    ('Record a shortcut for Focus Pane', '录制 聚焦窗格 的快捷键'),
+    ('See the keys bound to Split Pane and where each came from.', '查看绑定到 分栏 的按键及其来源。'),
+    ('/tmp/Keys/Split Pane.txt', '/tmp/Keys/Split Pane.txt'),
+    ('Custom Split Pane', 'Custom Split Pane'),
     ('Preview', '预览'),
     (' — Dynamic', ' — 动态'),
     ('0 results', '0 项结果'),
@@ -129,6 +160,11 @@ for app_name in ['Rex', 'Rex Beta', 'Rex 中文版', 'Rex Beta 中文版']:
 # Values without Rex UI sentence prefixes are user content and must survive intact.
 for value in ['', '中文界面', '/tmp/中文 😀/rex', '80x24', 'ssh://demo-host', 'Tailscale', 'test-123', 'Already translated 已翻译', 'Quit Terminal', 'Quit Rex Beta task', 'Hide Rex Beta logs', 'About Rexology', 'Quit Rex Beta 中文版 session', 'About Rex Beta 中文版 notes']:
     CASES.append((value, value))
+
+# Messages found in the original binary plus the actual mixed shortcut labels.
+# Include payload and prefix boundaries, not just the newly added exact keys.
+CASES.extend((case['input'], case['expected']) for case in json.loads(
+    (ROOT / 'tests/data/dynamic-coverage.json').read_text()))
 
 SWIFT_RUNNER = r'''
 let inputs = try JSONSerialization.jsonObject(with: FileHandle.standardInput.readDataToEndOfFile()) as! [String]

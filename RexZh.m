@@ -7,13 +7,162 @@
 #include <string.h>
 #include <objc/message.h>
 
-static NSString *RXTranslate(NSString *s) {
+static NSString *RXTranslate(NSString *s);
+
+static NSString *RXTranslateUncached(NSString *s) {
     if (![s isKindOfClass:[NSString class]] || s.length == 0) return s;
     static NSDictionary *map;
     static NSSet *translatedValues;
     static dispatch_once_t once;
     dispatch_once(&once, ^{
         map = @{
+            @"After Restart": @"重启后",
+            @"Agent Behavior": @"智能体行为",
+            @"Blocked": @"已阻塞",
+            @"Built": @"构建时间",
+            @"Checkout": @"检出",
+            @"Color Cube": @"颜色立方体",
+            @"Command": @"命令",
+            @"Continue": @"继续",
+            @"Copy API call": @"复制 API 调用",
+            @"Copy Path": @"复制路径",
+            @"Copy Prompt": @"复制提示词",
+            @"Delete": @"删除",
+            @"Delete Theme": @"删除主题",
+            @"Discard Changes": @"放弃更改",
+            @"Empty session": @"空会话",
+            @"Endpoint": @"端点",
+            @"Environment": @"环境",
+            @"Executable": @"可执行文件",
+            @"Go to Window": @"前往窗口",
+            @"Grayscale Ramp": @"灰阶渐变",
+            @"Light mode": @"浅色模式",
+            @"Not configured": @"未配置",
+            @"Not installed": @"未安装",
+            @"Other Fonts": @"其他字体",
+            @"Platform": @"平台",
+            @"Process": @"进程",
+            @"Reconnect Host": @"重新连接主机",
+            @"Refresh": @"刷新",
+            @"Regenerate": @"重新生成",
+            @"Remote Address": @"远程地址",
+            @"Remove": @"移除",
+            @"Remove Shortcut": @"移除快捷键",
+            @"Removed here": @"在此处移除",
+            @"Reset All": @"全部重置",
+            @"Revert Changes": @"还原更改",
+            @"Rex Version": @"Rex 版本",
+            @"Server Build": @"服务器构建",
+            @"Shared Server": @"共享服务器",
+            @"Show Keys": @"显示按键",
+            @"Show in Finder": @"在访达中显示",
+            @"Sign In": @"登录",
+            @"Start Again": @"重新开始",
+            @"Start Server": @"启动服务器",
+            @"Started": @"启动时间",
+            @"State": @"状态",
+            @"Subscription": @"订阅",
+            @"Trusted links": @"受信任的链接",
+            @"Try Again": @"重试",
+            @"Weight": @"字重",
+            @"Welcome": @"欢迎",
+            @"Working Tree": @"工作树",
+            @"No fonts found": @"未找到字体",
+            @"Font list": @"字体列表",
+            @"Search commands…": @"搜索命令…",
+            @"Import Theme File…": @"导入主题文件…",
+            @"Delete Custom Theme…": @"删除自定义主题…",
+            @"Filter custom themes…": @"筛选自定义主题…",
+            @"Loading folders…": @"正在加载文件夹…",
+            @"Select Interface Style…": @"选择界面样式…",
+            @"Search actions…": @"搜索操作…",
+            @"Select Terminal Padding Color…": @"选择终端内边距颜色…",
+            @"Select Update Channel…": @"选择更新频道…",
+            @"Select Option Key Behavior…": @"选择 Option 键行为…",
+            @"Select Cursor Style…": @"选择光标样式…",
+            @"Set copy on selection…": @"设置选择后复制…",
+            @"Select Terminal Font…": @"选择终端字体…",
+            @"Move Pane to Tab": @"将窗格移到标签页",
+            @"Loading the window's blocks…": @"正在加载窗口块…",
+            @"Creating Session…": @"正在创建会话…",
+            @"Preparing Rex Server…": @"正在准备 Rex 服务器…",
+            @"Stopping Rex Server…": @"正在停止 Rex 服务器…",
+            @"Starting Rex Server…": @"正在启动 Rex 服务器…",
+            @"Opening terminal…": @"正在打开终端…",
+            @"Reconnecting… Content preserved.": @"正在重新连接…已保留内容。",
+            @"Approve this device in Tailscale…": @"在 Tailscale 中批准此设备…",
+            @"Sign in to Tailscale…": @"登录 Tailscale…",
+            @"Subscribing to all sessions…": @"正在订阅所有会话…",
+            @"Restart Rex Server…": @"重启 Rex 服务器…",
+            @"Stopping Rex server…": @"正在停止 Rex 服务器…",
+            @"Starting Rex server…": @"正在启动 Rex 服务器…",
+            @"Waiting for Rex Server on this Mac to start…": @"正在等待此 Mac 上的 Rex 服务器启动…",
+            @"Preparing Rex…": @"正在准备 Rex…",
+            @"Signing out of Tailscale…": @"正在退出 Tailscale…",
+            @"Waiting for an HTTPS certificate…": @"正在等待 HTTPS 证书…",
+            @"Removing this Mac’s saved Tailscale login…": @"正在移除此 Mac 保存的 Tailscale 登录信息…",
+            @"Record Shortcut…": @"录制快捷键…",
+            @"Retry Rex App Update…": @"重试 Rex 应用更新…",
+            @"Check Rex App for Updates…": @"检查 Rex 应用更新…",
+            @"Installing Rex App Update…": @"正在安装 Rex 应用更新…",
+            @"Download Rex Update…": @"下载 Rex 更新…",
+            @"Restart to Update Rex…": @"重启以更新 Rex…",
+            @"Checking Rex App Updates…": @"正在检查 Rex 应用更新…",
+            @"Split Pane Right": @"向右分栏",
+            @"Split Pane": @"分栏",
+            @"Split Pane Left": @"向左分栏",
+            @"Split Pane Up": @"向上分栏",
+            @"Split Pane Down": @"向下分栏",
+            @"Focus Pane": @"聚焦窗格",
+            @"Keys": @"按键",
+            @"Preparing Session…": @"正在准备会话…",
+            @"Untitled Session": @"未命名会话",
+            @"Something went wrong": @"发生错误",
+            @"Open Diagnostics…": @"打开诊断…",
+            @"Couldn’t Connect to the Rex Server": @"无法连接到 Rex 服务器",
+            @"Connecting to Rex Server…": @"正在连接 Rex 服务器…",
+            @"Couldn’t reload config": @"无法重新加载配置",
+            @"Choose this Mac’s Tailscale hostname while serving. The assigned address may differ.": @"选择此 Mac 提供服务时使用的 Tailscale 主机名。分配的地址可能不同。",
+            @"See this device’s Tailscale tags. Sign out and back in to change them.": @"查看此设备的 Tailscale 标签。退出后重新登录即可更改标签。",
+            @"Choose Default — Dynamic, Bright, or Twilight artwork for the app icon.": @"为应用图标选择默认 — 动态、明亮或暮色图案。",
+            @"Use the theme’s colors 16–255 in light mode, or xterm’s standard palette when off.": @"在浅色模式下使用主题的 16–255 号颜色；关闭后使用 xterm 标准调色板。",
+            @"Use the theme’s colors 16–255 in dark mode, or xterm’s standard palette when off.": @"在深色模式下使用主题的 16–255 号颜色；关闭后使用 xterm 标准调色板。",
+            @"Keys this mode doesn’t bind do what they do outside it.": @"此模式未绑定的按键保持模式外的行为。",
+            @"Exclusive. Keys this mode doesn’t bind are ignored while it’s active.": @"独占模式。激活时忽略此模式未绑定的按键。",
+            @"Bindable only with arguments, from your configuration file": @"只能从配置文件通过参数绑定。",
+            @"Check the command’s quotes and backslash escapes.": @"检查命令中的引号和反斜杠转义。",
+            @"Choosing Always Open on a link’s notice adds the link’s scheme and the app that opens it here. These apply only while Links that open apps is set to Ask First.": @"在链接提示中选择“始终打开”后，链接协议和打开它的应用会显示在此处。这些规则仅在“打开应用的链接”设为“先询问”时生效。",
+            @"Choosing Always Open on a link’s notice adds the link’s scheme and the app that opens it here. Links with that scheme open without asking until you remove them.": @"在链接提示中选择“始终打开”后，链接协议和打开它的应用会显示在此处。在移除规则之前，该协议的链接将直接打开，不再询问。",
+            @"Enable Tailscale and wait for HTTPS to be ready in Rex’s Server settings to pair a device.": @"在 Rex 的服务器设置中启用 Tailscale，等待 HTTPS 就绪后即可配对设备。",
+            @"Agents can control Rex, including migrating your config from tmux, Ghostty, Herdr, and more…": @"智能体可以控制 Rex，包括从 tmux、Ghostty、Herdr 等迁移你的配置…",
+            @"Use 1–63 letters, numbers, or hyphens. The name can’t begin or end with a hyphen.": @"使用 1–63 个字母、数字或连字符。名称不能以连字符开头或结尾。",
+            @"Hold ⌘, ⌃, or ⌥ with the key. Shift on its own types a character.": @"按下按键时同时按住 ⌘、⌃ 或 ⌥。仅配合 Shift 会输入字符。",
+            @"Use light or dark appearance, or toggle the currently visible appearance.": @"使用浅色或深色外观，或切换当前显示的外观。",
+            @"The key to send, written the way a key binding is, such as \"ctrl+u\".": @"要发送的按键，使用快捷键的写法，例如“ctrl+u”。",
+            @"Built into Rex. A shortcut in your configuration file or one recorded here replaces it.": @"Rex 内置快捷键。配置文件中的快捷键或在此处记录的快捷键会替代它。",
+            @"Why this shortcut can't be recorded": @"为什么无法录制此快捷键",
+            @"Signing out of Tailscale timed out. Rex hasn’t confirmed that the saved login was removed. Try restarting the Rex server.": @"退出 Tailscale 超时。Rex 尚未确认已移除保存的登录信息。请尝试重启 Rex 服务器。",
+            @"Rex couldn’t start Tailscale to remove the saved login. Try again.": @"Rex 无法启动 Tailscale 以移除保存的登录信息。请重试。",
+            @"Couldn’t load “": @"无法加载“",
+            @"Save this theme and use it as your ": @"保存此主题并将其用于",
+            @"Couldn’t save your shortcuts: ": @"无法保存快捷键：",
+            @"Set in your configuration file, at ": @"在配置文件中设置，位置：",
+            @"Can’t Connect to ": @"无法连接到 ",
+            @"Couldn’t read the theme file. ": @"无法读取主题文件。",
+            @"Sized by another client · ": @"由另一个客户端调整大小 · ",
+            @"Rex returned an incomplete pane layout. ": @"Rex 返回了不完整的窗格布局。",
+            @"The terminal could not be reset. ": @"无法重置终端。",
+            @"The tab could not be activated. ": @"无法激活标签页。",
+            @"The session could not be moved. ": @"无法移动会话。",
+            @"The tab could not be moved. ": @"无法移动标签页。",
+            @"The tab could not be closed. ": @"无法关闭标签页。",
+            @"The tab could not be created. ": @"无法创建标签页。",
+            @"The name could not be changed. ": @"无法更改名称。",
+            @"The session could not be closed. ": @"无法关闭会话。",
+            @"The session could not be created. ": @"无法创建会话。",
+            @"Default — 动态": @"默认 — 动态",
+            @"Record a shortcut for ": @"录制快捷键：",
+            @"Change the shortcut for ": @"修改快捷键：",
             @"Waiting for permission": @"正在等待权限",
             @"Unsupported block": @"不支持的内容块",
             @"The content environment does not provide the capabilities required by this block.": @"当前内容环境不具备此内容块所需的功能。",
@@ -547,7 +696,7 @@ static NSString *RXTranslate(NSString *s) {
             @"Import Theme File": @"导入主题文件",
             @"Switch Appearance Mode": @"切换外观模式",
             @"Copy Config File Path": @"复制配置文件路径",
-            @"No GUI Overrides Yet": @"还没有图形界面覆盖",
+            @"No GUI Overrides Yet": @"尚未在此修改快捷键",
             @"Copy Shortcuts as Lua": @"将快捷键复制为 Lua",
             @"Reset All…": @"全部重置…",
             @"Reload Config": @"重新加载配置",
@@ -1611,6 +1760,9 @@ static NSString *RXTranslate(NSString *s) {
             @"The Rex server refused the connection because it doesn't support the API revisions this app needs (": @"Rex 服务器拒绝连接，因为它不支持此应用需要的 API 修订版（",
             @"On": @"开启",
             @"Connected to Rex": @"已连接到 Rex",
+            @"Connected": @"已连接",
+            @"Exited": @"已退出",
+            @"Action failed.": @"操作失败。",
             @"Update Rex.app, or restart the server to use the included one.": @"更新 Rex.app，或重新启动服务器以使用随附的服务器。",
             @"Hide Activity (⌘.)": @"隐藏活动 (⌘.)",
             @"Shown when a program finishes a task": @"程序完成任务时显示",
@@ -1728,6 +1880,66 @@ static NSString *RXTranslate(NSString *s) {
     // Getter hooks and polling see the same translated labels repeatedly.
     // Known complete translations need no dynamic-pattern parsing.
     if ([translatedValues containsObject:s]) return s;
+    // Preserve the host payload inside the complete observed Rex notice.
+    NSString *activationPrefix = @"Action failed. The tab could not be activated. On ";
+    NSString *activationSuffix = @": The server is not ready for this operation.";
+    if ([s hasPrefix:activationPrefix] && [s hasSuffix:activationSuffix] &&
+        s.length > activationPrefix.length + activationSuffix.length) {
+        NSString *host = [s substringWithRange:NSMakeRange(activationPrefix.length,
+            s.length - activationPrefix.length - activationSuffix.length)];
+        return [NSString stringWithFormat:@"操作失败。无法激活标签页。主机 %@：服务器尚未准备好执行此操作。", host];
+    }
+    if ([s hasPrefix:@"操作失败。无法激活标签页。主机 "] &&
+        [s hasSuffix:@"：服务器尚未准备好执行此操作。"]) return s;
+    // Repair the observed shortcut labels assembled from a translated literal
+    // prefix and an interpolated action. Only known action keys are translated.
+    for (NSArray<NSString *> *pair in @[
+        @[@"录制  的快捷键", @"录制 "], @[@"修改  的快捷键", @"修改 "],
+        @[@"录制快捷键：", @"录制 "], @[@"修改快捷键：", @"修改 "]
+    ]) {
+        NSString *prefix = pair[0];
+        if ([s hasPrefix:prefix] && s.length > prefix.length) {
+            NSString *action = [s substringFromIndex:prefix.length];
+            return [NSString stringWithFormat:@"%@%@ 的快捷键", pair[1], map[action] ? RXTranslate(action) : action];
+        }
+    }
+    for (NSString *prefix in @[@"录制 ", @"修改 "]) {
+        NSString *suffix = @" 的快捷键";
+        if ([s hasPrefix:prefix] && [s hasSuffix:suffix] && s.length > prefix.length + suffix.length) return s;
+    }
+    // Preserve the payload of these Rex messages, including on later passes.
+    for (NSArray<NSString *> *pair in @[
+        @[@"Couldn’t save your shortcuts: ", @"无法保存快捷键："],
+        @[@"Set in your configuration file, at ", @"在配置文件中设置，位置："],
+        @[@"Can’t Connect to ", @"无法连接到 "],
+        @[@"Couldn’t read the theme file. ", @"无法读取主题文件。"],
+        @[@"Sized by another client · ", @"由另一个客户端调整大小 · "],
+        @[@"Rex returned an incomplete pane layout. ", @"Rex 返回了不完整的窗格布局。"],
+        @[@"The terminal could not be reset. ", @"无法重置终端。"],
+        @[@"The tab could not be activated. ", @"无法激活标签页。"],
+        @[@"The session could not be moved. ", @"无法移动会话。"],
+        @[@"The tab could not be moved. ", @"无法移动标签页。"],
+        @[@"The tab could not be closed. ", @"无法关闭标签页。"],
+        @[@"The tab could not be created. ", @"无法创建标签页。"],
+        @[@"The name could not be changed. ", @"无法更改名称。"],
+        @[@"The session could not be closed. ", @"无法关闭会话。"],
+        @[@"The session could not be created. ", @"无法创建会话。"]
+    ]) {
+        if ([s hasPrefix:pair[1]]) return s;
+        if ([s hasPrefix:pair[0]]) return [pair[1] stringByAppendingString:[s substringFromIndex:pair[0].length]];
+    }
+    NSString *folderPrefix = @"Couldn’t load “";
+    if ([s hasPrefix:@"无法加载“"] && [s hasSuffix:@"”"]) return s;
+    if ([s hasPrefix:folderPrefix] && [s hasSuffix:@"”"] && s.length > folderPrefix.length + 1) {
+        return [@"无法加载“" stringByAppendingString:[s substringFromIndex:folderPrefix.length]];
+    }
+    for (NSString *prefix in @[@"Save this theme and use it as your ", @"保存此主题并将其用于"]) {
+        if ([s hasPrefix:prefix]) {
+            NSString *target = [s substringFromIndex:prefix.length];
+            if ([target isEqualToString:@"light theme"] || [target isEqualToString:@"浅色主题"]) return @"保存此主题并将其用于浅色主题";
+            if ([target isEqualToString:@"dark theme"] || [target isEqualToString:@"深色主题"]) return @"保存此主题并将其用于深色主题";
+        }
+    }
     if ([s hasPrefix:@"快捷键 › "]) {
         for (NSString *prefix in @[@"See the keys bound to ", @"Record, remove, or reset the keys bound to ", @"录制、移除或重置绑定到 ", @"查看绑定到 "]) {
             NSRange range = [s rangeOfString:prefix];
@@ -2299,6 +2511,31 @@ static NSString *RXTranslate(NSString *s) {
         return [NSString stringWithFormat:@"移动 %@ 窗格", middle];
     }
     return s;
+}
+
+static NSString *RXTranslate(NSString *s) {
+    if (![s isKindOfClass:[NSString class]]) return s;
+    // NSCache does not copy its keys. Snapshot mutable AppKit strings before
+    // lookup and parsing so later edits cannot alter a key or returned value.
+    NSString *key = [s copy];
+    if (key.length == 0) return key;
+    if (key.length > 1024) return [RXTranslateUncached(key) copy];
+    static NSCache<NSString *, NSString *> *cache;
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        cache = [NSCache new];
+        cache.countLimit = 512;
+        cache.totalCostLimit = 1024 * 1024;
+    });
+    NSString *cached = [cache objectForKey:key];
+    if (cached) return cached;
+    // NSCache synchronizes individual operations. Compute outside any lock:
+    // dynamic rules can recursively translate another fragment.
+    NSString *result = [RXTranslateUncached(key) copy];
+    if (result.length <= 1024) {
+        [cache setObject:result forKey:key cost:(key.length + result.length) * sizeof(unichar)];
+    }
+    return result;
 }
 
 static CFStringRef (*RXOriginalCFBundleCopyLocalizedString)(CFBundleRef, CFStringRef, CFStringRef, CFStringRef);
@@ -3072,133 +3309,9 @@ static void RXInstallDrawingHooks(void) {
     origAttributedStringGetter = RXHook([NSAttributedString class], @selector(string), (IMP)RXAttributedStringGetter);
 }
 
-/* Rex renders the command palette in two private NSView subclasses, bypassing
-   SwiftUI Text and AppKit text controls. Keep this hook limited to those views. */
-static IMP origCommandPaletteListDraw, origCommandPaletteContentDraw;
-
-static NSString *RXPaletteTextInTree(NSView *view) {
-    if ([view isKindOfClass:[NSTextView class]]) return ((NSTextView *)view).string ?: @"";
-    for (NSView *child in view.subviews) {
-        NSString *query = RXPaletteTextInTree(child);
-        if (query != nil) return query;
-    }
-    return nil;
-}
-
-static NSString *RXPaletteQuery(NSView *view) {
-    for (NSView *ancestor = view; ancestor; ancestor = ancestor.superview) {
-        NSString *query = RXPaletteTextInTree(ancestor);
-        if (query != nil) return query;
-    }
-    return nil;
-}
-
-static NSArray *RXPaletteCommands(void) {
-    static NSArray *commands;
-    static dispatch_once_t once;
-    dispatch_once(&once, ^{
-        commands = @[
-            @"Change Session…", @"Rename Session", @"Rename Tab", @"Add Remote Host…",
-            @"New Session", @"New Tab", @"Go to Directory…", @"New Window",
-            @"Move Tab to New Window", @"Close Tab", @"Refresh Sessions", @"Close Session",
-            @"Close Window", @"Enter Full Screen", @"Pane", @"Split Right", @"Split Down",
-            @"Split Left", @"Split Up", @"Split Best Fit", @"Focus Left", @"Focus Right",
-            @"Focus Up", @"Focus Down", @"Focus Previous Pane", @"Focus Next Pane",
-            @"Move Pane Left", @"Move Pane Right", @"Move Pane Up", @"Move Pane Down",
-            @"Balance Splits", @"Resize Pane", @"Move Pane to Tab…", @"Copy Pane ID",
-            @"Send Key", @"Send Key to Server", @"Jump to Previous Prompt", @"Jump to Next Prompt",
-            @"Clear Terminal", @"Reset Terminal", @"Enter Mode", @"Exit Mode", @"Exit All Modes",
-            @"Toggle Tab Style", @"Import Theme File", @"Switch Appearance Mode",
-            @"Copy Config File Path", @"Reload Config", @"View", @"Color Scheme", @"Tab Style",
-            @"Reset Font Size", @"Increase Font Size", @"Decrease Font Size", @"Toggle Sidebar",
-            @"Toggle Activity", @"Show Activity", @"Show Previous Tab", @"Show Next Tab",
-            @"Move Tab Backward", @"Move Tab Forward", @"Previous Session", @"Next Session"
-        ];
-    });
-    return commands;
-}
-
-static NSArray *RXPaletteRowsForQuery(NSString *query) {
-    NSArray *commands = RXPaletteCommands();
-    if (query.length == 0) return commands;
-    NSString *needle = query.lowercaseString;
-    if ([needle isEqualToString:@"tab"]) {
-        return @[
-            @"Commands", @"Tabs Above", @"Tabs on Left Side", @"Tabs on Right Side",
-            @"New Tab", @"Close Tab", @"Rename Tab", @"Move Tab to New Window",
-            @"Go to Directory…", @"Comfortable Pane Style", @"Tabs", @"", @"Pane",
-            @"Split Pane Best Fit"
-        ];
-    }
-    if ([needle isEqualToString:@"settings"]) {
-        return @[@"Settings…", @"Grant System Permissions…", @"Copy Config File Path", @"Reload Config"];
-    }
-    NSMutableArray *rows = [NSMutableArray array];
-    for (NSString *command in commands) {
-        if ([command isEqualToString:@"Pane"]) continue;
-        NSString *translated = RXTranslate(command);
-        if ([command.lowercaseString containsString:needle] || [translated.lowercaseString containsString:needle]) [rows addObject:command];
-    }
-    return rows;
-}
-
-static void RXDrawPaletteText(NSString *text, NSRect rect, BOOL selected) {
-    NSColor *background = selected ? NSColor.selectedControlColor : NSColor.windowBackgroundColor;
-    [background setFill];
-    NSRectFill(rect);
-    NSDictionary *attributes = @{
-        NSFontAttributeName: [NSFont systemFontOfSize:selected ? 16.0 : 16.0],
-        NSForegroundColorAttributeName: selected ? NSColor.alternateSelectedControlTextColor : NSColor.labelColor
-    };
-    [RXTranslate(text) drawAtPoint:NSMakePoint(NSMinX(rect) + 8.0, NSMinY(rect) + 5.0) withAttributes:attributes];
-}
-
-static void RXCommandPaletteListDraw(id self, SEL _cmd, NSRect rect) {
-    if (origCommandPaletteListDraw) ((void (*)(id, SEL, NSRect))origCommandPaletteListDraw)(self, _cmd, rect);
-    NSView *view = (NSView *)self;
-    NSString *query = RXPaletteQuery(view) ?: @"";
-    NSArray *rows = RXPaletteRowsForQuery(query);
-    // Clear Rex's custom-drawn labels before repainting translated rows.
-    NSRect textColumn = NSMakeRect(NSMinX(rect), NSMinY(rect), MIN(260.0, NSWidth(rect)), NSHeight(rect));
-    [NSColor.windowBackgroundColor setFill];
-    NSRectFill(textColumn);
-    CGFloat rowHeight = 28.5;
-    CGFloat originY = view.bounds.origin.y;
-    for (NSUInteger index = 0; index < rows.count; index++) {
-        CGFloat y = index * rowHeight - originY;
-        if (y + rowHeight < 0 || y > NSMaxY(rect)) continue;
-        NSUInteger selectedIndex = [query.lowercaseString isEqualToString:@"tab"] ? 1 : 0;
-        BOOL selected = index == selectedIndex;
-        NSRect textRect = NSMakeRect(10.0, y + 1.0, MIN(250.0, view.bounds.size.width - 20.0), rowHeight - 2.0);
-        RXDrawPaletteText(rows[index], textRect, selected);
-    }
-}
-
-static void RXCommandPaletteContentDraw(id self, SEL _cmd, NSRect rect) {
-    if (origCommandPaletteContentDraw) ((void (*)(id, SEL, NSRect))origCommandPaletteContentDraw)(self, _cmd, rect);
-    NSView *view = (NSView *)self;
-    NSString *query = RXPaletteQuery(view) ?: @"";
-    if (query.length == 0) {
-        NSRect placeholderRect = NSMakeRect(32.0, 9.0, MAX(0.0, view.bounds.size.width - 42.0), 34.0);
-        [NSColor.controlBackgroundColor setFill];
-        NSRectFill(placeholderRect);
-        NSDictionary *attributes = @{NSFontAttributeName: [NSFont systemFontOfSize: 16.0], NSForegroundColorAttributeName: NSColor.secondaryLabelColor};
-        [@"搜索命令、会话和标签页…" drawAtPoint:NSMakePoint(placeholderRect.origin.x + 5.0, placeholderRect.origin.y + 8.0) withAttributes:attributes];
-    }
-    NSRect footer = NSMakeRect(92.0, view.bounds.size.height - 36.0, 210.0, 28.0);
-    [NSColor.windowBackgroundColor setFill];
-    NSRectFill(footer);
-    NSDictionary *footerAttributes = @{NSFontAttributeName: [NSFont systemFontOfSize: 13.0], NSForegroundColorAttributeName: NSColor.secondaryLabelColor};
-    [@"更改快捷键" drawAtPoint:NSMakePoint(footer.origin.x + 4.0, footer.origin.y + 6.0) withAttributes:footerAttributes];
-    [@"操作" drawAtPoint:NSMakePoint(footer.origin.x + 150.0, footer.origin.y + 6.0) withAttributes:footerAttributes];
-}
-
-static void RXInstallCommandPaletteHooks(void) {
-    Class listClass = objc_getClass("_TtCE8RexMacOSO9RexShared9Workspace22CommandPaletteListView");
-    Class contentClass = objc_getClass("_TtCE8RexMacOSO9RexShared9Workspace25CommandPaletteContentView");
-    if (listClass && !origCommandPaletteListDraw) origCommandPaletteListDraw = RXHook(listClass, @selector(drawRect:), (IMP)RXCommandPaletteListDraw);
-    if (contentClass && !origCommandPaletteContentDraw) origCommandPaletteContentDraw = RXHook(contentClass, @selector(drawRect:), (IMP)RXCommandPaletteContentDraw);
-}
+// Command-palette rows use the native attributed-string drawing methods
+// translated by RXInstallDrawingHooks. Preserve their real order, selection,
+// clipping and action bindings instead of repainting a guessed command list.
 
 static NSString *RXPopupTitleOfSelectedItem(id self, SEL _cmd);
 static NSString *RXPopupCellTitle(id self, SEL _cmd);
@@ -3450,10 +3563,20 @@ static BOOL RXIsOwnedOverlayObject(id object) {
 }
 
 static id RXRawAXValue(id element, NSString *attribute) {
+    // SwiftUI nodes inherit NSObject. Only use the original registered for
+    // this receiver's class hierarchy; a generic AppKit IMP is incompatible.
+    SEL selector = @selector(accessibilityAttributeValue:);
+    IMP swiftOriginal = RXSwiftNodeOriginal(element, selector);
+    if (swiftOriginal) {
+        return ((id (*)(id, SEL, NSString *))swiftOriginal)(element, selector, attribute);
+    }
     if ([element isKindOfClass:[NSView class]] && origAccessibilityValue) {
         return ((id (*)(id, SEL, NSString *))origAccessibilityValue)(element, @selector(accessibilityAttributeValue:), attribute);
     }
-    if (origAXElementAttribute && [element respondsToSelector:@selector(accessibilityAttributeValue:)]) {
+    // A legacy AX selector also exists on unrelated NSWindow, NSCell and
+    // SwiftUI objects. Their layout is not compatible with this captured IMP.
+    if ([element isKindOfClass:[NSAccessibilityElement class]] && origAXElementAttribute &&
+        [element respondsToSelector:@selector(accessibilityAttributeValue:)]) {
         return ((id (*)(id, SEL, NSString *))origAXElementAttribute)(element, @selector(accessibilityAttributeValue:), attribute);
     }
     return nil;
@@ -4383,11 +4506,9 @@ __attribute__((constructor)) static void RexChineseInstall(void) {
             }];
             // Refresh the dynamic overlays on the common run-loop modes so
             // popovers and menus do not leave an English frame visible for
-            // the old two-second polling interval. The same timer also keeps
-            // the command-palette and text-field hooks installed as views are
-            // created lazily by SwiftUI.
+            // the old two-second polling interval. The same timer keeps the
+            // text-field hook installed as SwiftUI creates views lazily.
             NSTimer *timer = [NSTimer timerWithTimeInterval:0.2 repeats:YES block:^(NSTimer *timer) {
-                RXInstallCommandPaletteHooks();
                 RXInstallTextFieldTextViewHook();
                 RXRefreshAccessibility();
             }];

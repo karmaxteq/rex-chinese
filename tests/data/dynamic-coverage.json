@@ -1,0 +1,542 @@
+[
+  {
+    "input": "Couldn’t save your shortcuts: /tmp/中文 😀/theme.json",
+    "expected": "无法保存快捷键：/tmp/中文 😀/theme.json",
+    "kind": "payload_preserved",
+    "prefix": "Couldn’t save your shortcuts: "
+  },
+  {
+    "input": "Couldn’t save your shortcuts: Diagnostics warning: Build complete! / Filter Settings",
+    "expected": "无法保存快捷键：Diagnostics warning: Build complete! / Filter Settings",
+    "kind": "payload_preserved",
+    "prefix": "Couldn’t save your shortcuts: "
+  },
+  {
+    "input": "Notes: Couldn’t save your shortcuts: demo-value",
+    "expected": "Notes: Couldn’t save your shortcuts: demo-value",
+    "kind": "embedded_prefix_boundary"
+  },
+  {
+    "input": "Couldn’t save your shortcuts:demo-value",
+    "expected": "Couldn’t save your shortcuts:demo-value",
+    "kind": "missing_separator_boundary"
+  },
+  {
+    "input": "Set in your configuration file, at /tmp/中文 😀/theme.json",
+    "expected": "在配置文件中设置，位置：/tmp/中文 😀/theme.json",
+    "kind": "payload_preserved",
+    "prefix": "Set in your configuration file, at "
+  },
+  {
+    "input": "Set in your configuration file, at Diagnostics warning: Build complete! / Filter Settings",
+    "expected": "在配置文件中设置，位置：Diagnostics warning: Build complete! / Filter Settings",
+    "kind": "payload_preserved",
+    "prefix": "Set in your configuration file, at "
+  },
+  {
+    "input": "Notes: Set in your configuration file, at demo-value",
+    "expected": "Notes: Set in your configuration file, at demo-value",
+    "kind": "embedded_prefix_boundary"
+  },
+  {
+    "input": "Set in your configuration file, atdemo-value",
+    "expected": "Set in your configuration file, atdemo-value",
+    "kind": "missing_separator_boundary"
+  },
+  {
+    "input": "Can’t Connect to /tmp/中文 😀/theme.json",
+    "expected": "无法连接到 /tmp/中文 😀/theme.json",
+    "kind": "payload_preserved",
+    "prefix": "Can’t Connect to "
+  },
+  {
+    "input": "Can’t Connect to Diagnostics warning: Build complete! / Filter Settings",
+    "expected": "无法连接到 Diagnostics warning: Build complete! / Filter Settings",
+    "kind": "payload_preserved",
+    "prefix": "Can’t Connect to "
+  },
+  {
+    "input": "Notes: Can’t Connect to demo-value",
+    "expected": "Notes: Can’t Connect to demo-value",
+    "kind": "embedded_prefix_boundary"
+  },
+  {
+    "input": "Can’t Connect todemo-value",
+    "expected": "Can’t Connect todemo-value",
+    "kind": "missing_separator_boundary"
+  },
+  {
+    "input": "Couldn’t read the theme file. /tmp/中文 😀/theme.json",
+    "expected": "无法读取主题文件。/tmp/中文 😀/theme.json",
+    "kind": "payload_preserved",
+    "prefix": "Couldn’t read the theme file. "
+  },
+  {
+    "input": "Couldn’t read the theme file. Diagnostics warning: Build complete! / Filter Settings",
+    "expected": "无法读取主题文件。Diagnostics warning: Build complete! / Filter Settings",
+    "kind": "payload_preserved",
+    "prefix": "Couldn’t read the theme file. "
+  },
+  {
+    "input": "Notes: Couldn’t read the theme file. demo-value",
+    "expected": "Notes: Couldn’t read the theme file. demo-value",
+    "kind": "embedded_prefix_boundary"
+  },
+  {
+    "input": "Couldn’t read the theme file.demo-value",
+    "expected": "Couldn’t read the theme file.demo-value",
+    "kind": "missing_separator_boundary"
+  },
+  {
+    "input": "Sized by another client · /tmp/中文 😀/theme.json",
+    "expected": "由另一个客户端调整大小 · /tmp/中文 😀/theme.json",
+    "kind": "payload_preserved",
+    "prefix": "Sized by another client · "
+  },
+  {
+    "input": "Sized by another client · Diagnostics warning: Build complete! / Filter Settings",
+    "expected": "由另一个客户端调整大小 · Diagnostics warning: Build complete! / Filter Settings",
+    "kind": "payload_preserved",
+    "prefix": "Sized by another client · "
+  },
+  {
+    "input": "Notes: Sized by another client · demo-value",
+    "expected": "Notes: Sized by another client · demo-value",
+    "kind": "embedded_prefix_boundary"
+  },
+  {
+    "input": "Sized by another client ·demo-value",
+    "expected": "Sized by another client ·demo-value",
+    "kind": "missing_separator_boundary"
+  },
+  {
+    "input": "Rex returned an incomplete pane layout. /tmp/中文 😀/theme.json",
+    "expected": "Rex 返回了不完整的窗格布局。/tmp/中文 😀/theme.json",
+    "kind": "payload_preserved",
+    "prefix": "Rex returned an incomplete pane layout. "
+  },
+  {
+    "input": "Rex returned an incomplete pane layout. Diagnostics warning: Build complete! / Filter Settings",
+    "expected": "Rex 返回了不完整的窗格布局。Diagnostics warning: Build complete! / Filter Settings",
+    "kind": "payload_preserved",
+    "prefix": "Rex returned an incomplete pane layout. "
+  },
+  {
+    "input": "Notes: Rex returned an incomplete pane layout. demo-value",
+    "expected": "Notes: Rex returned an incomplete pane layout. demo-value",
+    "kind": "embedded_prefix_boundary"
+  },
+  {
+    "input": "Rex returned an incomplete pane layout.demo-value",
+    "expected": "Rex returned an incomplete pane layout.demo-value",
+    "kind": "missing_separator_boundary"
+  },
+  {
+    "input": "The terminal could not be reset. /tmp/中文 😀/theme.json",
+    "expected": "无法重置终端。/tmp/中文 😀/theme.json",
+    "kind": "payload_preserved",
+    "prefix": "The terminal could not be reset. "
+  },
+  {
+    "input": "The terminal could not be reset. Diagnostics warning: Build complete! / Filter Settings",
+    "expected": "无法重置终端。Diagnostics warning: Build complete! / Filter Settings",
+    "kind": "payload_preserved",
+    "prefix": "The terminal could not be reset. "
+  },
+  {
+    "input": "Notes: The terminal could not be reset. demo-value",
+    "expected": "Notes: The terminal could not be reset. demo-value",
+    "kind": "embedded_prefix_boundary"
+  },
+  {
+    "input": "The terminal could not be reset.demo-value",
+    "expected": "The terminal could not be reset.demo-value",
+    "kind": "missing_separator_boundary"
+  },
+  {
+    "input": "The tab could not be activated. /tmp/中文 😀/theme.json",
+    "expected": "无法激活标签页。/tmp/中文 😀/theme.json",
+    "kind": "payload_preserved",
+    "prefix": "The tab could not be activated. "
+  },
+  {
+    "input": "The tab could not be activated. Diagnostics warning: Build complete! / Filter Settings",
+    "expected": "无法激活标签页。Diagnostics warning: Build complete! / Filter Settings",
+    "kind": "payload_preserved",
+    "prefix": "The tab could not be activated. "
+  },
+  {
+    "input": "Notes: The tab could not be activated. demo-value",
+    "expected": "Notes: The tab could not be activated. demo-value",
+    "kind": "embedded_prefix_boundary"
+  },
+  {
+    "input": "The tab could not be activated.demo-value",
+    "expected": "The tab could not be activated.demo-value",
+    "kind": "missing_separator_boundary"
+  },
+  {
+    "input": "The session could not be moved. /tmp/中文 😀/theme.json",
+    "expected": "无法移动会话。/tmp/中文 😀/theme.json",
+    "kind": "payload_preserved",
+    "prefix": "The session could not be moved. "
+  },
+  {
+    "input": "The session could not be moved. Diagnostics warning: Build complete! / Filter Settings",
+    "expected": "无法移动会话。Diagnostics warning: Build complete! / Filter Settings",
+    "kind": "payload_preserved",
+    "prefix": "The session could not be moved. "
+  },
+  {
+    "input": "Notes: The session could not be moved. demo-value",
+    "expected": "Notes: The session could not be moved. demo-value",
+    "kind": "embedded_prefix_boundary"
+  },
+  {
+    "input": "The session could not be moved.demo-value",
+    "expected": "The session could not be moved.demo-value",
+    "kind": "missing_separator_boundary"
+  },
+  {
+    "input": "The tab could not be moved. /tmp/中文 😀/theme.json",
+    "expected": "无法移动标签页。/tmp/中文 😀/theme.json",
+    "kind": "payload_preserved",
+    "prefix": "The tab could not be moved. "
+  },
+  {
+    "input": "The tab could not be moved. Diagnostics warning: Build complete! / Filter Settings",
+    "expected": "无法移动标签页。Diagnostics warning: Build complete! / Filter Settings",
+    "kind": "payload_preserved",
+    "prefix": "The tab could not be moved. "
+  },
+  {
+    "input": "Notes: The tab could not be moved. demo-value",
+    "expected": "Notes: The tab could not be moved. demo-value",
+    "kind": "embedded_prefix_boundary"
+  },
+  {
+    "input": "The tab could not be moved.demo-value",
+    "expected": "The tab could not be moved.demo-value",
+    "kind": "missing_separator_boundary"
+  },
+  {
+    "input": "The tab could not be closed. /tmp/中文 😀/theme.json",
+    "expected": "无法关闭标签页。/tmp/中文 😀/theme.json",
+    "kind": "payload_preserved",
+    "prefix": "The tab could not be closed. "
+  },
+  {
+    "input": "The tab could not be closed. Diagnostics warning: Build complete! / Filter Settings",
+    "expected": "无法关闭标签页。Diagnostics warning: Build complete! / Filter Settings",
+    "kind": "payload_preserved",
+    "prefix": "The tab could not be closed. "
+  },
+  {
+    "input": "Notes: The tab could not be closed. demo-value",
+    "expected": "Notes: The tab could not be closed. demo-value",
+    "kind": "embedded_prefix_boundary"
+  },
+  {
+    "input": "The tab could not be closed.demo-value",
+    "expected": "The tab could not be closed.demo-value",
+    "kind": "missing_separator_boundary"
+  },
+  {
+    "input": "The tab could not be created. /tmp/中文 😀/theme.json",
+    "expected": "无法创建标签页。/tmp/中文 😀/theme.json",
+    "kind": "payload_preserved",
+    "prefix": "The tab could not be created. "
+  },
+  {
+    "input": "The tab could not be created. Diagnostics warning: Build complete! / Filter Settings",
+    "expected": "无法创建标签页。Diagnostics warning: Build complete! / Filter Settings",
+    "kind": "payload_preserved",
+    "prefix": "The tab could not be created. "
+  },
+  {
+    "input": "Notes: The tab could not be created. demo-value",
+    "expected": "Notes: The tab could not be created. demo-value",
+    "kind": "embedded_prefix_boundary"
+  },
+  {
+    "input": "The tab could not be created.demo-value",
+    "expected": "The tab could not be created.demo-value",
+    "kind": "missing_separator_boundary"
+  },
+  {
+    "input": "The name could not be changed. /tmp/中文 😀/theme.json",
+    "expected": "无法更改名称。/tmp/中文 😀/theme.json",
+    "kind": "payload_preserved",
+    "prefix": "The name could not be changed. "
+  },
+  {
+    "input": "The name could not be changed. Diagnostics warning: Build complete! / Filter Settings",
+    "expected": "无法更改名称。Diagnostics warning: Build complete! / Filter Settings",
+    "kind": "payload_preserved",
+    "prefix": "The name could not be changed. "
+  },
+  {
+    "input": "Notes: The name could not be changed. demo-value",
+    "expected": "Notes: The name could not be changed. demo-value",
+    "kind": "embedded_prefix_boundary"
+  },
+  {
+    "input": "The name could not be changed.demo-value",
+    "expected": "The name could not be changed.demo-value",
+    "kind": "missing_separator_boundary"
+  },
+  {
+    "input": "The session could not be closed. /tmp/中文 😀/theme.json",
+    "expected": "无法关闭会话。/tmp/中文 😀/theme.json",
+    "kind": "payload_preserved",
+    "prefix": "The session could not be closed. "
+  },
+  {
+    "input": "The session could not be closed. Diagnostics warning: Build complete! / Filter Settings",
+    "expected": "无法关闭会话。Diagnostics warning: Build complete! / Filter Settings",
+    "kind": "payload_preserved",
+    "prefix": "The session could not be closed. "
+  },
+  {
+    "input": "Notes: The session could not be closed. demo-value",
+    "expected": "Notes: The session could not be closed. demo-value",
+    "kind": "embedded_prefix_boundary"
+  },
+  {
+    "input": "The session could not be closed.demo-value",
+    "expected": "The session could not be closed.demo-value",
+    "kind": "missing_separator_boundary"
+  },
+  {
+    "input": "The session could not be created. /tmp/中文 😀/theme.json",
+    "expected": "无法创建会话。/tmp/中文 😀/theme.json",
+    "kind": "payload_preserved",
+    "prefix": "The session could not be created. "
+  },
+  {
+    "input": "The session could not be created. Diagnostics warning: Build complete! / Filter Settings",
+    "expected": "无法创建会话。Diagnostics warning: Build complete! / Filter Settings",
+    "kind": "payload_preserved",
+    "prefix": "The session could not be created. "
+  },
+  {
+    "input": "Notes: The session could not be created. demo-value",
+    "expected": "Notes: The session could not be created. demo-value",
+    "kind": "embedded_prefix_boundary"
+  },
+  {
+    "input": "The session could not be created.demo-value",
+    "expected": "The session could not be created.demo-value",
+    "kind": "missing_separator_boundary"
+  },
+  {
+    "input": "Couldn’t load “/tmp/中文 😀/folder”",
+    "expected": "无法加载“/tmp/中文 😀/folder”",
+    "kind": "quoted_path"
+  },
+  {
+    "input": "Couldn’t load “Diagnostics warning: Settings”",
+    "expected": "无法加载“Diagnostics warning: Settings”",
+    "kind": "quoted_payload_preserved"
+  },
+  {
+    "input": "Couldn’t load “unfinished path",
+    "expected": "Couldn’t load “unfinished path",
+    "kind": "missing_close_quote_boundary"
+  },
+  {
+    "input": "Notes: Couldn’t load “/tmp/folder”",
+    "expected": "Notes: Couldn’t load “/tmp/folder”",
+    "kind": "embedded_prefix_boundary"
+  },
+  {
+    "input": "Save this theme and use it as your light theme",
+    "expected": "保存此主题并将其用于浅色主题",
+    "kind": "closed_theme_target"
+  },
+  {
+    "input": "Save this theme and use it as your dark theme",
+    "expected": "保存此主题并将其用于深色主题",
+    "kind": "closed_theme_target"
+  },
+  {
+    "input": "保存此主题并将其用于light theme",
+    "expected": "保存此主题并将其用于浅色主题",
+    "kind": "mixed_theme_target"
+  },
+  {
+    "input": "保存此主题并将其用于dark theme",
+    "expected": "保存此主题并将其用于深色主题",
+    "kind": "mixed_theme_target"
+  },
+  {
+    "input": "Save this theme and use it as your 浅色主题",
+    "expected": "保存此主题并将其用于浅色主题",
+    "kind": "mixed_theme_target"
+  },
+  {
+    "input": "Save this theme and use it as your 深色主题",
+    "expected": "保存此主题并将其用于深色主题",
+    "kind": "mixed_theme_target"
+  },
+  {
+    "input": "Save this theme and use it as your named-theme",
+    "expected": "Save this theme and use it as your named-theme",
+    "kind": "unknown_theme_boundary"
+  },
+  {
+    "input": "保存此主题并将其用于named-theme",
+    "expected": "保存此主题并将其用于named-theme",
+    "kind": "unknown_theme_boundary"
+  },
+  {
+    "input": "/tmp/Filter/Settings.txt",
+    "expected": "/tmp/Filter/Settings.txt",
+    "kind": "user_path_boundary"
+  },
+  {
+    "input": "Rex user session: Settings / Filter",
+    "expected": "Rex user session: Settings / Filter",
+    "kind": "user_data_boundary"
+  },
+  {
+    "input": "录制  的快捷键Send Key to Server",
+    "expected": "录制 向服务器发送按键 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "录制  的快捷键Toggle Activity",
+    "expected": "录制 切换活动 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "录制  的快捷键Rex Diagnostics",
+    "expected": "录制 Rex 诊断 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "录制  的快捷键Rex Diagnostics task",
+    "expected": "录制 Rex Diagnostics task 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "录制  的快捷键/tmp/Settings/Filter 😀",
+    "expected": "录制 /tmp/Settings/Filter 😀 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "Notes: 录制  的快捷键my-action",
+    "expected": "Notes: 录制  的快捷键my-action",
+    "kind": "embedded_shortcut_prefix_boundary"
+  },
+  {
+    "input": "修改  的快捷键Send Key to Server",
+    "expected": "修改 向服务器发送按键 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "修改  的快捷键Toggle Activity",
+    "expected": "修改 切换活动 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "修改  的快捷键Rex Diagnostics",
+    "expected": "修改 Rex 诊断 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "修改  的快捷键Rex Diagnostics task",
+    "expected": "修改 Rex Diagnostics task 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "修改  的快捷键/tmp/Settings/Filter 😀",
+    "expected": "修改 /tmp/Settings/Filter 😀 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "Notes: 修改  的快捷键my-action",
+    "expected": "Notes: 修改  的快捷键my-action",
+    "kind": "embedded_shortcut_prefix_boundary"
+  },
+  {
+    "input": "录制快捷键：Send Key to Server",
+    "expected": "录制 向服务器发送按键 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "录制快捷键：Toggle Activity",
+    "expected": "录制 切换活动 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "录制快捷键：Rex Diagnostics",
+    "expected": "录制 Rex 诊断 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "录制快捷键：Rex Diagnostics task",
+    "expected": "录制 Rex Diagnostics task 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "录制快捷键：/tmp/Settings/Filter 😀",
+    "expected": "录制 /tmp/Settings/Filter 😀 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "Notes: 录制快捷键：my-action",
+    "expected": "Notes: 录制快捷键：my-action",
+    "kind": "embedded_shortcut_prefix_boundary"
+  },
+  {
+    "input": "修改快捷键：Send Key to Server",
+    "expected": "修改 向服务器发送按键 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "修改快捷键：Toggle Activity",
+    "expected": "修改 切换活动 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "修改快捷键：Rex Diagnostics",
+    "expected": "修改 Rex 诊断 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "修改快捷键：Rex Diagnostics task",
+    "expected": "修改 Rex Diagnostics task 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "修改快捷键：/tmp/Settings/Filter 😀",
+    "expected": "修改 /tmp/Settings/Filter 😀 的快捷键",
+    "kind": "shortcut_fragment_repair"
+  },
+  {
+    "input": "Notes: 修改快捷键：my-action",
+    "expected": "Notes: 修改快捷键：my-action",
+    "kind": "embedded_shortcut_prefix_boundary"
+  },
+  {
+    "input": "录制 Rex Diagnostics task 的快捷键",
+    "expected": "录制 Rex Diagnostics task 的快捷键",
+    "kind": "normalized_unknown_shortcut_payload"
+  },
+  {
+    "input": "录制 /tmp/Settings/Filter 😀 的快捷键",
+    "expected": "录制 /tmp/Settings/Filter 😀 的快捷键",
+    "kind": "normalized_unknown_shortcut_payload"
+  },
+  {
+    "input": "修改 Rex Diagnostics task 的快捷键",
+    "expected": "修改 Rex Diagnostics task 的快捷键",
+    "kind": "normalized_unknown_shortcut_payload"
+  },
+  {
+    "input": "修改 /tmp/Settings/Filter 😀 的快捷键",
+    "expected": "修改 /tmp/Settings/Filter 😀 的快捷键",
+    "kind": "normalized_unknown_shortcut_payload"
+  }
+]
