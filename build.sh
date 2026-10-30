@@ -20,10 +20,18 @@ for arch in arm64 x86_64; do
     -fblocks -c "$ROOT/RexTextHookInterpose.c" \
     -o "$BUILD_DIR/RexTextHookInterpose-${arch}.o"
 
+  clang -arch "$arch" -isysroot "$SDKROOT" -mmacosx-version-min=13.0 \
+    -O2 -c "$ROOT/RexSearchHook.c" -o "$BUILD_DIR/RexSearchHook-${arch}.o"
+
+  clang -arch "$arch" -isysroot "$SDKROOT" -mmacosx-version-min=13.0 \
+    -c "$ROOT/RexSearchDispatch.S" -o "$BUILD_DIR/RexSearchDispatch-${arch}.o"
+
   swiftc -target "${arch}-apple-macos13.0" \
     -emit-library -parse-as-library -O \
     "$BUILD_DIR/RexTextHook-${arch}.o" \
     "$BUILD_DIR/RexTextHookInterpose-${arch}.o" \
+    "$BUILD_DIR/RexSearchHook-${arch}.o" \
+    "$BUILD_DIR/RexSearchDispatch-${arch}.o" \
     -o "$BUILD_DIR/libRexTextHook-${arch}.dylib" \
     -framework Foundation -framework SwiftUI
 

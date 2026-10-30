@@ -11,11 +11,20 @@ BUILD=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$SRC/Contents/Info.
 [ "$VERSION" = 0.1.0 ] && [ "$BUILD" = 1408 ] || { echo "仅支持 Rex Beta 0.1.0 (1408)，当前为 $VERSION ($BUILD)。" >&2; exit 1; }
 # Validate the exact GPU demos and remote-warning title constants before touching the installed copy.
 python3 "$ROOT/tools/patch-preview.py" "$SRC/Contents/MacOS/Rex" --dry-run
+python3 "$ROOT/tools/patch-search.py" "$SRC/Contents/MacOS/Rex" --dry-run
+lipo "$ROOT/bin/libRexTextHook.dylib" -verify_arch arm64 x86_64
+for arch in arm64 x86_64; do
+  nm -arch "$arch" -gU "$ROOT/bin/libRexTextHook.dylib" | grep -q ' _rxHookSearchLowercased$' || {
+    echo "请先运行 ./build.sh 构建保留搜索标题所有权和权重的双架构补丁库。" >&2
+    exit 1
+  }
+done
 mkdir -p "$HOME/Applications"
 ditto "$SRC" "$DST"
 # Launch through a local Objective-C shim so AppKit labels can be translated at runtime.
 mv "$DST/Contents/MacOS/Rex" "$DST/Contents/MacOS/RexCore"
 python3 "$ROOT/tools/patch-preview.py" "$DST/Contents/MacOS/RexCore" --write
+python3 "$ROOT/tools/patch-search.py" "$DST/Contents/MacOS/RexCore" --write
 cp "$(dirname "$0")/bin/RexLauncher" "$DST/Contents/MacOS/Rex"
 cp "$(dirname "$0")/bin/libRexChinese.dylib" "$DST/Contents/Frameworks/libRexChinese.dylib"
 cp "$(dirname "$0")/bin/libRexTextHook.dylib" "$DST/Contents/Frameworks/libRexTextHook.dylib"

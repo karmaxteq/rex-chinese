@@ -2477,6 +2477,16 @@ private func translate(_ value: String) -> String {
   return value
 }
 
+// This value belongs only to a native command palette's temporary search
+// field. Keep the original title searchable and add a known Chinese alias;
+// the candidate model, displayed name, query, and action are never rewritten.
+// Rex transfers a retained String into this field, so the bridge consumes it.
+@_silgen_name("rxSearchTitle")
+public func rxSearchTitle(_ value: consuming String) -> String {
+  guard let alias = translations[copy value], alias != value else { return value }
+  return value + " " + alias
+}
+
 // Match SwiftUI initializer ownership when calling their raw addresses.
 // The original initializers consume these values; borrowing them here would
 // make the caller destroy already-consumed storage during SwiftUI updates.
