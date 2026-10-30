@@ -2,6 +2,30 @@
 
 更新日期：2026-10-30。对象是 `~/Applications/Rex Beta 中文版.app`。本记录区分像素截图、Accessibility（AX）读回和静态规则；**不宣称全部界面已汉化，也不宣称没有英文残留**。品牌、技术标识和用户数据保留原文。
 
+## 正式中文版现场复测（2026-10-30，进程 76842）
+
+这次复测直接针对正在运行的正式中文版 `~/Applications/Rex Beta 中文版.app`，没有把同名原版或临时候选的画面算入结果。正式进程的 `vmmap` 读回了 `libRexChinese.dylib` 和 `libRexTextHook.dylib`，应用深度签名通过；当前正式副本仍加载已安装的旧库（`f606db05…` / `e1bdbba0…`），工作区 `bin/` 的新构建（`25464c45…` / `bb5a1497…`）尚未安装，所以本节是“当前正式副本”的现场覆盖，不是最新源码构建的覆盖。
+
+用原生 AX 读取正式窗口并逐页截图后，九个设置页首屏均实际看到中文。统计只包含设置窗口 `app/0` 下的唯一可见文本，排除了可编辑值、终端内容、菜单栏和用户数据；“含汉字”是证据指标，不是全量翻译百分比。
+
+| 页面 | 唯一可见文本 | 含汉字 | 仍为纯英文/技术标识 | 当前像素证据 |
+| --- | ---: | ---: | --- | --- |
+| 服务器 | 31 | 30 | `Tailscale` | `formal-settings-server-current.png` |
+| 界面 | 64 | 64 | 无；`Shell` 出现在混合中文标签中 | `formal-coverage-current-interface.png` |
+| 主题 | 113 | 113 | 无；主题品牌名、`Ghostty`、`iTerm` 保留 | `formal-coverage-current-themes.png` |
+| 终端 | 80 | 75 | `Menlo`、`pt`、`⌃⌘I`、`Shell` | `formal-coverage-current-terminal.png` |
+| 快捷键 | 74 | 74 | 无；修饰键和 `Rex` 等技术名保留 | `formal-coverage-current-shortcuts.png` |
+| 集成 | 21 | 21 | 无；`Claude Code`、`Codex`、`OpenCode`、`Pi` 保留 | `formal-coverage-current-integrations.png` |
+| 通知 | 49 | 49 | 无；`OSC 9/777`、`Tailscale` 保留 | `formal-coverage-current-notifications.png` |
+| 远程主机 | 20 | 20 | 无；`HTTP/HTTPS` 和 `Rex` 保留 | `formal-coverage-current-remote.png` |
+| 开发者 | 19 | 19 | 无 | `formal-coverage-current-developer.png` |
+
+这些截图只证明各页当前可见区域。界面、主题、终端、通知仍有滚动内容；扩展调色板、颜色弹窗、所有下拉菜单和命令面板动作不能由首屏表格推导。此前实际查看过的 12 个原生下拉菜单、命令面板滚动和通知详情仍按各自证据记录计算，未因本次首屏复测扩大范围。
+
+本次同时重新执行隔离回归：`translation-regressions.py` 为 **3,420 × 2**，`color-accessibility.py` 为 **16,036/16,036**，`raw-ax-receiver.py` 为 **37/37**，`accessibility-walk.py` 为 **71/71**，`palette-drawing.py` 为 **90/90**，`localized-message-hooks.py` 的注入正例为 **21/21**；这些测试没有创建 Rex 窗口，不能代替上表的像素证据。测试日志和逐页 AX 读回在 `.artifacts/formal-coverage-current/`、`.artifacts/coverage-check-*.log`。
+
+复测期间没有执行设置值、远程主机、更新、服务器启停或终端命令。候选同名窗口曾被 CUA 误绑定到原版并显示英文，该画面已排除；正式进程仍运行，原版可执行文件哈希未变。终端未提交草稿已恢复并读回，未按回车执行。
+
 ## 本轮实机复查与命令面板漏译修复（2026-10-30）
 
 **正式中文版并非没有补丁。** 进程 76842 从正式应用加载两份汉化库，桌面软链接、独立 bundle 标识及深度严格签名均正确；库的双架构 UUID 和四份中文资源对应 8717334/1e6120e。它仍未安装 2faf604 及本节新增修复，不能把以下候选截图称为正式副本的复测。

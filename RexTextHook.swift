@@ -598,6 +598,8 @@ private let translations: [String: String] = [
   "Customize View": "自定义视图",
   "Change Theme…": "更改主题…",
   "Change Theme": "更改主题",
+  "Select Theme...": "选择主题…",
+  "Select Theme…": "选择主题…",
   "Auto Color Scheme": "自动配色方案",
   "Light Color Scheme": "浅色配色方案",
   "Dark Color Scheme": "深色配色方案",

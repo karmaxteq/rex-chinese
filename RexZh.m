@@ -303,6 +303,8 @@ static NSString *RXTranslateUncached(NSString *s) {
             @"Customize View": @"自定义视图",
             @"Change Theme…": @"更改主题…",
             @"Change Theme": @"更改主题",
+            @"Select Theme...": @"选择主题…",
+            @"Select Theme…": @"选择主题…",
             @"Auto Color Scheme": @"自动配色方案",
             @"Light Color Scheme": @"浅色配色方案",
             @"Dark Color Scheme": @"深色配色方案",
@@ -2706,6 +2708,7 @@ static IMP origTitle, origButtonTitleGetter, origMenuTitle, origMenuTitleGetter,
 static IMP origAXElementAttribute, origAXElementValue, origAXElementPlaceholder, origAXElementLabel, origAXElementTitle, origAXElementHelp, origAXElementDescription, origAXElementRoleDescription;
 static IMP origMockAccessibilityAttribute;
 static IMP origAttributedPlaceholder, origCellPlaceholder, origCellAttributedPlaceholder;
+static NSString *RXTranslateColorAXText(id element, NSString *attribute, NSString *value);
 // Editable values are user input. Placeholder/label translation must never
 // turn a query or command such as "Filter" into the matching UI translation.
 static BOOL RXIsEditableTextObject(id object) {
@@ -2768,7 +2771,7 @@ static id RXAXElementAttribute(id self, SEL _cmd, NSString *attribute) {
     if (RXInAXElementHook) return value;
     RXDebugTranslation(self, _cmd, value, [NSString stringWithFormat:@"AX %@", attribute]);
     RXInAXElementHook = YES;
-    id translated = [value isKindOfClass:[NSString class]] ? RXTranslate(value) : value;
+    id translated = [value isKindOfClass:[NSString class]] ? RXTranslateColorAXText(self, attribute, value) : value;
     RXInAXElementHook = NO;
     return translated;
 }
@@ -2777,7 +2780,11 @@ static id RXAXElementObject(id self, SEL _cmd) {
     id value = original ? ((id (*)(id, SEL))original)(self, _cmd) : nil;
     if (RXInAXElementHook) return value;
     RXInAXElementHook = YES;
-    id translated = [value isKindOfClass:[NSString class]] ? RXTranslate(value) : value;
+    NSString *attribute = _cmd == @selector(accessibilityValue) ? NSAccessibilityValueAttribute :
+        _cmd == @selector(accessibilityLabel) ? @"AXLabel" :
+        _cmd == @selector(accessibilityTitle) ? NSAccessibilityTitleAttribute :
+        _cmd == @selector(accessibilityDescription) ? NSAccessibilityDescriptionAttribute : nil;
+    id translated = [value isKindOfClass:[NSString class]] ? RXTranslateColorAXText(self, attribute, value) : value;
     RXInAXElementHook = NO;
     return translated;
 }
@@ -3031,11 +3038,11 @@ static void RXSetToolTip(id self, SEL _cmd, NSString *value) {
 }
 static NSString *RXViewAccessibilityLabel(id self, SEL _cmd) {
     NSString *value = origViewAccessibilityLabelGetter ? ((NSString *(*)(id, SEL))origViewAccessibilityLabelGetter)(self, _cmd) : nil;
-    return RXTranslate(value);
+    return RXTranslateColorAXText(self, @"AXLabel", value);
 }
 static NSString *RXViewAccessibilityTitle(id self, SEL _cmd) {
     NSString *value = origViewAccessibilityTitleGetter ? ((NSString *(*)(id, SEL))origViewAccessibilityTitleGetter)(self, _cmd) : nil;
-    return RXTranslate(value);
+    return RXTranslateColorAXText(self, NSAccessibilityTitleAttribute, value);
 }
 static NSString *RXViewAccessibilityHelp(id self, SEL _cmd) {
     NSString *value = origViewAccessibilityHelpGetter ? ((NSString *(*)(id, SEL))origViewAccessibilityHelpGetter)(self, _cmd) : nil;
@@ -3043,7 +3050,7 @@ static NSString *RXViewAccessibilityHelp(id self, SEL _cmd) {
 }
 static NSString *RXViewAccessibilityDescription(id self, SEL _cmd) {
     NSString *value = origViewAccessibilityDescriptionGetter ? ((NSString *(*)(id, SEL))origViewAccessibilityDescriptionGetter)(self, _cmd) : nil;
-    return RXTranslate(value);
+    return RXTranslateColorAXText(self, NSAccessibilityDescriptionAttribute, value);
 }
 static NSString *RXViewAccessibilityPlaceholder(id self, SEL _cmd) {
     NSString *value = origViewAccessibilityPlaceholderGetter ? ((NSString *(*)(id, SEL))origViewAccessibilityPlaceholderGetter)(self, _cmd) : nil;
@@ -3052,11 +3059,11 @@ static NSString *RXViewAccessibilityPlaceholder(id self, SEL _cmd) {
 static id RXViewAccessibilityValue(id self, SEL _cmd) {
     id value = origViewAccessibilityValueGetter ? ((id (*)(id, SEL))origViewAccessibilityValueGetter)(self, _cmd) : nil;
     if (RXIsEditableTextObject(self)) return value;
-    return [value isKindOfClass:[NSString class]] ? RXTranslate(value) : value;
+    return [value isKindOfClass:[NSString class]] ? RXTranslateColorAXText(self, NSAccessibilityValueAttribute, value) : value;
 }
 static NSString *RXViewAccessibilityValueDescription(id self, SEL _cmd) {
     NSString *value = origViewAccessibilityValueDescriptionGetter ? ((NSString *(*)(id, SEL))origViewAccessibilityValueDescriptionGetter)(self, _cmd) : nil;
-    return RXTranslate(value);
+    return RXTranslateColorAXText(self, NSAccessibilityValueDescriptionAttribute, value);
 }
 static NSString *RXViewAccessibilityRoleDescription(id self, SEL _cmd) {
     NSString *value = origViewAccessibilityRoleDescriptionGetter ? ((NSString *(*)(id, SEL))origViewAccessibilityRoleDescriptionGetter)(self, _cmd) : nil;
@@ -3101,7 +3108,8 @@ static IMP RXSwiftNodeOriginal(id self, SEL sel) {
 static NSString *RXSwiftLabel(id self, SEL _cmd) {
     IMP original = RXSwiftNodeOriginal(self, _cmd);
     if (!original) original = origSwiftLabel;
-    return RXTranslate(original ? ((NSString *(*)(id, SEL))original)(self, _cmd) : nil);
+    NSString *value = original ? ((NSString *(*)(id, SEL))original)(self, _cmd) : nil;
+    return RXTranslateColorAXText(self, @"AXLabel", value);
 }
 static NSString *RXSwiftHelp(id self, SEL _cmd) {
     IMP original = RXSwiftNodeOriginal(self, _cmd);
@@ -3111,7 +3119,8 @@ static NSString *RXSwiftHelp(id self, SEL _cmd) {
 static NSString *RXSwiftDescription(id self, SEL _cmd) {
     IMP original = RXSwiftNodeOriginal(self, _cmd);
     if (!original) original = origSwiftDescription;
-    return RXTranslate(original ? ((NSString *(*)(id, SEL))original)(self, _cmd) : nil);
+    NSString *value = original ? ((NSString *(*)(id, SEL))original)(self, _cmd) : nil;
+    return RXTranslateColorAXText(self, NSAccessibilityDescriptionAttribute, value);
 }
 static NSString *RXSwiftPlaceholder(id self, SEL _cmd) {
     IMP original = RXSwiftNodeOriginal(self, _cmd);
@@ -3123,20 +3132,20 @@ static id RXSwiftAttribute(id self, SEL _cmd, NSString *attribute) {
     if (!original) original = origSwiftAttribute;
     id value = original ? ((id (*)(id, SEL, NSString *))original)(self, _cmd, attribute) : nil;
     RXDebugTranslation(self, _cmd, value, [NSString stringWithFormat:@"Swift %@", attribute]);
-    return [value isKindOfClass:[NSString class]] ? RXTranslate(value) : value;
+    return [value isKindOfClass:[NSString class]] ? RXTranslateColorAXText(self, attribute, value) : value;
 }
 static id RXSwiftValue(id self, SEL _cmd) {
     IMP original = RXSwiftNodeOriginal(self, _cmd);
     if (!original) original = origSwiftValue;
     id value = original ? ((id (*)(id, SEL))original)(self, _cmd) : nil;
     RXDebugTranslation(self, _cmd, value, @"Swift value");
-    return [value isKindOfClass:[NSString class]] ? RXTranslate(value) : value;
+    return [value isKindOfClass:[NSString class]] ? RXTranslateColorAXText(self, NSAccessibilityValueAttribute, value) : value;
 }
 static id RXSwiftValueDescription(id self, SEL _cmd) {
     IMP original = RXSwiftNodeOriginal(self, _cmd);
     if (!original) original = origSwiftValueDescription;
     id value = original ? ((id (*)(id, SEL))original)(self, _cmd) : nil;
-    return [value isKindOfClass:[NSString class]] ? RXTranslate(value) : value;
+    return [value isKindOfClass:[NSString class]] ? RXTranslateColorAXText(self, NSAccessibilityValueDescriptionAttribute, value) : value;
 }
 static id RXSwiftRoleDescription(id self, SEL _cmd) {
     IMP original = RXSwiftNodeOriginal(self, _cmd);
@@ -3254,7 +3263,7 @@ static id RXAccessibilityAttributeValue(id self, SEL _cmd, NSString *attribute) 
     if ([attribute isEqualToString:NSAccessibilityValueAttribute] && RXIsEditableTextObject(self)) return value;
     RXDebugTranslation(self, _cmd, value, [NSString stringWithFormat:@"View %@", attribute]);
     if ([value isKindOfClass:[NSString class]] && ([attribute isEqualToString:NSAccessibilityTitleAttribute] || [attribute isEqualToString:NSAccessibilityDescriptionAttribute] || [attribute isEqualToString:NSAccessibilityHelpAttribute] || [attribute isEqualToString:NSAccessibilityValueAttribute] || [attribute isEqualToString:NSAccessibilityPlaceholderValueAttribute] || [attribute isEqualToString:NSAccessibilityValueDescriptionAttribute] || [attribute isEqualToString:NSAccessibilityRoleDescriptionAttribute])) {
-        return RXTranslate(value);
+        return RXTranslateColorAXText(self, attribute, value);
     }
     return value;
 }
@@ -3643,6 +3652,79 @@ static id RXRawAXValue(id element, NSString *attribute) {
         return ((id (*)(id, SEL, NSString *))origAXElementAttribute)(element, @selector(accessibilityAttributeValue:), attribute);
     }
     return nil;
+}
+
+// Extended-palette names are generated only for canonical indices 16–255.
+// Keep this out of RXTranslate: the same strings can be names or user input.
+static BOOL RXGeneratedColorIndex(NSString *label, NSUInteger *index) {
+    if (![label hasPrefix:@"Color #"] || label.length < 9 || label.length > 10) return NO;
+    NSUInteger number = 0;
+    for (NSUInteger i = 7; i < label.length; i++) {
+        unichar digit = [label characterAtIndex:i];
+        if (digit < '0' || digit > '9' || (i == 7 && digit == '0')) return NO;
+        number = number * 10 + digit - '0';
+    }
+    if (number < 16 || number > 255) return NO;
+    if (index) *index = number;
+    return YES;
+}
+
+static __thread BOOL RXInColorAXHook;
+static NSString *RXTranslateColorAXText(id element, NSString *attribute, NSString *value) {
+    if (![value isKindOfClass:NSString.class] || RXInColorAXHook) return value;
+    BOOL state = [value isEqualToString:@"Unedited"];
+    BOOL hex = [value hasPrefix:@"Hex value for Color #"];
+    BOOL color = [value hasPrefix:@"Color #"];
+    BOOL combinedColor = color && ([value hasSuffix:@". Click to choose a color."] ||
+                                  [value hasSuffix:@". 点击选择颜色。"]);
+    BOOL reorderedHex = [value hasPrefix:@"的十六进制值Color #"];
+    // The overwhelmingly common path performs no additional AX reads.
+    if (!state && !hex && !color && !reorderedHex) return RXTranslate(value);
+    BOOL description = [attribute isEqualToString:NSAccessibilityDescriptionAttribute] ||
+        [attribute isEqualToString:NSAccessibilityTitleAttribute] || [attribute isEqualToString:@"AXLabel"];
+    BOOL status = [attribute isEqualToString:NSAccessibilityValueAttribute] ||
+        [attribute isEqualToString:NSAccessibilityValueDescriptionAttribute];
+    if ((state && !status) || (!state && !description)) return value;
+    NSString *label = value;
+    if (hex) label = [value substringFromIndex:[@"Hex value for " length]];
+    else if (reorderedHex) {
+        hex = YES;
+        label = [value substringFromIndex:[@"的十六进制值" length]];
+    }
+    else if (combinedColor) label = [value substringToIndex:[value rangeOfString:@". "].location];
+    else if (color && [value hasSuffix:@"的十六进制值"]) {
+        hex = YES;
+        label = [value substringToIndex:value.length - [@"的十六进制值" length]];
+    }
+    NSUInteger index = 0;
+    if (!state && !RXGeneratedColorIndex(label, &index)) return value;
+    RXInColorAXHook = YES;
+    id role = RXRawAXValue(element, NSAccessibilityRoleAttribute);
+    NSString *translated = value;
+    if (![role isKindOfClass:NSString.class]) {
+        RXInColorAXHook = NO;
+        return value;
+    }
+    NSString *className = NSStringFromClass(object_getClass(element));
+    if (hex && (([role isEqualToString:NSAccessibilityTextFieldRole] ||
+                 [role isEqualToString:NSAccessibilityTextAreaRole]) ||
+                (reorderedHex && ([className containsString:@"TextField"] || [className containsString:@"AccessibilityNode"])))) {
+        if ([RXRawAXValue(element, NSAccessibilityPlaceholderValueAttribute) isEqual:@"#RRGGBB"])
+            translated = [NSString stringWithFormat:@"颜色 #%lu的十六进制值", (unsigned long)index];
+    } else if (!hex && [role isEqualToString:NSAccessibilityColorWellRole]) {
+        id help = RXRawAXValue(element, NSAccessibilityHelpAttribute);
+        BOOL generated = [help isEqual:@"Click to choose a color."] || [help isEqual:@"点击选择颜色。"];
+        if (state && generated) {
+            id rawLabel = RXRawAXValue(element, NSAccessibilityDescriptionAttribute);
+            generated = [rawLabel isKindOfClass:NSString.class] && RXGeneratedColorIndex(rawLabel, NULL);
+        }
+        if (generated) {
+            translated = state ? @"未编辑" : [NSString stringWithFormat:@"颜色 #%lu", (unsigned long)index];
+            if (combinedColor) translated = [translated stringByAppendingString:@"。点击选择颜色。"];
+        }
+    }
+    RXInColorAXHook = NO;
+    return translated;
 }
 
 static void RXWalk(NSView *view) {

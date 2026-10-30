@@ -15,6 +15,8 @@ ROOT = Path(__file__).resolve().parents[1]
 CASES = [
     # Native palette labels observed only after scrolling past the first page.
     ('Change Theme', '更改主题'),
+    ('Select Theme...', '选择主题…'),
+    ('Select Theme…', '选择主题…'),
     ('Auto Color Scheme', '自动配色方案'),
     ('Light Color Scheme', '浅色配色方案'),
     ('Dark Color Scheme', '深色配色方案'),
