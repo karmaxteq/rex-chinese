@@ -16,6 +16,8 @@ open -n "$HOME/Applications/Rex Beta 中文版.app"
 
 `build.sh` 从源码生成 arm64/x86_64 通用启动器和动态库。`patch.sh` 校验版本与构建号、只读验证原版的三个固定界面常量和精确搜索调用点，再复制应用、安装当前 `bin/` 构建并签名；它不会自动编译源码。修改源码或资源后，应重新执行上述构建、安装步骤，并先正常退出旧中文版进程再启动。
 
+安装脚本还会刷新 LaunchServices 注册并请求 Spotlight 重新索引该副本，避免复制后残留原版的 bundle 标识；Spotlight 索引为异步过程。
+
 补丁副本使用本机临时签名，不具有上游开发者签名或公证身份，当前用途是本机测试。应用更新到其他构建后需重新适配，脚本会拒绝非 0.1.0 (1408) 版本。
 
 本机桌面已提供“Rex Beta 中文版.app”入口，指向上述安装副本。如果仍看到英文，先确认打开的是带“中文版”的副本。直接打开 `/Applications/Rex Beta.app` 会启动原版。终端真实命令输出、路径、主机名和用户会话名保留原文，不属于界面翻译失败。
@@ -37,6 +39,8 @@ vmmap PID | rg 'libRexChinese|libRexTextHook'
 
 ## 当前验证结果
 
+最新源码另补齐 sRGB 颜色帮助、Tailscale 账户验证/地址分配说明、服务器支持版本摘要和首次迁移完整提示，保留所有插入值与 `rex skill show` 命令。3,376 × 2 翻译回归及双架构构建通过；**这些新增修复尚未安装到本机正在运行的副本，也没有真实 Rex 像素复测**。窗口读取异常仍在，详见 [COVERAGE.md](COVERAGE.md)；下文现场结果对应此前已安装的补丁。
+
 2026-10-30 已在正式中文版中逐页查看九个设置页首屏：服务器、界面、主题、终端、快捷键、集成、通知、远程主机、开发者。可见的设置文案为中文；品牌、字体名、主机名和用户输入保留原文。进程 70247 的九页再次截图查看，随后又实际查看界面/终端共 12 个原生下拉菜单，包括字体样式、光标、Option 键、选择颜色与链接策略；展开选项均为中文，原设置值已核对保持不变。“自定义”闪烁间隔也已展开查看并恢复。两补丁库实际加载，安装/构建双架构 UUID 一致，深度签名通过，原版可执行文件 SHA-256 不变。
 
 其后直接 AX 工具遇到跨应用窗口识别异常；正常重启同一正式副本后，进程 76842 仍加载补丁且签名通过，但未把未完成的菜单滚动测试计为通过。原版对照也复现该 AX 现象，未据此修改生产 hook；诊断、截图范围和恢复记录见 [COVERAGE.md](COVERAGE.md)。
@@ -55,6 +59,7 @@ vmmap PID | rg 'libRexChinese|libRexTextHook'
 
 ```sh
 python3 tests/translation-regressions.py
+python3 tests/localized-message-hooks.py
 python3 tests/translation-cache.py
 python3 tests/palette-drawing.py
 python3 tests/preview-patch.py
@@ -69,7 +74,9 @@ plutil -lint Resources/zh_CN.lproj/Localizable.strings
 git diff --check
 ```
 
-翻译回归直接编译调用两个生产函数，遍历 1,514 个发布资源键、对应译文及 282 个动态/用户文本边界用例，共 3,310 用例，检查预期结果、Swift/ObjC 一致性和重复稳定性。动态边界用例位于 `tests/translation-regressions.py` 和 `tests/data/dynamic-coverage.json`，包含完整错误消息、通知分片、插值内容保留及快捷键分片修复。此前发现的 116 个词表差异已统一。固定界面常量补丁有 17 组结构与 CLI 测试；原版只读 dry-run 确认 x86_64、arm64 各有三个精确样本。
+翻译回归直接编译调用两个生产函数，遍历 1,515 个发布资源键、对应译文及 346 个动态/用户文本边界用例，共 3,376 用例，检查预期结果、Swift/ObjC 一致性和重复稳定性。动态边界用例位于 `tests/translation-regressions.py` 和 `tests/data/dynamic-coverage.json`，包含完整错误消息、通知分片、插值内容保留及快捷键分片修复。此前发现的 116 个词表差异已统一。固定界面常量补丁有 17 组结构与 CLI 测试；原版只读 dry-run 确认 x86_64、arm64 各有三个精确样本。
+
+`localized-message-hooks.py` 使用当前 `bin/` 正式库测试真实 Foundation 插值资源到原生 SwiftUI Text 的构造路径：21 个正例在未注入基线全部不匹配中文，注入后全部匹配；10 个保留负例与 135 次比较控制通过。中文期望调用原始构造器旁路翻译 hook，防止两侧同时翻译产生假通过。该测试在 arm64 执行，不代替 Rex 真实界面截图。
 
 `palette-drawing.py` 直接加载完整生产库，48 项检查覆盖富文本 backing storage、字体/颜色/段落、绘制矩形及原生标记像素。旧列表重画版确实擦掉标记，当前版保留；测试不证明所有真实命令与动作均匹配。`raw-ax-receiver.py` 的 37 项覆盖 AppKit 类型边界以及已安装生产 SwiftUI getter 的 NSObject/继承节点，保留原始文本与颜色/保存帧，避免对不兼容 receiver 调用原生 IMP。
 

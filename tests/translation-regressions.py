@@ -13,6 +13,12 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 CASES = [
+    # The sRGB theme-color help is a distinct literal from the Display P3 help.
+    ('Six-digit sRGB hex color, for example #AABBCC', '六位 sRGB 十六进制颜色，例如 #AABBCC'),
+    ('sRGB', 'sRGB'),
+    ('#AABBCC', '#AABBCC'),
+    ('/tmp/Six-digit sRGB hex color, for example #AABBCC.txt', '/tmp/Six-digit sRGB hex color, for example #AABBCC.txt'),
+    ('Notes: Six-digit sRGB hex color, for example #AABBCC', 'Notes: Six-digit sRGB hex color, for example #AABBCC'),
     # Visible residuals found while sweeping the full shortcuts list.
     ('Split Pane', '分栏'),
     ('Split Pane Left', '向左分栏'),
@@ -186,6 +192,36 @@ for app_name in ['Rex', 'Rex Beta', 'Rex 中文版', 'Rex Beta 中文版']:
         CASES.append((f'{action} {app_name}', f'{translated} {app_name}'))
     for ellipsis in ['…', '...']:
         CASES.append((f'About {app_name}{ellipsis}', f'关于 {app_name}…'))
+
+# Complete interpolated UI messages reconstructed from the original binary.
+# Preserve payloads even when they resemble translation keys or begin with a
+# combining mark; Swift and ObjC must use the same literal boundaries.
+for account in ['Filter Settings', '中文 😀 用户输入', '\u0301Settings', 'user@example.invalid', '%1$@']:
+    CASES.append((f'Rex will verify the caller is signed in as {account}.',
+                  f'Rex 将验证调用者是否以 {account} 登录。'))
+for host in ['Filter Settings', '中文 😀', '\u0301Settings', '/tmp/Filter/Settings.txt', '%@']:
+    for prefix in ['Tailscale assigned ', 'Tailscale 已分配 ']:
+        CASES.append((prefix + host + ' for your address. The address may differ to keep it unique.',
+                      f'Tailscale 为你的地址分配了 {host}。为保持地址唯一，实际地址可能不同。'))
+for source in ['Ghostty', 'Filter Settings', '中文 😀', '\u0301Settings', '/tmp/Filter/Settings.txt', '%@']:
+    expected = f'将我的快捷键和设置从 {source} 迁移到 Rex。运行 `rex skill show` 了解 Rex 的配置方式。'
+    for prefix in ['Migrate my keybindings and settings from ', '从以下来源迁移我的快捷键和设置：']:
+        CASES.append((prefix + source + ' to Rex. Run `rex skill show` to learn how Rex is configured.', expected))
+    CASES.append((f'从 {source} to Rex. Run `rex skill show` to learn how Rex is configured. 迁移我的快捷键和设置', expected))
+for server, app in [('1–2', '2–3'), ('7', '9'), ('%@', '%@'), ('%1$@', '%2$@'), ('\u0301Settings', '/tmp/Filter/Settings.txt')]:
+    for prefix in ['Server supports ', '服务器支持 ']:
+        for separator in ['; Rex.app supports ', '; Rex.app 支持 ']:
+            CASES.append((prefix + server + separator + app + '.',
+                          f'服务器支持 {server}；Rex.app 支持 {app}。'))
+for value in [
+    'Rex will verify the caller is signed in as Settings',
+    'Rex will verify the caller is signed in as .',
+    'Notes: Rex will verify the caller is signed in as Settings.',
+    'Notes: Tailscale assigned Settings for your address. The address may differ to keep it unique.',
+    'Notes: Server supports 1–2; Rex.app supports 2–3.',
+    'Notes: Migrate my keybindings and settings from Ghostty to Rex. Run `rex skill show` to learn how Rex is configured.',
+]:
+    CASES.append((value, value))
 
 # Values without Rex UI sentence prefixes are user content and must survive intact.
 for value in ['', '中文界面', '/tmp/中文 😀/rex', '80x24', 'ssh://demo-host', 'Tailscale', 'test-123', 'Already translated 已翻译', 'Quit Terminal', 'Quit Rex Beta task', 'Hide Rex Beta logs', 'About Rexology', 'Quit Rex Beta 中文版 session', 'About Rex Beta 中文版 notes']:

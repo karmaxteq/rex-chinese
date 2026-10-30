@@ -1558,6 +1558,7 @@ static NSString *RXTranslateUncached(NSString *s) {
             @"Rex rejected the WebSocket upgrade.": @"Rex 拒绝了 WebSocket 升级。",
             @"Rex's terminals are composited by WindowServer, so their cost appears under both processes.": @"Rex 的终端由 WindowServer 合成，因此开销会同时显示在两个进程下。",
             @"Six-digit Display P3 hex color, for example #AABBCC, as read by Ghostty in P3.": @"六位 Display P3 十六进制颜色，例如 Ghostty 在 P3 中读取的 #AABBCC。",
+            @"Six-digit sRGB hex color, for example #AABBCC": @"六位 sRGB 十六进制颜色，例如 #AABBCC",
             @"Socket was connected before flushing pending write.": @"套接字在刷新待写入数据前已连接。",
             @"Terminals use Display P3, so colors can be more saturated than sRGB.": @"终端使用 Display P3，因此颜色可能比 sRGB 更饱和。",
             @"The Rex WebSocket closed.": @"Rex WebSocket 已关闭。",
@@ -1902,6 +1903,46 @@ static NSString *RXTranslateUncached(NSString *s) {
     }
     if ([s hasPrefix:@"操作失败。无法激活标签页。主机 "] &&
         [s hasSuffix:@"：服务器尚未准备好执行此操作。"]) return s;
+    // Translate complete UI sentences around an untouched interpolated value.
+    // NSString ranges match the Swift translator's UTF-16 boundaries.
+    for (NSArray<NSString *> *pattern in @[
+        @[@"Rex will verify the caller is signed in as ", @".", @"Rex 将验证调用者是否以 ", @" 登录。"],
+        @[@"Tailscale assigned ", @" for your address. The address may differ to keep it unique.",
+          @"Tailscale 为你的地址分配了 ", @"。为保持地址唯一，实际地址可能不同。"],
+        @[@"Tailscale 已分配 ", @" for your address. The address may differ to keep it unique.",
+          @"Tailscale 为你的地址分配了 ", @"。为保持地址唯一，实际地址可能不同。"],
+        @[@"Migrate my keybindings and settings from ", @" to Rex. Run `rex skill show` to learn how Rex is configured.",
+          @"将我的快捷键和设置从 ", @" 迁移到 Rex。运行 `rex skill show` 了解 Rex 的配置方式。"],
+        @[@"从以下来源迁移我的快捷键和设置：", @" to Rex. Run `rex skill show` to learn how Rex is configured.",
+          @"将我的快捷键和设置从 ", @" 迁移到 Rex。运行 `rex skill show` 了解 Rex 的配置方式。"],
+        @[@"从 ", @" to Rex. Run `rex skill show` to learn how Rex is configured. 迁移我的快捷键和设置",
+          @"将我的快捷键和设置从 ", @" 迁移到 Rex。运行 `rex skill show` 了解 Rex 的配置方式。"]
+    ]) {
+        NSString *prefix = pattern[0], *suffix = pattern[1];
+        if ([s hasPrefix:prefix] && [s hasSuffix:suffix] && s.length > prefix.length + suffix.length) {
+            NSString *payload = [s substringWithRange:NSMakeRange(prefix.length, s.length - prefix.length - suffix.length)];
+            return [NSString stringWithFormat:@"%@%@%@", pattern[2], payload, pattern[3]];
+        }
+    }
+    for (NSArray<NSString *> *pair in @[
+        @[@"Rex 将验证调用者是否以 ", @" 登录。"],
+        @[@"Tailscale 为你的地址分配了 ", @"。为保持地址唯一，实际地址可能不同。"],
+        @[@"将我的快捷键和设置从 ", @" 迁移到 Rex。运行 `rex skill show` 了解 Rex 的配置方式。"]
+    ]) {
+        if ([s hasPrefix:pair[0]] && [s hasSuffix:pair[1]] && s.length > pair[0].length + pair[1].length) return s;
+    }
+    // A support summary has two revision values; retain both verbatim.
+    for (NSString *prefix in @[@"Server supports ", @"服务器支持 "]) {
+        if (![s hasPrefix:prefix] || ![s hasSuffix:@"."] || s.length <= prefix.length + 1) continue;
+        NSString *body = [s substringWithRange:NSMakeRange(prefix.length, s.length - prefix.length - 1)];
+        for (NSString *separator in @[@"; Rex.app supports ", @"; Rex.app 支持 "]) {
+            NSArray<NSString *> *parts = [body componentsSeparatedByString:separator];
+            if (parts.count == 2 && parts[0].length && parts[1].length) {
+                return [NSString stringWithFormat:@"服务器支持 %@；Rex.app 支持 %@。", parts[0], parts[1]];
+            }
+        }
+    }
+    if ([s hasPrefix:@"服务器支持 "] && [s hasSuffix:@"。"] && [s containsString:@"；Rex.app 支持 "]) return s;
     // Repair the observed shortcut labels assembled from a translated literal
     // prefix and an interpolated action. Only known action keys are translated.
     for (NSArray<NSString *> *pair in @[

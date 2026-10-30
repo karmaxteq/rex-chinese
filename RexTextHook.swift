@@ -1525,6 +1525,7 @@ private let translations: [String: String] = [
   "Rex rejected the WebSocket upgrade.": "Rex 拒绝了 WebSocket 升级。",
   "Rex's terminals are composited by WindowServer, so their cost appears under both processes.": "Rex 的终端由 WindowServer 合成，因此开销会同时显示在两个进程下。",
   "Six-digit Display P3 hex color, for example #AABBCC, as read by Ghostty in P3.": "六位 Display P3 十六进制颜色，例如 Ghostty 在 P3 中读取的 #AABBCC。",
+  "Six-digit sRGB hex color, for example #AABBCC": "六位 sRGB 十六进制颜色，例如 #AABBCC",
   "Socket was connected before flushing pending write.": "套接字在刷新待写入数据前已连接。",
   "Terminals use Display P3, so colors can be more saturated than sRGB.": "终端使用 Display P3，因此颜色可能比 sRGB 更饱和。",
   "The Rex WebSocket closed.": "Rex WebSocket 已关闭。",
@@ -1883,6 +1884,52 @@ private func translate(_ value: String) -> String {
   }
   if value.hasPrefix("操作失败。无法激活标签页。主机 ") &&
       value.hasSuffix("：服务器尚未准备好执行此操作。") { return value }
+  // Complete UI sentences have literal text on both sides of a payload.
+  // Match UTF-16 boundaries and copy that payload without translating it.
+  let message = value as NSString
+  for (prefix, suffix, translatedPrefix, translatedSuffix) in [
+    ("Rex will verify the caller is signed in as ", ".", "Rex 将验证调用者是否以 ", " 登录。"),
+    ("Tailscale assigned ", " for your address. The address may differ to keep it unique.",
+      "Tailscale 为你的地址分配了 ", "。为保持地址唯一，实际地址可能不同。"),
+    ("Tailscale 已分配 ", " for your address. The address may differ to keep it unique.",
+      "Tailscale 为你的地址分配了 ", "。为保持地址唯一，实际地址可能不同。"),
+    ("Migrate my keybindings and settings from ", " to Rex. Run `rex skill show` to learn how Rex is configured.",
+      "将我的快捷键和设置从 ", " 迁移到 Rex。运行 `rex skill show` 了解 Rex 的配置方式。"),
+    ("从以下来源迁移我的快捷键和设置：", " to Rex. Run `rex skill show` to learn how Rex is configured.",
+      "将我的快捷键和设置从 ", " 迁移到 Rex。运行 `rex skill show` 了解 Rex 的配置方式。"),
+    ("从 ", " to Rex. Run `rex skill show` to learn how Rex is configured. 迁移我的快捷键和设置",
+      "将我的快捷键和设置从 ", " 迁移到 Rex。运行 `rex skill show` 了解 Rex 的配置方式。"),
+  ] {
+    let prefixLength = (prefix as NSString).length
+    let suffixLength = (suffix as NSString).length
+    if message.hasPrefix(prefix) && message.hasSuffix(suffix) && message.length > prefixLength + suffixLength {
+      let payload = message.substring(with: NSRange(location: prefixLength,
+        length: message.length - prefixLength - suffixLength))
+      return translatedPrefix + payload + translatedSuffix
+    }
+  }
+  for (prefix, suffix) in [
+    ("Rex 将验证调用者是否以 ", " 登录。"),
+    ("Tailscale 为你的地址分配了 ", "。为保持地址唯一，实际地址可能不同。"),
+    ("将我的快捷键和设置从 ", " 迁移到 Rex。运行 `rex skill show` 了解 Rex 的配置方式。"),
+  ] where message.hasPrefix(prefix) && message.hasSuffix(suffix) &&
+      message.length > (prefix as NSString).length + (suffix as NSString).length { return value }
+  // API support summaries contain two independent revision values. A generic
+  // prefix rule would leave the second clause in English.
+  for prefix in ["Server supports ", "服务器支持 "] where message.hasPrefix(prefix) && message.hasSuffix(".") {
+    let prefixLength = (prefix as NSString).length
+    guard message.length > prefixLength + 1 else { continue }
+    let body = message.substring(with: NSRange(location: prefixLength,
+      length: message.length - prefixLength - 1)) as NSString
+    for separator in ["; Rex.app supports ", "; Rex.app 支持 "] {
+      let parts = body.components(separatedBy: separator)
+      if parts.count == 2 && !parts[0].isEmpty && !parts[1].isEmpty {
+        return "服务器支持 " + parts[0] + "；Rex.app 支持 " + parts[1] + "。"
+      }
+    }
+  }
+  if message.hasPrefix("服务器支持 ") && message.hasSuffix("。") &&
+      message.contains("；Rex.app 支持 ") { return value }
   // Old empty-prefix translations put the interpolated action after a whole
   // sentence. Repair only those two observed prefixes and their new literal
   // forms; unknown action names remain literal user/configuration payloads.

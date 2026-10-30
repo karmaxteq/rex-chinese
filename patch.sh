@@ -55,4 +55,9 @@ LSREGISTER=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchSe
 if [ -x "$LSREGISTER" ]; then
   "$LSREGISTER" -f "$DST" >/dev/null 2>&1 || true
 fi
+# The copied bundle can retain the original identifier in Spotlight even after
+# LaunchServices has the new one. Reimport this copy; indexing is asynchronous.
+if command -v mdimport >/dev/null 2>&1; then
+  mdimport -i "$DST" >/dev/null 2>&1 || true
+fi
 echo "已生成: $DST"

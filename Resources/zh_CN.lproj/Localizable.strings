@@ -1209,6 +1209,7 @@
 "Rex rejected the WebSocket upgrade." = "Rex 拒绝了 WebSocket 升级。";
 "Rex's terminals are composited by WindowServer, so their cost appears under both processes." = "Rex 的终端由 WindowServer 合成，因此开销会同时显示在两个进程下。";
 "Six-digit Display P3 hex color, for example #AABBCC, as read by Ghostty in P3." = "六位 Display P3 十六进制颜色，例如 Ghostty 在 P3 中读取的 #AABBCC。";
+"Six-digit sRGB hex color, for example #AABBCC" = "六位 sRGB 十六进制颜色，例如 #AABBCC";
 "Socket was connected before flushing pending write." = "套接字在刷新待写入数据前已连接。";
 "Terminals use Display P3, so colors can be more saturated than sRGB." = "终端使用 Display P3，因此颜色可能比 sRGB 更饱和。";
 "The Rex WebSocket closed." = "Rex WebSocket 已关闭。";

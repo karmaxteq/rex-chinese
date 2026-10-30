@@ -2,6 +2,28 @@
 
 更新日期：2026-10-30。对象是 `~/Applications/Rex Beta 中文版.app`。本记录区分像素截图、Accessibility（AX）读回和静态规则；**不宣称全部界面已汉化，也不宣称没有英文残留**。品牌、技术标识和用户数据保留原文。
 
+## 新增颜色帮助与四种完整消息修复（2026-10-30，源码与构建）
+
+**本节新增修复尚未安装到正在运行的中文版 76842，也没有真实 Rex 像素复测。** 当前应用继续使用上一节历史记录所列的已安装补丁；不能用新源码或构建通过来声称现场已修复。读取工具仍受阻，没有直接覆盖正在运行的副本。
+
+复用较早的原版二进制提取证据，对本轮编译快照实际执行 5,855 个去重输入 × 两个生产译器；此前 144 条候选已全部翻译，另确认以下五类缺口。完整/组装文本来自原版固定字串及插值调用的反汇编，129 条相关指令已与原版字节核对；使用非私人的测试账户、主机和版本值，不把任意日志或用户文本当作界面缺口。
+
+| 已确认的原文或模板 | 本次源码行为 | 验证边界 |
+| --- | --- | --- |
+| `Six-digit sRGB hex color, for example #AABBCC` | 增加独立 sRGB 精确词条；保留 `sRGB` 与 `#AABBCC`，不借用 Display P3 文案 | 两生产译器先复现原样英文；新增精确词条后通过，尚未触发真实颜色卡片帮助 |
+| `Rex will verify the caller is signed in as <account>.` | 翻译账户验证说明，完整复制账户 | 匹配固定首尾及非空账户，缺句点/空账户/额外前缀负对照保持原样 |
+| `Tailscale assigned <host> for your address. The address may differ to keep it unique.` | 翻译完整地址说明，保留主机；支持旧规则产生的半中文前缀 | 未执行真实 Tailscale 登录或分配地址流程 |
+| `Server supports <revision>; Rex.app supports <revision>.` | 两个独立版本值分别保留，两个分句均中文；兼容分片已翻译的形式 | 未改变真实服务器版本或兼容性状态 |
+| 首次迁移的完整提示及固定 `rex skill show` 命令 | 修复旧 prefix 规则把英文后半句误当来源的句序问题；复制来源名称与命令，兼容已知半中文/旧坏句形式 | 未重新执行首次引导或迁移用户配置 |
+
+新增规则按 NSString/UTF-16 的完整首尾截取，覆盖以 U+0301 开头的插入值；不对账户、主机、路径、源工具名、版本值或格式占位符再次调用翻译。翻译回归先复现 sRGB 的两条后端失败，再复现四模板的 82 条后端失败；修复后 **1,515 资源键 + 1,515 译文 + 346 动态/边界用例，共 3,376 × 2** 全部通过。每例同时检查预期、后端一致和二次翻译稳定；另保留“不匹配完整模板”的负对照。
+
+另新增 `tests/localized-message-hooks.py`，以真实 Foundation 插值构造 `LocalizedStringResource`，再通过原生 `Text(resource)` 调用当前正式 `bin/libRexTextHook.dylib`。21 个正例在未注入基线全部不匹配中文，正式库注入后全部匹配；10 个原文保留负例、135 次比较控制和保留后的值检查通过。期望值通过生产库导出的原始构造器地址生成，旁路翻译 hook，并有错误期望及两个版本值互换的负对照，避免两侧一起翻译造成假通过。固定 fixture 数量已断言。该测试实际执行架构是 arm64，验证资源插值到 Text 的构造路径，**没有创建 Rex 窗口或验证最终像素**；证据为同目录 `localized-message-hooks.{log,json}`，记录被加载库的 SHA-256。
+
+输入存储 80 项、缓存 24 项/16,000 次并发迭代、arm64/x86_64 构建、资源 lint、脚本语法和差异检查通过。构建仍有既存 AX 废弃 API 警告。正式安装副本签名与原版 SHA-256 均再次核验；新构建库与已安装库哈希明确不同。证据在忽略目录 `.artifacts/remaining-literals-1030/`：`report.json`、`xref-evidence.json`、`verified-disassembly.txt`、`{srgb,templates}-{before,after}.log`、`inputs-final.log`、`cache-final.log`、`build-final.log`、`build-and-installed-state.json`。旧审计输出标记了编译快照，不能当作修复后的当前结果。
+
+本轮还发现 Spotlight 对中文版保留旧的原版 bundle 标识；执行针对该副本的 `mdimport -i` 后，`mdls` 已读回 `com.superlogical.rex.chinese`。安装脚本现在会在 LaunchServices 注册后请求重新索引，索引为异步、失败不阻断安装。CUA 重置会话及改用规范路径后仍无法选中中文版，**没有将索引修正记作工具恢复**。原生 C 的单属性、批量、索引和导航 AX 读取也继续返回应用根元素，未恢复真实窗口；诊断在 `.artifacts/ax-channel-1030/`。未修改系统辅助功能权限、生产服务或原有终端草稿。
+
 ## 新增原生下拉菜单实测（2026-10-30，进程 70247）
 
 本轮实际打开并查看以下 12 个原生下拉菜单，随后取消；逐项读回确认原设置值未变。证据在忽略目录 `.artifacts/menu-coverage-1030/`，每张菜单截图均有同名 `.png.json`，记录展开内容、取消结果及前后值。
@@ -210,7 +232,8 @@
 
 | 检查 | 已取得的结果 | 不能证明的事项 |
 | --- | --- | --- |
-| `python3 tests/translation-regressions.py` | 当前 3,310 用例 × 2 个生产翻译器通过；包括 1,514 个发布资源键、对应译文和 282 个动态/用户文本边界用例 | 文本是否成功接入每个真实 UI 绘制路径 |
+| `python3 tests/translation-regressions.py` | 当前源码 3,376 用例 × 2 个生产翻译器通过；包括 1,515 个发布资源键、对应译文和 346 个动态/用户文本边界用例 | 文本是否成功接入每个真实 UI 绘制路径；本轮新增修复尚未安装或现场复测 |
+| `python3 tests/localized-message-hooks.py` | 当前正式库：真实 Foundation 资源插值到 SwiftUI Text 的 21 个正例、10 个保留负例、135 次比较控制通过；未注入基线明确有 21 个正例差异 | Rex 实际调用点、最终像素与 x86_64 实机执行 |
 | `python3 tests/palette-drawing.py` | 48 项通过，旧清列绘制版原生标记 64→0，当前 64→64 | 全部真实命令的选择与动作绑定 |
 | `python3 tests/raw-ax-receiver.py` | 37 项通过，覆盖已 hook 的 NSObject/继承 provider 与 raw frame | 所有 SwiftUI 私有节点的实际像素 |
 | `python3 tests/translation-cache.py` | 24 项断言、16,000 次并发迭代通过；旧实现原生运行有 10 项预期失败 | 真实应用 CPU、严格内存上限；NSCache 容量限制为建议值 |
