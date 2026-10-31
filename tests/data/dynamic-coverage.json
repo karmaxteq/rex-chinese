@@ -538,5 +538,20 @@
     "input": "修改 /tmp/Settings/Filter 😀 的快捷键",
     "expected": "修改 /tmp/Settings/Filter 😀 的快捷键",
     "kind": "normalized_unknown_shortcut_payload"
+  },
+  {
+    "input": "Black #0 color",
+    "expected": "黑色 #0 颜色",
+    "kind": "generated_color_ax_suffix"
+  },
+  {
+    "input": "Color #16 color",
+    "expected": "颜色 #16 颜色",
+    "kind": "generated_color_ax_suffix"
+  },
+  {
+    "input": "黑色 #0 color",
+    "expected": "黑色 #0 颜色",
+    "kind": "generated_color_ax_suffix"
   }
 ]

@@ -62,6 +62,20 @@ static id makeNode(Class cls, NSString *role, NSString *description) {
     objc_setAssociatedObject(node, &storageKey, attributes, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     return node;
 }
+static id makeColorMockNode(NSString *description) {
+    Class cls = objc_getClass("NSAccessibilityColorButtonMockUIElement");
+    if (!cls) return nil;
+    id node = class_createInstance(cls, 0);
+    NSMutableDictionary *attributes = [@{NSAccessibilityRoleAttribute: NSAccessibilityColorWellRole,
+        NSAccessibilityDescriptionAttribute: description, @"AXLabel": description,
+        NSAccessibilityTitleAttribute: description, NSAccessibilityHelpAttribute: @"Click to choose a color.",
+        NSAccessibilityValueAttribute: @"Unedited"} mutableCopy];
+    objc_setAssociatedObject(node, &storageKey, attributes, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    NSString *key = [NSString stringWithFormat:@"%p:%s", cls, sel_getName(@selector(accessibilityAttributeValue:))];
+    if (!RXPopupOriginals) RXPopupOriginals = [NSMutableDictionary dictionary];
+    RXPopupOriginals[key] = [NSValue valueWithPointer:(IMP)provider];
+    return node;
+}
 static id legacy(id node, NSString *attribute) {
     if ([node isKindOfClass:ColorFixtureView.class])
         return RXAccessibilityAttributeValue(node, @selector(accessibilityAttributeValue:), attribute);
@@ -128,6 +142,24 @@ int main(void) { @autoreleasepool {
                 }
             }
         }
+        id suffix = makeNode(cls, NSAccessibilityColorWellRole, @"Color #16 color");
+        storage(suffix)[@"AXLabel"] = @"Color #16 color";
+        storage(suffix)[NSAccessibilityTitleAttribute] = @"Color #16";
+        check([legacy(suffix, NSAccessibilityDescriptionAttribute) isEqual:@"颜色 #16 颜色"], @"generated extended color suffix translates in context");
+        check([modern(suffix, @selector(accessibilityLabel)) isEqual:@"颜色 #16 颜色"], @"modern generated extended color suffix translates in context");
+        check([legacy(suffix, NSAccessibilityValueAttribute) isEqual:@"未编辑"], @"generated color suffix state translates in context");
+        id ansiSuffix = makeNode(cls, NSAccessibilityColorWellRole, @"Black #0 color");
+        storage(ansiSuffix)[@"AXLabel"] = @"Black #0 color";
+        storage(ansiSuffix)[NSAccessibilityTitleAttribute] = @"Black #0";
+        check([legacy(ansiSuffix, NSAccessibilityDescriptionAttribute) isEqual:@"黑色 #0 颜色"], @"generated ANSI color suffix translates in context");
+        check([modern(ansiSuffix, @selector(accessibilityLabel)) isEqual:@"黑色 #0 颜色"], @"modern generated ANSI color suffix translates in context");
+        check([legacy(ansiSuffix, NSAccessibilityValueAttribute) isEqual:@"Unedited"], @"ANSI suffix state remains outside extended state translation");
+        id localizedSuffix = makeNode(cls, NSAccessibilityColorWellRole, @"黑色 #0 color");
+        storage(localizedSuffix)[@"AXLabel"] = @"黑色 #0 color";
+        storage(localizedSuffix)[NSAccessibilityTitleAttribute] = @"黑色 #0";
+        check([legacy(localizedSuffix, NSAccessibilityDescriptionAttribute) isEqual:@"黑色 #0 颜色"], @"already localized ANSI suffix translates in context");
+        check([modern(localizedSuffix, @selector(accessibilityLabel)) isEqual:@"黑色 #0 颜色"], @"modern already localized ANSI suffix translates in context");
+        check([legacy(localizedSuffix, NSAccessibilityValueAttribute) isEqual:@"Unedited"], @"localized ANSI suffix state remains outside extended state translation");
         NSArray *invalid = @[@"Color #0", @"Color #15", @"Color #256", @"Color #-16", @"Color #016",
             @"Color #16 ", @"Color #16.example", @"Color #16/Settings", @"/tmp/Color #16", @"my Color #16",
             @"Color #16 color", @"Color #１６", @"Color #16\n", @"Color #9999999999999999999999999"];
@@ -181,6 +213,24 @@ int main(void) { @autoreleasepool {
         check([RXTranslate(@"Color #232") isEqual:@"Color #232"] && [RXTranslate(@"Unedited") isEqual:@"Unedited"],
               @"generic translator never receives color or state rules");
     }
+    id colorMock = makeColorMockNode(@"Black #0 color");
+    check(colorMock != nil, @"AppKit color-button mock provider is available");
+    if (colorMock) {
+        NSDictionary *before = [storage(colorMock) copy];
+        check([RXColorMockAccessibilityAttributeValue(colorMock, @selector(accessibilityAttributeValue:), NSAccessibilityDescriptionAttribute) isEqual:@"黑色 #0 颜色"],
+              @"private color-button provider translates ANSI suffix descriptions");
+        check([RXColorMockAccessibilityAttributeValue(colorMock, @selector(accessibilityAttributeValue:), NSAccessibilityTitleAttribute) isEqual:@"黑色 #0 颜色"],
+              @"private color-button provider translates ANSI suffix titles");
+        check([RXColorMockAccessibilityAttributeValue(colorMock, @selector(accessibilityAttributeValue:), NSAccessibilityValueAttribute) isEqual:@"未编辑"],
+              @"private color-button provider translates generated state");
+        storage(colorMock)[NSAccessibilityDescriptionAttribute] = @"/tmp/Black #0 color";
+        check([RXColorMockAccessibilityAttributeValue(colorMock, @selector(accessibilityAttributeValue:), NSAccessibilityDescriptionAttribute) isEqual:@"/tmp/Black #0 color"],
+              @"private color-button provider preserves path-shaped labels");
+        check([storage(colorMock)[NSAccessibilityValueAttribute] isEqual:@"Unedited"],
+              @"private color-button provider does not mutate raw state");
+        check([before[NSAccessibilityRoleAttribute] isEqual:NSAccessibilityColorWellRole],
+              @"private color-button provider retains raw role");
+    }
     check(incompatibleCalls == 0, @"raw lookup never invokes incompatible AppKit original");
     NSDictionary *report = @{@"checks": @(checks), @"failures": failures,
         @"canonical_indices": @240, @"provider_kinds": @3, @"incompatible_original_calls": @(incompatibleCalls),
@@ -218,7 +268,7 @@ def main():
         if not result.stdout:
             raise RuntimeError('Native color AX harness did not produce a report')
         report = json.loads(result.stdout)
-        if report.get('checks') != 16036 or report.get('canonical_indices') != 240 or not isinstance(report.get('failures'), list):
+        if report.get('checks') != 16070 or report.get('canonical_indices') != 240 or not isinstance(report.get('failures'), list):
             raise RuntimeError('Native color AX harness did not execute expected fixtures')
         print(json.dumps(report, ensure_ascii=False, indent=2))
         return result.returncode

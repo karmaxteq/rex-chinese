@@ -8,6 +8,39 @@
 #include <objc/message.h>
 
 static NSString *RXTranslate(NSString *s);
+static BOOL RXCanonicalColorAXBase(NSString *label);
+
+// ANSI and extended palette cells append ` color` to the accessibility
+// description of the native color picker.  This suffix is generated UI text,
+// but the same shape can also occur in user input or paths.  Recognize only a
+// canonical palette name plus a decimal index.
+static BOOL RXCanonicalColorAXBase(NSString *label) {
+    if (![label isKindOfClass:NSString.class]) return NO;
+    static NSArray<NSString *> *prefixes;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        prefixes = @[
+            @"Color #", @"颜色 #",
+            @"Black #", @"Red #", @"Green #", @"Yellow #", @"Blue #", @"Magenta #", @"Cyan #", @"White #",
+            @"Bright Black #", @"Bright Red #", @"Bright Green #", @"Bright Yellow #", @"Bright Blue #", @"Bright Magenta #", @"Bright Cyan #", @"Bright White #",
+            @"黑色 #", @"红色 #", @"绿色 #", @"黄色 #", @"蓝色 #", @"品红色 #", @"青色 #", @"白色 #",
+            @"亮黑色 #", @"亮红色 #", @"亮绿色 #", @"亮黄色 #", @"亮蓝色 #", @"亮品红色 #", @"亮青色 #", @"亮白色 #"
+        ];
+    });
+    for (NSString *prefix in prefixes) {
+        if (![label hasPrefix:prefix]) continue;
+        NSString *digits = [label substringFromIndex:prefix.length];
+        if (digits.length < 1 || digits.length > 3 || (digits.length > 1 && [digits characterAtIndex:0] == '0')) return NO;
+        NSUInteger number = 0;
+        for (NSUInteger i = 0; i < digits.length; i++) {
+            unichar digit = [digits characterAtIndex:i];
+            if (digit < '0' || digit > '9') return NO;
+            number = number * 10 + (digit - '0');
+        }
+        return number <= 255;
+    }
+    return NO;
+}
 
 static NSString *RXTranslateUncached(NSString *s) {
     if (![s isKindOfClass:[NSString class]] || s.length == 0) return s;
@@ -60,6 +93,11 @@ static NSString *RXTranslateUncached(NSString *s) {
             @"Start Again": @"重新开始",
             @"Start Server": @"启动服务器",
             @"Started": @"启动时间",
+            @"Starting…": @"正在启动…",
+            @"Starting...": @"正在启动…",
+            @"Stopping…": @"正在停止…",
+            @"Stopping...": @"正在停止…",
+            @"Stopped": @"已停止",
             @"State": @"状态",
             @"Subscription": @"订阅",
             @"Trusted links": @"受信任的链接",
@@ -70,6 +108,7 @@ static NSString *RXTranslateUncached(NSString *s) {
             @"No fonts found": @"未找到字体",
             @"Font list": @"字体列表",
             @"Search commands…": @"搜索命令…",
+            @"Select ": @"选择",
             @"Import Theme File…": @"导入主题文件…",
             @"Delete Custom Theme…": @"删除自定义主题…",
             @"Filter custom themes…": @"筛选自定义主题…",
@@ -210,8 +249,10 @@ static NSString *RXTranslateUncached(NSString *s) {
             @"Background color": @"背景色",
             @"Text color": @"文本色",
             @"Cursor color": @"光标颜色",
+            @"Cursor Text color": @"光标文本颜色",
             @"Cursor text color": @"光标文本颜色",
             @"Selection color": @"选择颜色",
+            @"Select Selection": @"选择选区",
             @"Selected text color": @"选中文本颜色",
             @"Hue": @"色相",
             @"Chroma": @"色度",
@@ -439,7 +480,7 @@ static NSString *RXTranslateUncached(NSString *s) {
             @"Padding": @"内边距",
             @"Padding color": @"内边距颜色",
             @"Background uses the pane background. Extend carries edge-cell backgrounds into the padding when appropriate. Extend Always extends them without those checks.": @"背景使用窗格背景。适用时，“扩展”会将边缘单元格背景延伸到内边距；“始终扩展”会跳过这些检查。",
-            @"Selection": @"选择",
+            @"Selection": @"选区",
             @"Selection preview: highlighted terminal text.": @"选择预览：高亮的终端文本。",
             @"Copy on selection": @"选择后复制",
             @"Play animation on copy": @"复制时播放动画",
@@ -1847,6 +1888,10 @@ static NSString *RXTranslateUncached(NSString *s) {
             @"Show the running program and its directory instead of titles that shells set.": @"显示正在运行的程序及其目录，而不是 Shell 设置的标题。",
             @"Changes apply to new agent sessions.": @"更改将应用于新的智能体会话。",
             @"Downloading update": @"正在下载更新",
+            @"Update failed": @"更新失败",
+            @"Update failed.": @"更新失败。",
+            @"The update is improperly signed and could not be validated. Please try again later or contact the app developer.": @"更新签名不正确，无法验证。请稍后重试，或联系应用开发者。",
+            @"Update failed. The update is improperly signed and could not be validated. Please try again later or contact the app developer.": @"更新失败。更新签名不正确，无法验证。请稍后重试，或联系应用开发者。",
             @"Reconnecting to Rex": @"正在重新连接 Rex",
             @"Browse monospaced or all installed fonts to choose the terminal typeface.": @"浏览等宽字体或所有已安装字体，以选择终端字体。",
             @"Restarted the Rex server": @"已重新启动 Rex 服务器",
@@ -1894,6 +1939,28 @@ static NSString *RXTranslateUncached(NSString *s) {
     });
     NSString *exact = map[s];
     if (exact) return exact;
+    NSString *failedPrefix = @"Update failed. ";
+    if ([s hasPrefix:@"更新失败。"] ) return s;
+    if ([s hasPrefix:failedPrefix]) {
+        NSString *suffix = [s substringFromIndex:failedPrefix.length];
+        return [@"更新失败。" stringByAppendingString:RXTranslate(suffix)];
+    }
+    // Update progress is emitted with a changing percentage rather than as a
+    // localized string key. Translate only a well-formed numeric percentage so
+    // arbitrary user text beginning with the same words remains untouched.
+    NSString *downloadingPrefix = @"Downloading update ";
+    NSString *localizedDownloadingPrefix = @"正在下载更新 ";
+    if ([s hasPrefix:localizedDownloadingPrefix]) return s;
+    if ([s hasPrefix:downloadingPrefix]) {
+        NSString *percent = [s substringFromIndex:downloadingPrefix.length];
+        if ([percent hasSuffix:@"%"] && percent.length > 1) {
+            NSString *digits = [percent substringToIndex:percent.length - 1];
+            NSCharacterSet *notDigit = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
+            if (digits.length && [digits rangeOfCharacterFromSet:notDigit].location == NSNotFound) {
+                return [localizedDownloadingPrefix stringByAppendingString:percent];
+            }
+        }
+    }
     // Getter hooks and polling see the same translated labels repeatedly.
     // Known complete translations need no dynamic-pattern parsing.
     if ([translatedValues containsObject:s]) return s;
@@ -2343,6 +2410,14 @@ static NSString *RXTranslateUncached(NSString *s) {
         NSString *label = [s substringFromIndex:[@"Hex value for " length]];
         return [NSString stringWithFormat:@"%@的十六进制值", RXTranslate(label)];
     }
+    if ([s hasSuffix:@" color"]) {
+        NSString *base = [s substringToIndex:s.length - [@" color" length]];
+        if (RXCanonicalColorAXBase(base)) {
+            NSString *translatedBase = [base hasPrefix:@"Color #"] ?
+                [NSString stringWithFormat:@"颜色%@", [base substringFromIndex:[@"Color" length]]] : RXTranslate(base);
+            return [translatedBase stringByAppendingString:@" 颜色"];
+        }
+    }
     if ([s hasPrefix:@"Black #"]) return [NSString stringWithFormat:@"黑色%@", [s substringFromIndex:[@"Black" length]]];
     if ([s hasPrefix:@"Red #"]) return [NSString stringWithFormat:@"红色%@", [s substringFromIndex:[@"Red" length]]];
     if ([s hasPrefix:@"Green #"]) return [NSString stringWithFormat:@"绿色%@", [s substringFromIndex:[@"Green" length]]];
@@ -2374,6 +2449,8 @@ static NSString *RXTranslateUncached(NSString *s) {
     if ([s containsString:@"Import a Ghostty or iTerm theme file"]) s = [s stringByReplacingOccurrencesOfString:@"Import a Ghostty or iTerm theme file" withString:@"导入 Ghostty 或 iTerm 主题文件"];
     if ([s containsString:@"Themes are matched to an appearance based on their background color."]) s = [s stringByReplacingOccurrencesOfString:@"Themes are matched to an appearance based on their background color." withString:@"主题会根据背景颜色匹配到相应外观。"];
     if ([s containsString:@"Access Rex securely from your other devices."]) s = [s stringByReplacingOccurrencesOfString:@"Access Rex securely from your other devices." withString:@"从其他设备安全访问 Rex。"];
+    if ([s containsString:@"Start the Rex Server to sign in."]) s = [s stringByReplacingOccurrencesOfString:@"Start the Rex Server to sign in." withString:@"启动 Rex 服务器以登录。"];
+    if ([s containsString:@"Start the Rex server to sign in."]) s = [s stringByReplacingOccurrencesOfString:@"Start the Rex server to sign in." withString:@"启动 Rex 服务器以登录。"];
     if ([s containsString:@"Displayed bottom right"]) s = [s stringByReplacingOccurrencesOfString:@"Displayed bottom right" withString:@"显示在右下角"];
     if ([s containsString:@"Default login shell"]) s = [s stringByReplacingOccurrencesOfString:@"Default login shell" withString:@"默认登录 Shell"];
     if ([s containsString:@"Filter Shortcuts…"]) s = [s stringByReplacingOccurrencesOfString:@"Filter Shortcuts…" withString:@"筛选快捷键…"];
@@ -2937,6 +3014,26 @@ static id RXMockAccessibilityAttributeValue(id self, SEL _cmd, NSString *attribu
          [attribute isEqualToString:NSAccessibilityValueAttribute] ||
          [attribute isEqualToString:NSAccessibilityValueDescriptionAttribute] ||
          [attribute isEqualToString:NSAccessibilityRoleDescriptionAttribute])) return RXTranslate(value);
+    return value;
+}
+static id RXColorMockAccessibilityAttributeValue(id self, SEL _cmd, NSString *attribute) {
+    if (RXInSegmentAXHook) {
+        IMP original = RXPopupOriginal(self, _cmd);
+        return original ? ((id (*)(id, SEL, NSString *))original)(self, _cmd, attribute) : nil;
+    }
+    RXInSegmentAXHook = YES;
+    IMP original = RXPopupOriginal(self, _cmd);
+    id value = original ? ((id (*)(id, SEL, NSString *))original)(self, _cmd, attribute) : nil;
+    RXInSegmentAXHook = NO;
+    if ([value isKindOfClass:[NSString class]] &&
+        ([attribute isEqualToString:NSAccessibilityTitleAttribute] ||
+         [attribute isEqualToString:NSAccessibilityDescriptionAttribute] ||
+         [attribute isEqualToString:NSAccessibilityHelpAttribute] ||
+         [attribute isEqualToString:NSAccessibilityValueAttribute] ||
+         [attribute isEqualToString:NSAccessibilityValueDescriptionAttribute] ||
+         [attribute isEqualToString:NSAccessibilityRoleDescriptionAttribute])) {
+        return RXTranslateColorAXText(self, attribute, value);
+    }
     return value;
 }
 static id RXSegmentAccessibilityAttributeValue(id self, SEL _cmd, NSString *attribute) {
@@ -3746,6 +3843,26 @@ static void RXInstallColorSwatchHooks(id element) {
 static BOOL RXIsColorSwatchObject(id element) {
     return RXIsColorSwatchClass(object_getClass(element));
 }
+static BOOL RXIsColorButtonMockObject(id element) {
+    for (Class cls = object_getClass(element); cls; cls = class_getSuperclass(cls)) {
+        const char *name = class_getName(cls);
+        if (name && strcmp(name, "NSAccessibilityColorButtonMockUIElement") == 0) return YES;
+    }
+    return NO;
+}
+static id RXColorButtonMockOriginalAttribute(id element, NSString *attribute) {
+    IMP original = RXPopupOriginal(element, @selector(accessibilityAttributeValue:));
+    return original ? ((id (*)(id, SEL, NSString *))original)(element, @selector(accessibilityAttributeValue:), attribute) : nil;
+}
+static BOOL RXIsGeneratedColorLabel(NSString *value) {
+    if (![value isKindOfClass:NSString.class]) return NO;
+    if (RXGeneratedColorIndex(value, NULL) || RXCanonicalColorAXBase(value)) return YES;
+    if ([value hasSuffix:@" color"]) {
+        NSString *base = [value substringToIndex:value.length - [@" color" length]];
+        return RXGeneratedColorIndex(base, NULL) || RXCanonicalColorAXBase(base);
+    }
+    return NO;
+}
 static BOOL RXHasGeneratedColorStateContext(id element) {
     // The lazy SwiftUI Swatch nodes do not expose their raw label/help through
     // the legacy AX bridge, so their private class is the only reliable
@@ -3753,6 +3870,13 @@ static BOOL RXHasGeneratedColorStateContext(id element) {
     // generated label; require both before translating an otherwise ordinary
     // user value such as Unedited.
     if (RXIsColorSwatchObject(element)) return YES;
+    if (RXIsColorButtonMockObject(element)) {
+        for (NSString *attribute in @[NSAccessibilityDescriptionAttribute,
+                                      NSAccessibilityTitleAttribute, @"AXLabel"]) {
+            if (RXIsGeneratedColorLabel(RXColorButtonMockOriginalAttribute(element, attribute))) return YES;
+        }
+        return NO;
+    }
     id help = RXRawAXValue(element, NSAccessibilityHelpAttribute);
     BOOL standardHelp = [help isEqual:@"Click to choose a color."] ||
         [help isEqual:@"点击选择颜色。"];
@@ -3762,6 +3886,29 @@ static BOOL RXHasGeneratedColorStateContext(id element) {
         id rawLabel = RXRawAXValue(element, attribute);
         if ([rawLabel isKindOfClass:NSString.class] &&
             RXGeneratedColorIndex(rawLabel, NULL)) return YES;
+    }
+    return NO;
+}
+static BOOL RXHasGeneratedColorSuffixContext(id element) {
+    if (RXIsColorSwatchObject(element)) return YES;
+    if (RXIsColorButtonMockObject(element)) {
+        for (NSString *attribute in @[NSAccessibilityDescriptionAttribute,
+                                      NSAccessibilityTitleAttribute, @"AXLabel"]) {
+            if (RXIsGeneratedColorLabel(RXColorButtonMockOriginalAttribute(element, attribute))) return YES;
+        }
+        return NO;
+    }
+    id help = RXRawAXValue(element, NSAccessibilityHelpAttribute);
+    BOOL standardHelp = [help isEqual:@"Click to choose a color."] ||
+        [help isEqual:@"点击选择颜色。"];
+    if (!standardHelp) return NO;
+    for (NSString *attribute in @[NSAccessibilityDescriptionAttribute,
+                                  NSAccessibilityTitleAttribute, @"AXLabel"]) {
+        id rawLabel = RXRawAXValue(element, attribute);
+        if (![rawLabel isKindOfClass:NSString.class]) continue;
+        if (RXGeneratedColorIndex(rawLabel, NULL)) return YES;
+        if (RXCanonicalColorAXBase(rawLabel) &&
+            ![rawLabel hasPrefix:@"Color #"] && ![rawLabel hasPrefix:@"颜色 #"]) return YES;
     }
     return NO;
 }
@@ -3837,15 +3984,29 @@ static NSString *RXTranslateColorAXText(id element, NSString *attribute, NSStrin
     BOOL state = [value isEqualToString:@"Unedited"];
     BOOL hex = [value hasPrefix:@"Hex value for Color #"];
     BOOL color = [value hasPrefix:@"Color #"];
+    BOOL generatedColorSuffix = [value hasSuffix:@" color"] &&
+        RXCanonicalColorAXBase([value substringToIndex:value.length - [@" color" length]]);
     BOOL combinedColor = color && ([value hasSuffix:@". Click to choose a color."] ||
                                   [value hasSuffix:@". 点击选择颜色。"]);
     BOOL reorderedHex = [value hasPrefix:@"的十六进制值Color #"];
     // The overwhelmingly common path performs no additional AX reads.
-    if (!state && !hex && !color && !reorderedHex) return RXTranslate(value);
+    if (!state && !hex && !color && !reorderedHex && !generatedColorSuffix) return RXTranslate(value);
     BOOL description = [attribute isEqualToString:NSAccessibilityDescriptionAttribute] ||
         [attribute isEqualToString:NSAccessibilityTitleAttribute] || [attribute isEqualToString:@"AXLabel"];
     BOOL status = [attribute isEqualToString:NSAccessibilityValueAttribute] ||
         [attribute isEqualToString:NSAccessibilityValueDescriptionAttribute];
+    if (generatedColorSuffix) {
+        if (!description || !RXHasGeneratedColorSuffixContext(element)) return value;
+        NSString *base = [value substringToIndex:value.length - [@" color" length]];
+        NSString *translatedBase = RXTranslate(base);
+        if ([base hasPrefix:@"Color #"]) {
+            NSUInteger index = 0;
+            NSString *digits = [base substringFromIndex:[@"Color " length]];
+            for (NSUInteger i = 1; i < digits.length; i++) index = index * 10 + ([digits characterAtIndex:i] - '0');
+            translatedBase = [NSString stringWithFormat:@"颜色 #%lu", (unsigned long)index];
+        }
+        return [translatedBase stringByAppendingString:@" 颜色"];
+    }
     if ((state && !status) || (!state && !description)) return value;
     NSString *label = value;
     if (hex) label = [value substringFromIndex:[@"Hex value for " length]];
@@ -4013,6 +4174,35 @@ static void RXWalk(NSView *view) {
         NSForegroundColorAttributeName: NSColor.secondaryLabelColor
     };
     [self.text drawAtPoint:NSMakePoint(0.0, 1.0) withAttributes:attributes];
+}
+@end
+
+// The color-selection palette uses a SwiftUI drawing path for its contextual
+// title.  That title is not an AppKit text node, so the normal text and AX
+// hooks cannot replace it.  Keep the overlay narrow: it is enabled only when
+// the palette's own search field contains one of the two selection-color
+// labels, and it never participates in hit testing.
+@interface RXCommandPaletteSelectionOverlayView : NSView
+@end
+
+@implementation RXCommandPaletteSelectionOverlayView
+- (BOOL)isFlipped { return YES; }
+- (BOOL)isOpaque { return YES; }
+- (NSView *)hitTest:(NSPoint)point { (void)point; return nil; }
+- (void)drawRect:(NSRect)dirtyRect {
+    (void)dirtyRect;
+    NSBezierPath *pill = [NSBezierPath bezierPathWithRoundedRect:NSInsetRect(self.bounds, 0.5, 0.5)
+                                                          xRadius:8.0 yRadius:8.0];
+    [NSColor.controlBackgroundColor setFill];
+    [pill fill];
+    NSDictionary *attributes = @{
+        NSFontAttributeName: [NSFont systemFontOfSize:16.0],
+        NSForegroundColorAttributeName: NSColor.secondaryLabelColor
+    };
+    NSString *text = @"选择选区";
+    NSSize textSize = [text sizeWithAttributes:attributes];
+    [text drawAtPoint:NSMakePoint(7.0, (self.bounds.size.height - textSize.height) / 2.0 - 1.0)
+       withAttributes:attributes];
 }
 @end
 
@@ -4368,6 +4558,62 @@ static void RXUpdateRuntimeTextOverlays(NSWindow *window) {
     if (RXHasRemoteSaveFrame) RXSetRuntimeOverlayView(window, @"rex-remote-host-save", [RXRemoteHostSaveOverlayView class], RXRemoteSaveFrame);
 }
 
+static NSView *RXFindCommandPaletteContentView(NSView *view) {
+    if (![view isKindOfClass:[NSView class]]) return nil;
+    const char *name = class_getName(object_getClass(view));
+    if (name && strstr(name, "CommandPaletteContentView")) return view;
+    for (NSView *child in view.subviews) {
+        NSView *result = RXFindCommandPaletteContentView(child);
+        if (result) return result;
+    }
+    return nil;
+}
+
+static NSString *RXCommandPaletteSearchValue(NSView *view) {
+    if (![view isKindOfClass:[NSView class]]) return nil;
+    if ([view isKindOfClass:[NSTextView class]]) {
+        NSString *value = [(NSTextView *)view string];
+        if (value.length) return value;
+    } else if ([view isKindOfClass:[NSTextField class]]) {
+        NSString *value = [(NSTextField *)view stringValue];
+        if (value.length) return value;
+    }
+    for (NSView *child in view.subviews) {
+        NSString *result = RXCommandPaletteSearchValue(child);
+        if (result.length) return result;
+    }
+    return nil;
+}
+
+static void RXRemoveCommandPaletteSelectionOverlays(NSView *view) {
+    if (![view isKindOfClass:[NSView class]]) return;
+    for (NSView *child in [view.subviews copy]) {
+        if ([child isKindOfClass:[RXCommandPaletteSelectionOverlayView class]]) {
+            [child removeFromSuperview];
+            continue;
+        }
+        RXRemoveCommandPaletteSelectionOverlays(child);
+    }
+}
+
+static void RXUpdateCommandPaletteSelectionOverlay(NSWindow *window) {
+    if (!window || !window.isVisible || !window.contentView) return;
+    NSView *palette = RXFindCommandPaletteContentView(window.contentView);
+    if (!palette) return;
+    RXRemoveCommandPaletteSelectionOverlays(palette);
+    NSString *query = [RXCommandPaletteSearchValue(palette) stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (![query isEqualToString:@"选区前景色"] && ![query isEqualToString:@"选区背景色"]) return;
+    if (palette.bounds.size.width <= 150.0 || palette.bounds.size.height <= 1.0) return;
+    NSRect frame = NSMakeRect(150.0, 0.0, palette.bounds.size.width - 150.0,
+                              MIN(38.0, palette.bounds.size.height));
+    RXCommandPaletteSelectionOverlayView *overlay = [[RXCommandPaletteSelectionOverlayView alloc] initWithFrame:frame];
+    overlay.identifier = @"rex-command-palette-selection";
+    overlay.wantsLayer = YES;
+    overlay.layer.zPosition = 1000.0;
+    [palette addSubview:overlay positioned:NSWindowAbove relativeTo:nil];
+    [overlay setNeedsDisplay:YES];
+}
+
 static void RXSetWindowResidualOverlay(NSWindow *window, NSString *key, NSString *text, NSRect screenFrame) {
     if (!window || NSIsEmptyRect(screenFrame)) return;
     NSView *content = window.contentView;
@@ -4682,6 +4928,23 @@ static void RXRefreshToolbar(NSToolbar *toolbar) {
 }
 
 static void RXInstallSegmentHooks(void) {
+    // Color-button mock providers are loaded lazily when the SwiftUI color
+    // popover first appears. Install this narrow hook independently of the
+    // indexed-segment hook so an early segment install cannot prevent the
+    // later color provider from being patched.
+    Class colorMockClass = objc_getClass("NSAccessibilityColorButtonMockUIElement");
+    if (colorMockClass) {
+        if (!RXPopupOriginals) RXPopupOriginals = [NSMutableDictionary dictionary];
+        SEL selector = @selector(accessibilityAttributeValue:);
+        Method method = class_getInstanceMethod(colorMockClass, selector);
+        if (method) {
+            NSString *key = [NSString stringWithFormat:@"%p:%s", colorMockClass, sel_getName(selector)];
+            if (!RXPopupOriginals[key]) {
+                RXPopupOriginals[key] = [NSValue valueWithPointer:method_getImplementation(method)];
+                method_setImplementation(method, (IMP)RXColorMockAccessibilityAttributeValue);
+            }
+        }
+    }
     if (origSegmentAccessibilityValue) return;
     // These private AX provider classes are loaded lazily with the first
     // toolbar that exposes indexed segments, so retry after windows exist.
@@ -4764,6 +5027,7 @@ static void RXRefreshAccessibility(void) {
         // translate every accessibility read synchronously.
         if (refreshNative || firstVisit || liveFrames) RXWalkAX(window, 0);
         RXUpdateSettingsResidualOverlays(window);
+        RXUpdateCommandPaletteSelectionOverlay(window);
         RXUpdateRemoteHostSheetOverlay(window);
         RXUpdateRuntimeTextOverlays(window);
     }

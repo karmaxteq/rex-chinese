@@ -1,0 +1,361 @@
+{
+  "description": "High-confidence Rex Beta 0.1.0 (1408) arm64 UI literals from the binary audit. These are UI candidates, not user data or technical identifiers.",
+  "cases": [
+    {
+      "input": "Search commands…",
+      "expected": "搜索命令…"
+    },
+    {
+      "input": "Search commands, sessions, and tabs…",
+      "expected": "搜索命令、会话和标签页…"
+    },
+    {
+      "input": "Import Theme File…",
+      "expected": "导入主题文件…"
+    },
+    {
+      "input": "Delete Custom Theme…",
+      "expected": "删除自定义主题…"
+    },
+    {
+      "input": "Filter custom themes…",
+      "expected": "筛选自定义主题…"
+    },
+    {
+      "input": "Loading folders…",
+      "expected": "正在加载文件夹…"
+    },
+    {
+      "input": "Select Interface Style…",
+      "expected": "选择界面样式…"
+    },
+    {
+      "input": "Search actions…",
+      "expected": "搜索操作…"
+    },
+    {
+      "input": "Select Terminal Padding Color…",
+      "expected": "选择终端内边距颜色…"
+    },
+    {
+      "input": "Select Update Channel…",
+      "expected": "选择更新频道…"
+    },
+    {
+      "input": "Comfortable Pane Style",
+      "expected": "舒适窗格样式"
+    },
+    {
+      "input": "Select Option Key Behavior…",
+      "expected": "选择 Option 键行为…"
+    },
+    {
+      "input": "Select Cursor Style…",
+      "expected": "选择光标样式…"
+    },
+    {
+      "input": "Set copy on selection…",
+      "expected": "设置选择后复制…"
+    },
+    {
+      "input": "Select Terminal Font…",
+      "expected": "选择终端字体…"
+    },
+    {
+      "input": "Move Pane to Tab",
+      "expected": "将窗格移到标签页"
+    },
+    {
+      "input": "Loading the window's blocks…",
+      "expected": "正在加载窗口块…"
+    },
+    {
+      "input": "Creating Session…",
+      "expected": "正在创建会话…"
+    },
+    {
+      "input": "Preparing Rex Server…",
+      "expected": "正在准备 Rex 服务器…"
+    },
+    {
+      "input": "Stopping Rex Server…",
+      "expected": "正在停止 Rex 服务器…"
+    },
+    {
+      "input": "Starting Rex Server…",
+      "expected": "正在启动 Rex 服务器…"
+    },
+    {
+      "input": "Opening terminal…",
+      "expected": "正在打开终端…"
+    },
+    {
+      "input": "Reconnecting… Content preserved.",
+      "expected": "正在重新连接…已保留内容。"
+    },
+    {
+      "input": "Approve this device in Tailscale…",
+      "expected": "在 Tailscale 中批准此设备…"
+    },
+    {
+      "input": "Sign in to Tailscale…",
+      "expected": "登录 Tailscale…"
+    },
+    {
+      "input": "Subscribing to all sessions…",
+      "expected": "正在订阅所有会话…"
+    },
+    {
+      "input": "Restart Rex Server…",
+      "expected": "重启 Rex 服务器…"
+    },
+    {
+      "input": "Stopping Rex server…",
+      "expected": "正在停止 Rex 服务器…"
+    },
+    {
+      "input": "Starting Rex server…",
+      "expected": "正在启动 Rex 服务器…"
+    },
+    {
+      "input": "Waiting for Rex Server on this Mac to start…",
+      "expected": "正在等待此 Mac 上的 Rex 服务器启动…"
+    },
+    {
+      "input": "Preparing Rex…",
+      "expected": "正在准备 Rex…"
+    },
+    {
+      "input": "Signing out of Tailscale…",
+      "expected": "正在退出 Tailscale…"
+    },
+    {
+      "input": "Waiting for an HTTPS certificate…",
+      "expected": "正在等待 HTTPS 证书…"
+    },
+    {
+      "input": "Removing this Mac’s saved Tailscale login…",
+      "expected": "正在移除此 Mac 保存的 Tailscale 登录信息…"
+    },
+    {
+      "input": "Record Shortcut…",
+      "expected": "录制快捷键…"
+    },
+    {
+      "input": "Retry Rex App Update…",
+      "expected": "重试 Rex 应用更新…"
+    },
+    {
+      "input": "Check Rex App for Updates…",
+      "expected": "检查 Rex 应用更新…"
+    },
+    {
+      "input": "Installing Rex App Update…",
+      "expected": "正在安装 Rex 应用更新…"
+    },
+    {
+      "input": "Download Rex Update…",
+      "expected": "下载 Rex 更新…"
+    },
+    {
+      "input": "Restart to Update Rex…",
+      "expected": "重启以更新 Rex…"
+    },
+    {
+      "input": "Checking Rex App Updates…",
+      "expected": "正在检查 Rex 应用更新…"
+    },
+    {
+      "input": "Split Pane Best Fit",
+      "expected": "最佳分栏"
+    },
+    {
+      "input": "Split Pane Right",
+      "expected": "向右分栏"
+    },
+    {
+      "input": "Preparing Session…",
+      "expected": "正在准备会话…"
+    },
+    {
+      "input": "Untitled Session",
+      "expected": "未命名会话"
+    },
+    {
+      "input": "Something went wrong",
+      "expected": "发生错误"
+    },
+    {
+      "input": "Open Diagnostics…",
+      "expected": "打开诊断…"
+    },
+    {
+      "input": "Couldn’t Connect to the Rex Server",
+      "expected": "无法连接到 Rex 服务器"
+    },
+    {
+      "input": "Connecting to Rex Server…",
+      "expected": "正在连接 Rex 服务器…"
+    },
+    {
+      "input": "Couldn’t reload config",
+      "expected": "无法重新加载配置"
+    },
+    {
+      "input": "Choose this Mac’s Tailscale hostname while serving. The assigned address may differ.",
+      "expected": "选择此 Mac 提供服务时使用的 Tailscale 主机名。分配的地址可能不同。"
+    },
+    {
+      "input": "See this device’s Tailscale tags. Sign out and back in to change them.",
+      "expected": "查看此设备的 Tailscale 标签。退出后重新登录即可更改标签。"
+    },
+    {
+      "input": "Choose Default — Dynamic, Bright, or Twilight artwork for the app icon.",
+      "expected": "为应用图标选择默认 — 动态、明亮或暮色图案。"
+    },
+    {
+      "input": "Use the theme’s colors 16–255 in light mode, or xterm’s standard palette when off.",
+      "expected": "在浅色模式下使用主题的 16–255 号颜色；关闭后使用 xterm 标准调色板。"
+    },
+    {
+      "input": "Use the theme’s colors 16–255 in dark mode, or xterm’s standard palette when off.",
+      "expected": "在深色模式下使用主题的 16–255 号颜色；关闭后使用 xterm 标准调色板。"
+    },
+    {
+      "input": "Keys this mode doesn’t bind do what they do outside it.",
+      "expected": "此模式未绑定的按键保持模式外的行为。"
+    },
+    {
+      "input": "Exclusive. Keys this mode doesn’t bind are ignored while it’s active.",
+      "expected": "独占模式。激活时忽略此模式未绑定的按键。"
+    },
+    {
+      "input": "Bindable only with arguments, from your configuration file",
+      "expected": "只能从配置文件通过参数绑定。"
+    },
+    {
+      "input": "Check the command’s quotes and backslash escapes.",
+      "expected": "检查命令中的引号和反斜杠转义。"
+    },
+    {
+      "input": "Choosing Always Open on a link’s notice adds the link’s scheme and the app that opens it here. These apply only while Links that open apps is set to Ask First.",
+      "expected": "在链接提示中选择“始终打开”后，链接协议和打开它的应用会显示在此处。这些规则仅在“打开应用的链接”设为“先询问”时生效。"
+    },
+    {
+      "input": "Choosing Always Open on a link’s notice adds the link’s scheme and the app that opens it here. Links with that scheme open without asking until you remove them.",
+      "expected": "在链接提示中选择“始终打开”后，链接协议和打开它的应用会显示在此处。在移除规则之前，该协议的链接将直接打开，不再询问。"
+    },
+    {
+      "input": "Enable Tailscale and wait for HTTPS to be ready in Rex’s Server settings to pair a device.",
+      "expected": "在 Rex 的服务器设置中启用 Tailscale，等待 HTTPS 就绪后即可配对设备。"
+    },
+    {
+      "input": "Agents can control Rex, including migrating your config from tmux, Ghostty, Herdr, and more…",
+      "expected": "智能体可以控制 Rex，包括从 tmux、Ghostty、Herdr 等迁移你的配置…"
+    },
+    {
+      "input": "Use 1–63 letters, numbers, or hyphens. The name can’t begin or end with a hyphen.",
+      "expected": "使用 1–63 个字母、数字或连字符。名称不能以连字符开头或结尾。"
+    },
+    {
+      "input": "Hold ⌘, ⌃, or ⌥ with the key. Shift on its own types a character.",
+      "expected": "按下按键时同时按住 ⌘、⌃ 或 ⌥。仅配合 Shift 会输入字符。"
+    },
+    {
+      "input": "Use light or dark appearance, or toggle the currently visible appearance.",
+      "expected": "使用浅色或深色外观，或切换当前显示的外观。"
+    },
+    {
+      "input": "The key to send, written the way a key binding is, such as \"ctrl+u\".",
+      "expected": "要发送的按键，使用快捷键的写法，例如“ctrl+u”。"
+    },
+    {
+      "input": "Built into Rex. A shortcut in your configuration file or one recorded here replaces it.",
+      "expected": "Rex 内置快捷键。配置文件中的快捷键或在此处记录的快捷键会替代它。"
+    },
+    {
+      "input": "Why this shortcut can't be recorded",
+      "expected": "为什么无法录制此快捷键"
+    },
+    {
+      "input": "Signing out of Tailscale timed out. Rex hasn’t confirmed that the saved login was removed. Try restarting the Rex server.",
+      "expected": "退出 Tailscale 超时。Rex 尚未确认已移除保存的登录信息。请尝试重启 Rex 服务器。"
+    },
+    {
+      "input": "Rex couldn’t start Tailscale to remove the saved login. Try again.",
+      "expected": "Rex 无法启动 Tailscale 以移除保存的登录信息。请重试。"
+    },
+    {
+      "input": "Couldn’t load “",
+      "expected": "无法加载“"
+    },
+    {
+      "input": "Save this theme and use it as your ",
+      "expected": "保存此主题并将其用于"
+    },
+    {
+      "input": "Couldn’t save your shortcuts: ",
+      "expected": "无法保存快捷键："
+    },
+    {
+      "input": "Set in your configuration file, at ",
+      "expected": "在配置文件中设置，位置："
+    },
+    {
+      "input": "Can’t Connect to ",
+      "expected": "无法连接到 "
+    },
+    {
+      "input": "Couldn’t read the theme file. ",
+      "expected": "无法读取主题文件。"
+    },
+    {
+      "input": "Sized by another client · ",
+      "expected": "由另一个客户端调整大小 · "
+    },
+    {
+      "input": "Rex returned an incomplete pane layout. ",
+      "expected": "Rex 返回了不完整的窗格布局。"
+    },
+    {
+      "input": "The terminal could not be reset. ",
+      "expected": "无法重置终端。"
+    },
+    {
+      "input": "The tab could not be activated. ",
+      "expected": "无法激活标签页。"
+    },
+    {
+      "input": "The session could not be moved. ",
+      "expected": "无法移动会话。"
+    },
+    {
+      "input": "The tab could not be moved. ",
+      "expected": "无法移动标签页。"
+    },
+    {
+      "input": "The tab could not be closed. ",
+      "expected": "无法关闭标签页。"
+    },
+    {
+      "input": "The tab could not be created. ",
+      "expected": "无法创建标签页。"
+    },
+    {
+      "input": "The name could not be changed. ",
+      "expected": "无法更改名称。"
+    },
+    {
+      "input": "The session could not be closed. ",
+      "expected": "无法关闭会话。"
+    },
+    {
+      "input": "The session could not be created. ",
+      "expected": "无法创建会话。"
+    },
+    {
+      "input": "Settings navigation",
+      "expected": "设置导航"
+    }
+  ]
+}

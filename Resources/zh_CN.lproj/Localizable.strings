@@ -1,6 +1,7 @@
 "Record a shortcut for " = "录制快捷键：";
 "Change the shortcut for " = "修改快捷键：";
 "Search commands…" = "搜索命令…";
+"Select " = "选择";
 "Search commands, sessions, and tabs…" = "搜索命令、会话和标签页…";
 "Import Theme File…" = "导入主题文件…";
 "Delete Custom Theme…" = "删除自定义主题…";
@@ -115,8 +116,11 @@
 "Background color" = "背景色";
 "Text color" = "文本色";
 "Cursor color" = "光标颜色";
+"Cursor Text color" = "光标文本颜色";
 "Cursor text color" = "光标文本颜色";
 "Selection color" = "选择颜色";
+"Selection" = "选区";
+"Select Selection" = "选择选区";
 "Selected text color" = "选中文本颜色";
 "Hue" = "色相";
 "Chroma" = "色度";
@@ -713,6 +717,10 @@
 "Checking for updates" = "正在检查更新";
 "Download Rex Update" = "下载 Rex 更新";
 "Downloading update" = "正在下载更新";
+"Update failed" = "更新失败";
+"Update failed." = "更新失败。";
+"The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "更新签名不正确，无法验证。请稍后重试，或联系应用开发者。";
+"Update failed. The update is improperly signed and could not be validated. Please try again later or contact the app developer." = "更新失败。更新签名不正确，无法验证。请稍后重试，或联系应用开发者。";
 "Installing update" = "正在安装更新";
 "Relaunch to Update" = "重新启动以更新";
 "Rex App Update Failed" = "Rex 应用更新失败";
@@ -1538,6 +1546,11 @@
 "Start Again" = "重新开始";
 "Start Server" = "启动服务器";
 "Started" = "启动时间";
+"Starting…" = "正在启动…";
+"Starting..." = "正在启动…";
+"Stopping…" = "正在停止…";
+"Stopping..." = "正在停止…";
+"Stopped" = "已停止";
 "State" = "状态";
 "Subscription" = "订阅";
 "Trusted links" = "受信任的链接";

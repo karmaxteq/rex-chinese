@@ -161,6 +161,8 @@ struct SearchBridgeRunner {
     let titleInputs = [
       ("Settings", "Settings 设置"),
       ("Search commands…", "Search commands… 搜索命令…"),
+      ("Change Theme", "Change Theme 更改主题 修改主题"),
+      ("Change Theme…", "Change Theme… 更改主题… 修改主题…"),
       ("你好😀", "你好😀"),
       ("/tmp/Filter/Settings.txt", "/tmp/Filter/Settings.txt"),
       (String(repeating: "unknown-😀/", count: 200), String(repeating: "unknown-😀/", count: 200)),

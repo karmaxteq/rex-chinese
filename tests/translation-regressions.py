@@ -34,6 +34,7 @@ CASES = [
     ('/tmp/Ready to Check for Updates · Preview.txt', '/tmp/Ready to Check for Updates · Preview.txt'),
     # The sRGB theme-color help is a distinct literal from the Display P3 help.
     ('Six-digit sRGB hex color, for example #AABBCC', '六位 sRGB 十六进制颜色，例如 #AABBCC'),
+    ('Cursor Text color', '光标文本颜色'),
     ('sRGB', 'sRGB'),
     ('#AABBCC', '#AABBCC'),
     ('/tmp/Six-digit sRGB hex color, for example #AABBCC.txt', '/tmp/Six-digit sRGB hex color, for example #AABBCC.txt'),
@@ -55,6 +56,26 @@ CASES = [
     ('Settings Filter Reconnecting…', 'Settings Filter Reconnecting…'),
     ('正在重新连接…', '正在重新连接…'),
     ('Exited', '已退出'),
+    ('Starting…', '正在启动…'),
+    ('Starting...', '正在启动…'),
+    ('Stopping…', '正在停止…'),
+    ('Stopping...', '正在停止…'),
+    ('Stopped', '已停止'),
+    ('Downloading update 0%', '正在下载更新 0%'),
+    ('Downloading update 42%', '正在下载更新 42%'),
+    ('Downloading update 100%', '正在下载更新 100%'),
+    ('正在下载更新 42%', '正在下载更新 42%'),
+    ('Downloading update pending', 'Downloading update pending'),
+    ('Update failed', '更新失败'),
+    ('Update failed.', '更新失败。'),
+    ('Update failed. 更新签名不正确，无法验证。请稍后重试，或联系应用开发者。',
+     '更新失败。更新签名不正确，无法验证。请稍后重试，或联系应用开发者。'),
+    ('The update is improperly signed and could not be validated. Please try again later or contact the app developer.',
+     '更新签名不正确，无法验证。请稍后重试，或联系应用开发者。'),
+    ('Update failed. The update is improperly signed and could not be validated. Please try again later or contact the app developer.',
+     '更新失败。更新签名不正确，无法验证。请稍后重试，或联系应用开发者。'),
+    ('登录 Tailscale、Start the Rex Server to sign in.', '登录 Tailscale、启动 Rex 服务器以登录。'),
+    ('登录 Tailscale、Start the Rex server to sign in.', '登录 Tailscale、启动 Rex 服务器以登录。'),
     ('/tmp/Exited/Connected', '/tmp/Exited/Connected'),
     ('Action failed.', '操作失败。'),
     ('Action failed', '操作失败'),
@@ -250,6 +271,13 @@ for value in ['', '中文界面', '/tmp/中文 😀/rex', '80x24', 'ssh://demo-h
 # Include payload and prefix boundaries, not just the newly added exact keys.
 CASES.extend((case['input'], case['expected']) for case in json.loads(
     (ROOT / 'tests/data/dynamic-coverage.json').read_text()))
+
+# Keep the high-confidence UI literals found by the version-specific binary
+# audit in the ordinary translation regression. This protects the strings
+# that are not present in the published .strings catalog but are still
+# rendered by Rex's command palette, settings, status and error views.
+CASES.extend((case['input'], case['expected']) for case in json.loads(
+    (ROOT / 'tests/data/binary-ui-candidates.json').read_text())['cases'])
 
 SWIFT_RUNNER = r'''
 let inputs = try JSONSerialization.jsonObject(with: FileHandle.standardInput.readDataToEndOfFile()) as! [String]

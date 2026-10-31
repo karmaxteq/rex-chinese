@@ -46,6 +46,11 @@ private let translations: [String: String] = [
   "Start Again": "重新开始",
   "Start Server": "启动服务器",
   "Started": "启动时间",
+  "Starting…": "正在启动…",
+  "Starting...": "正在启动…",
+  "Stopping…": "正在停止…",
+  "Stopping...": "正在停止…",
+  "Stopped": "已停止",
   "State": "状态",
   "Subscription": "订阅",
   "Trusted links": "受信任的链接",
@@ -58,6 +63,7 @@ private let translations: [String: String] = [
   "Record a shortcut for ": "录制快捷键：",
   "Change the shortcut for ": "修改快捷键：",
   "Search commands…": "搜索命令…",
+  "Select ": "选择",
   "Search commands, sessions, and tabs…": "搜索命令、会话和标签页…",
   "Import Theme File…": "导入主题文件…",
   "Delete Custom Theme…": "删除自定义主题…",
@@ -171,8 +177,10 @@ private let translations: [String: String] = [
   "Background color": "背景色",
   "Text color": "文本色",
   "Cursor color": "光标颜色",
+  "Cursor Text color": "光标文本颜色",
   "Cursor text color": "光标文本颜色",
   "Selection color": "选择颜色",
+  "Select Selection": "选择选区",
   "Selected text color": "选中文本颜色",
   "Hue": "色相",
   "Chroma": "色度",
@@ -279,7 +287,7 @@ private let translations: [String: String] = [
   "Force theme palette for text": "强制使用主题文本配色",
   "Cursor": "光标",
   "Keyboard": "键盘",
-  "Selection": "选择",
+  "Selection": "选区",
   "Links": "链接",
   "Titles": "标题",
   "Shell": "Shell",
@@ -1822,6 +1830,10 @@ private let translations: [String: String] = [
   "Show the running program and its directory instead of titles that shells set.": "显示正在运行的程序及其目录，而不是 Shell 设置的标题。",
   "Changes apply to new agent sessions.": "更改将应用于新的智能体会话。",
   "Downloading update": "正在下载更新",
+  "Update failed": "更新失败",
+  "Update failed.": "更新失败。",
+  "The update is improperly signed and could not be validated. Please try again later or contact the app developer.": "更新签名不正确，无法验证。请稍后重试，或联系应用开发者。",
+  "Update failed. The update is improperly signed and could not be validated. Please try again later or contact the app developer.": "更新失败。更新签名不正确，无法验证。请稍后重试，或联系应用开发者。",
   "Reconnecting to Rex": "正在重新连接 Rex",
   "Browse monospaced or all installed fonts to choose the terminal typeface.": "浏览等宽字体或所有已安装字体，以选择终端字体。",
   "Restarted the Rex server": "已重新启动 Rex 服务器",
@@ -1872,8 +1884,41 @@ private let translations: [String: String] = [
   "None": "无",
 ]
 
+private func canonicalColorAXBase(_ value: String) -> Bool {
+  let prefixes = [
+    "Color #", "颜色 #",
+    "Black #", "Red #", "Green #", "Yellow #", "Blue #", "Magenta #", "Cyan #", "White #",
+    "Bright Black #", "Bright Red #", "Bright Green #", "Bright Yellow #", "Bright Blue #", "Bright Magenta #", "Bright Cyan #", "Bright White #",
+    "黑色 #", "红色 #", "绿色 #", "黄色 #", "蓝色 #", "品红色 #", "青色 #", "白色 #",
+    "亮黑色 #", "亮红色 #", "亮绿色 #", "亮黄色 #", "亮蓝色 #", "亮品红色 #", "亮青色 #", "亮白色 #"
+  ]
+  guard let prefix = prefixes.first(where: { value.hasPrefix($0) }) else { return false }
+  let digits = String(value.dropFirst(prefix.count))
+  guard !digits.isEmpty, digits.count <= 3, !(digits.count > 1 && digits.first == "0"),
+        let number = Int(digits) else { return false }
+  return number <= 255
+}
+
 private func translate(_ value: String) -> String {
   if let translated = translations[value] { return translated }
+  let failedPrefix = "Update failed. "
+  if value.hasPrefix("更新失败。") { return value }
+  if value.hasPrefix(failedPrefix) {
+    return "更新失败。" + translate(String(value.dropFirst(failedPrefix.count)))
+  }
+  // Update progress is emitted with a changing percentage rather than as a
+  // localized string key. Translate only a well-formed numeric percentage so
+  // arbitrary user text beginning with the same words remains untouched.
+  let downloadingPrefix = "Downloading update "
+  let localizedDownloadingPrefix = "正在下载更新 "
+  if value.hasPrefix(localizedDownloadingPrefix) { return value }
+  if value.hasPrefix(downloadingPrefix) {
+    let percent = String(value.dropFirst(downloadingPrefix.count))
+    let digits = String(percent.dropLast())
+    if percent.hasSuffix("%") && !digits.isEmpty && digits.allSatisfy({ $0.isNumber }) {
+      return localizedDownloadingPrefix + percent
+    }
+  }
   // AX includes the title, while SwiftUI renders the body separately and
   // may have already translated its first literal. Match both complete
   // boundaries before the generic error-prefix rule preserves the payload.
@@ -2373,6 +2418,27 @@ private func translate(_ value: String) -> String {
     let label = String(value.dropFirst("Hex value for ".count))
     return translate(label) + "的十六进制值"
   }
+  if value.hasSuffix(" color") {
+    let base = String(value.dropLast(" color".count))
+    if canonicalColorAXBase(base) {
+      let translatedBase: String
+      if base.hasPrefix("Color #") {
+        translatedBase = "颜色" + base.dropFirst("Color".count)
+      } else if let separator = base.range(of: " #") {
+        let name = String(base[..<separator.lowerBound])
+        let ansiNames = [
+          "Black": "黑色", "Red": "红色", "Green": "绿色", "Yellow": "黄色",
+          "Blue": "蓝色", "Magenta": "品红色", "Cyan": "青色", "White": "白色",
+          "Bright Black": "亮黑色", "Bright Red": "亮红色", "Bright Green": "亮绿色", "Bright Yellow": "亮黄色",
+          "Bright Blue": "亮蓝色", "Bright Magenta": "亮品红色", "Bright Cyan": "亮青色", "Bright White": "亮白色"
+        ]
+        translatedBase = ansiNames[name].map { $0 + String(base[separator.lowerBound...]) } ?? translate(base)
+      } else {
+        translatedBase = translate(base)
+      }
+      return translatedBase + " 颜色"
+    }
+  }
   if value.hasPrefix("Black #") { return "黑色 " + value.dropFirst("Black".count) }
   if value.hasPrefix("Red #") { return "红色 " + value.dropFirst("Red".count) }
   if value.hasPrefix("Green #") { return "绿色 " + value.dropFirst("Green".count) }
@@ -2441,6 +2507,12 @@ private func translate(_ value: String) -> String {
   if value.hasPrefix("Click to record a shortcut.") { return "点击以录制快捷键。" }
   if value.contains("Access Rex securely from your other devices.") {
     return value.replacingOccurrences(of: "Access Rex securely from your other devices.", with: "从其他设备安全访问 Rex。")
+  }
+  if value.contains("Start the Rex Server to sign in.") {
+    return value.replacingOccurrences(of: "Start the Rex Server to sign in.", with: "启动 Rex 服务器以登录。")
+  }
+  if value.contains("Start the Rex server to sign in.") {
+    return value.replacingOccurrences(of: "Start the Rex server to sign in.", with: "启动 Rex 服务器以登录。")
   }
   if value.contains("Displayed bottom right") {
     return value.replacingOccurrences(of: "Displayed bottom right", with: "显示在右下角")
@@ -2553,13 +2625,24 @@ private func translate(_ value: String) -> String {
 }
 
 // This value belongs only to a native command palette's temporary search
-// field. Keep the original title searchable and add a known Chinese alias;
-// the candidate model, displayed name, query, and action are never rewritten.
+// field. Keep the original title searchable and add the translated title plus
+// any deliberate Chinese synonyms; the candidate model, displayed name,
+// query, and action are never rewritten.
 // Rex transfers a retained String into this field, so the bridge consumes it.
+private let commandSearchAliases: [String: [String]] = [
+  "Change Theme": ["修改主题"],
+  "Change Theme…": ["修改主题…"],
+]
+
 @_silgen_name("rxSearchTitle")
 public func rxSearchTitle(_ value: consuming String) -> String {
-  guard let alias = translations[copy value], alias != value else { return value }
-  return value + " " + alias
+  let original = copy value
+  guard let translated = translations[original], translated != original else { return value }
+  var searchable = value + " " + translated
+  for alias in commandSearchAliases[original] ?? [] where alias != translated {
+    searchable += " " + alias
+  }
+  return searchable
 }
 
 // Match SwiftUI initializer ownership when calling their raw addresses.
@@ -2653,6 +2736,7 @@ public func rxHookTextAttributedString(_ value: consuming AttributedString, _ ty
 
 @_silgen_name("rxHookTextGeneric")
 public func rxHookTextGeneric<S: StringProtocol>(_ value: consuming S, _ type: Text.Type) -> Text {
-  let translated = translate(String(value))
+  let raw = String(value)
+  let translated = translate(raw)
   return Text(verbatim: translated)
 }
